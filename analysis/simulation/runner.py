@@ -270,7 +270,9 @@ def run_simulation(config: SimulationConfig,
 
             # Periodic checkpoint
             if snapshot_count % config.checkpoint_interval == 0:
-                checkpoint_file = f"{config.name}_checkpoint.pkl"
+                checkpoint_file = f"results/pkl/checkpoints/{config.name}_checkpoint.pkl"
+                import os
+                os.makedirs(os.path.dirname(checkpoint_file), exist_ok=True)
                 save_checkpoint(checkpoint_file, times, snapshots_massive,
                                 snapshots_planetesimals, l4_counts, l5_counts, config)
 

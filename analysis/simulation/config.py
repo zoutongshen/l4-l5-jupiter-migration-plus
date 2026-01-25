@@ -114,6 +114,9 @@ class SimulationConfig:
     planetesimal_e_max: float = 0.1
     planetesimal_i_max: float = 5.0  # degrees
 
+    # Trojan initialization
+    trojan_emphasis: bool = True  # If True, concentrates particles near L4/L5
+    
     # For source tracking: use broader disk
     disk_a_min: float = 2.0   # AU
     disk_a_max: float = 35.0  # AU
@@ -143,7 +146,9 @@ class SimulationConfig:
     def __post_init__(self):
         """Generate output filename if not provided."""
         if self.output_file is None:
-            self.output_file = f"{self.name}.pkl"
+            import os
+            os.makedirs('results/pkl', exist_ok=True)
+            self.output_file = f"results/pkl/{self.name}.pkl"
 
     @classmethod
     def burnin(cls, duration_kyr: float = 50, jupiter_a: float = 5.2,
@@ -188,7 +193,7 @@ class SimulationConfig:
             direction='inward'
         )
         mig_config.tau_a = mig_config.compute_tau_from_duration(duration_kyr * 1000)
-        mig_config.tau_e = mig_config.tau_a / 100
+        mig_config.tau_e = abs(mig_config.tau_a) / 2
 
         return cls(
             name=name,
@@ -214,7 +219,7 @@ class SimulationConfig:
             direction='outward'
         )
         mig_config.tau_a = mig_config.compute_tau_from_duration(duration_kyr * 1000)
-        mig_config.tau_e = abs(mig_config.tau_a) / 100
+        mig_config.tau_e = abs(mig_config.tau_a) / 2
 
         return cls(
             name=name,

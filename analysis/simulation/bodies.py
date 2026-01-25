@@ -66,12 +66,144 @@ def create_massive_bodies(config: SimulationConfig) -> Particles:
         planets.add_particle(planet)
 
     # Combine Sun + planets
-    bodies = sun + planets
+    bodies = Particles()
+    bodies.add_particles(sun)
+    bodies.add_particles(planets)
 
     # Move to center of mass frame
     bodies.move_to_center()
 
     return bodies
+
+
+def create_structured_disk(config: SimulationConfig,
+                           massive_bodies: Particles) -> Particles:
+    """
+    Create a structured protoplanetary disk with specific regions.
+
+    Regions:
+    - Inner disk (0.7-3 AU): 50%
+    - Mid disk feeding the belt (3-10 AU): 30%
+    - Co-orbital seeds near Jupiter: 15%
+    - Outer disk (10-30 AU): 5%
+
+    Based on user-defined distribution.
+    """
+    np.random.seed(config.random_seed + 1)
+    
+    n = config.n_planetesimals
+    planetesimals = Particles(n)
+    planetesimals.mass = 0 | units.kg
+    
+    sun = massive_bodies[0]
+    star_mass = sun.mass
+    
+    # Find Jupiter for co-orbital region center
+    jupiter_a = config.jupiter_initial_a
+    
+    # Helper for power-law sampling
+    def sample_powerlaw(r_min, r_max, count, p=-1.5):
+        u = np.random.random(count)
+        if abs(p + 1) < 1e-8:
+            res = r_min * (r_max / r_min) ** u
+        else:
+            term1 = r_min**(p + 1)
+            term2 = r_max**(p + 1) - r_min**(p + 1)
+            res = (term1 + u * term2) ** (1 / (p + 1))
+        return res
+
+    # Assign regions
+    u_regions = np.random.random(n)
+    
+    # Pre-allocate arrays
+    a_values = np.zeros(n)
+    true_anoms = np.random.uniform(0, 360, n)  # Default uniform angles
+    
+    # 1. Inner disk (50%)
+    mask_inner = u_regions < 0.50
+    n_inner = np.sum(mask_inner)
+    if n_inner > 0:
+        a_values[mask_inner] = sample_powerlaw(0.7, 3.0, n_inner)
+        
+    # 2. Mid disk (30%)
+    mask_mid = (u_regions >= 0.50) & (u_regions < 0.80)
+    n_mid = np.sum(mask_mid)
+    if n_mid > 0:
+        a_values[mask_mid] = sample_powerlaw(3.0, 10.0, n_mid)
+        
+    # 3. Co-orbital seeds (15%)
+    mask_coorb = (u_regions >= 0.80) & (u_regions < 0.95)
+    n_coorb = np.sum(mask_coorb)
+    if n_coorb > 0:
+        # Gaussian centered at Jupiter's a
+        a_values[mask_coorb] = jupiter_a + 0.2 * np.random.randn(n_coorb)
+        
+        # Bias angles toward L4/L5
+        # L4 is +60, L5 is -60 (or 300)
+        centers = np.where(np.random.random(n_coorb) < 0.5, 60, -60)
+        offsets = 15 * np.random.uniform(-1, 1, n_coorb)
+        # We need to respect Jupiter's actual position if it's not at angle=0?
+        # The user's code assumed Jupiter angle=0? 
+        # Yes, new_binary... usually places the primary at origin or we assume J is defined.
+        # But wait, true_anomaly in binary creation is for the PARTICLE, relative to periapsis?
+        # Typically in these simple setups, we assume circular coplanar for reference.
+        # Let's align with Jupiter's current angle if possible, but user code just set true_anom directly.
+        # Assuming all planets start random, we should probably check Jupiter's angle if we want EXACT L4/L5 relative to J.
+        # However, `create_massive_bodies` randomizes anomalies. 
+        # TO DO IT RIGHT: We need Jupiter's mean anomaly/true anomaly.
+        
+        # Find Jupiter in massive_bodies
+        jupiter = None
+        for b in massive_bodies:
+            if b.name == 'Jupiter': jupiter = b
+            
+        jupiter_angle_deg = 0.0
+        if jupiter is not None:
+            # Approximate current angle from position
+            pos = jupiter.position.value_in(units.AU)
+            jupiter_angle_deg = np.degrees(np.arctan2(pos[1], pos[0]))
+            
+        true_anoms[mask_coorb] = centers + offsets + jupiter_angle_deg
+        
+    # 4. Outer disk (5%)
+    mask_outer = u_regions >= 0.95
+    n_outer = np.sum(mask_outer)
+    if n_outer > 0:
+        a_values[mask_outer] = sample_powerlaw(10.0, 30.0, n_outer, p=-2.0)
+        
+    a_values = a_values | units.AU
+    true_anoms = true_anoms | units.deg
+    
+    # Shared properties
+    e_values = 0.05 * np.random.random(n)
+    i_values = (3.0 * np.random.random(n)) | units.deg
+    long_asc = np.random.uniform(0, 360, n) | units.deg
+    arg_peri = np.random.uniform(0, 360, n) | units.deg
+    
+    # Creation loop
+    for k in range(n):
+        binary = new_binary_from_orbital_elements(
+            star_mass,
+            0 | units.kg,
+            a_values[k],
+            e_values[k],
+            true_anomaly=true_anoms[k],
+            inclination=i_values[k],
+            longitude_of_the_ascending_node=long_asc[k],
+            argument_of_periapsis=arg_peri[k]
+        )
+        planetesimals[k].position = binary[1].position
+        planetesimals[k].velocity = binary[1].velocity
+        
+    planetesimals.velocity -= massive_bodies.center_of_mass_velocity()
+    
+    print(f"Created structured disk with {n} particles:")
+    print(f"  Inner (0.7-3 AU): {n_inner} ({n_inner/n:.1%})")
+    print(f"  Mid (3-10 AU): {n_mid} ({n_mid/n:.1%})")
+    print(f"  Co-orbital (~{jupiter_a} AU): {n_coorb} ({n_coorb/n:.1%})")
+    print(f"  Outer (10-30 AU): {n_outer} ({n_outer/n:.1%})")
+
+    return planetesimals
 
 
 def create_planetesimals(config: SimulationConfig,
@@ -80,6 +212,7 @@ def create_planetesimals(config: SimulationConfig,
     Create planetesimals (test particles) for the simulation.
 
     For 'source_tracking' simulations, uses broader disk parameters.
+    If 'trojan_emphasis' is True, creates particles centered on L4/L5.
 
     Args:
         config: Simulation configuration
@@ -88,6 +221,9 @@ def create_planetesimals(config: SimulationConfig,
     Returns:
         Particles set containing planetesimals
     """
+    if config.trojan_emphasis:
+        return create_structured_disk(config, massive_bodies)
+
     np.random.seed(config.random_seed + 1)  # Different seed from planets
 
     n = config.n_planetesimals

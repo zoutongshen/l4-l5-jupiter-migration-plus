@@ -13,7 +13,7 @@ Usage:
 from .config import SimulationConfig, MigrationConfig
 from .bodies import create_massive_bodies, create_planetesimals, create_trojan_disk
 from .integrators import PlanetesimalIntegrator, ExternalGravityField, JupiterMigrationCode
-from .analysis import compute_trojan_counts, compute_orbital_elements
+from .analysis import compute_trojan_counts, compute_orbital_elements, compute_population_summary, classify_planetesimals, compute_jupiter_orbit
 from .visualization import plot_snapshot, plot_trojan_evolution, create_animation
 from .runner import run_simulation, load_checkpoint, save_checkpoint
 
@@ -32,6 +32,9 @@ __all__ = [
     # Analysis
     'compute_trojan_counts',
     'compute_orbital_elements',
+    'compute_population_summary',
+    'classify_planetesimals',
+    'compute_jupiter_orbit',
     # Visualization
     'plot_snapshot',
     'plot_trojan_evolution',

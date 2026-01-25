@@ -226,6 +226,8 @@ class JupiterMigrationCode:
         channel_to_code = self.massive_bodies.new_channel_to(self.code.particles)
         channel_to_code.copy()
 
+        return 0 | units.J
+
     def get_particles(self):
         """Return particles (required by Bridge)."""
         return self.massive_bodies
