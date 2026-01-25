@@ -118,14 +118,22 @@ def setup_simulation(config: SimulationConfig,
 
     # Set up migration if enabled
     if config.migration.enabled:
+        # Jupiter is at index 4: Sun=0, Venus=1, Earth=2, Mars=3, Jupiter=4
         migration_code = JupiterMigrationCode(gravity_massive, massive_bodies, jupiter_index=4)
-        migration_code.tau_a = config.migration.tau_a
-        migration_code.tau_e = config.migration.tau_e
+        migration_code.timestep = 0.1 | units.yr  # Migration kick timestep
+
+        # IMPORTANT: tau_a and tau_e must be AMUSE quantities with units!
+        migration_code.tau_a = config.migration.tau_a | units.yr
+        if config.migration.tau_e is not None:
+            migration_code.tau_e = config.migration.tau_e | units.yr
+        else:
+            migration_code.tau_e = abs(config.migration.tau_a) / 2 | units.yr
 
         # Create bridge for coupled evolution
         migration_bridge = bridge.Bridge(use_threading=False)
         migration_bridge.add_system(gravity_massive)
         migration_bridge.add_code(migration_code)
+        migration_bridge.timestep = 0.1 | units.yr  # Match migration code timestep
     else:
         migration_bridge = None
 
