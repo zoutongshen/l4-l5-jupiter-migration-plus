@@ -188,7 +188,7 @@ class SimulationConfig:
             direction='inward'
         )
         mig_config.tau_a = mig_config.compute_tau_from_duration(duration_kyr * 1000)
-        mig_config.tau_e = mig_config.tau_a / 100
+        mig_config.tau_e = abs(mig_config.tau_a) / 2
 
         return cls(
             name=name,
@@ -214,7 +214,7 @@ class SimulationConfig:
             direction='outward'
         )
         mig_config.tau_a = mig_config.compute_tau_from_duration(duration_kyr * 1000)
-        mig_config.tau_e = abs(mig_config.tau_a) / 100
+        mig_config.tau_e = abs(mig_config.tau_a) / 2
 
         return cls(
             name=name,
