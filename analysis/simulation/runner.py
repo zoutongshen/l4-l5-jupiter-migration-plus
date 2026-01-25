@@ -129,16 +129,16 @@ def setup_simulation(config: SimulationConfig,
         else:
             migration_code.tau_e = abs(config.migration.tau_a) / 2 | units.yr
 
-        # Create bridge for coupled evolution
-        migration_bridge = bridge.Bridge(use_threading=False)
-        migration_bridge.add_system(gravity_massive)
-        migration_bridge.add_code(migration_code)
-        migration_bridge.timestep = 0.1 | units.yr  # Match migration code timestep
+        # Bridge for massive bodies with migration
+        bridge_massive = bridge.Bridge(use_threading=False)
+        bridge_massive.add_system(gravity_massive)
+        bridge_massive.add_code(migration_code)
+        bridge_massive.timestep = 0.1 | units.yr
     else:
-        migration_bridge = None
+        bridge_massive = None
 
     return (massive_bodies, planetesimals, gravity_massive,
-            planetesimal_code, gravity_field, migration_bridge)
+            planetesimal_code, gravity_field, bridge_massive)
 
 
 def run_simulation(config: SimulationConfig,
@@ -173,7 +173,7 @@ def run_simulation(config: SimulationConfig,
 
     # Setup simulation components
     (massive_bodies, planetesimals, gravity_massive,
-     planetesimal_code, gravity_field, migration_bridge) = setup_simulation(
+     planetesimal_code, gravity_field, bridge_massive) = setup_simulation(
         config, massive_bodies, planetesimals
     )
 
@@ -228,20 +228,20 @@ def run_simulation(config: SimulationConfig,
 
     # Main simulation loop
     while time < end_time:
-        # Evolve massive bodies
-        if migration_bridge is not None:
-            migration_bridge.evolve_model(time + dt)
+        # Evolve massive bodies (with migration if enabled)
+        if bridge_massive is not None:
+            bridge_massive.evolve_model(time + dt)
         else:
             gravity_massive.evolve_model(time + dt)
 
-        # Sync massive bodies
+        # Copy updated positions to massive_bodies
         channel_from_massive = gravity_massive.particles.new_channel_to(massive_bodies)
         channel_from_massive.copy()
 
-        # Update gravity field reference
+        # Update gravity field for planetesimals
         gravity_field.massive_bodies = massive_bodies
 
-        # Evolve planetesimals
+        # Evolve planetesimals (array-cached leapfrog, direct call)
         planetesimal_code.evolve_model(time + dt)
 
         time += dt

@@ -11,10 +11,18 @@ from amuse.units import units, constants
 
 
 class ExternalGravityField:
-    """Simple container to hold massive bodies reference for planetesimal integrator."""
+    """Gravity field from massive bodies for test particles.
+
+    Used by Bridge to synchronize with PlanetesimalIntegrator.
+    """
 
     def __init__(self, massive_bodies):
         self.massive_bodies = massive_bodies
+        self.model_time = 0 | units.yr
+
+    def evolve_model(self, tend):
+        """Dummy evolve - Bridge handles actual evolution."""
+        self.model_time = tend
 
 
 class PlanetesimalIntegrator:
@@ -66,10 +74,6 @@ class PlanetesimalIntegrator:
 
             r2 = dx * dx + dy * dy + dz * dz
             r3 = r2 * np.sqrt(r2)
-
-            # Avoid division by zero
-            r3 = np.maximum(r3, 1e-10)
-
             factor = (-G_val * masses) / r3
             ax = np.sum(factor * dx, axis=1)
             ay = np.sum(factor * dy, axis=1)
