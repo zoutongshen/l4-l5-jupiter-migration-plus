@@ -58,7 +58,8 @@ def create_massive_bodies(config: SimulationConfig) -> Particles:
             true_anomaly=true_anomaly,
             inclination=inc,
             longitude_of_the_ascending_node=long_asc_node,
-            argument_of_periapsis=arg_perihelion
+            argument_of_periapsis=arg_perihelion,
+            G=constants.G
         )
 
         planet = binary[1]
@@ -108,7 +109,7 @@ def create_planetesimals(config: SimulationConfig,
     star_mass = sun.mass
 
     planetesimals = Particles(n)
-    planetesimals.mass = 0 | units.kg  # Test particles
+    planetesimals.mass = 0 | units.MSun  # Test particles (massless)
 
     # Generate orbital elements
     # Semi-major axis: uniform in a (or could use a^(-1/2) for surface density)
@@ -131,13 +132,14 @@ def create_planetesimals(config: SimulationConfig,
     for i in range(n):
         binary = new_binary_from_orbital_elements(
             star_mass,
-            0 | units.kg,  # Test particle
+            0 | units.MSun,  # Test particle (massless)
             a_values[i],
             e_values[i],
             true_anomaly=true_anomaly[i],
             inclination=i_values[i],
             longitude_of_the_ascending_node=long_asc_node[i],
-            argument_of_periapsis=arg_perihelion[i]
+            argument_of_periapsis=arg_perihelion[i],
+            G=constants.G
         )
         planetesimals[i].position = binary[1].position
         planetesimals[i].velocity = binary[1].velocity
@@ -195,7 +197,7 @@ def create_trojan_disk(config: SimulationConfig,
     l5_angle = jupiter_angle - np.deg2rad(60)
 
     planetesimals = Particles(n_l4 + n_l5)
-    planetesimals.mass = 0 | units.kg
+    planetesimals.mass = 0 | units.MSun  # Test particles (massless)
 
     def generate_trojans(n, center_angle, jupiter_a):
         """Generate trojans near a Lagrange point."""
