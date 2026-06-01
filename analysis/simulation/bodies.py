@@ -1,391 +1,297 @@
 """
-Functions for creating massive bodies (Sun + planets) and planetesimals.
+Functions for creating the solar system (Sun + planets) and planetesimals
+as a REBOUND simulation.
+
+Units: ('yr', 'AU', 'Msun') so G = 4 pi^2.
+
+Frame convention (matches the original AMUSE setup intent):
+- Bodies are added heliocentrically (relative to the Sun at the origin).
+- The whole system is moved to the centre-of-mass frame once at the end.
+- Planetesimals are massless test particles (m = 0) and do not perturb the
+  massive bodies or each other (enforced via sim.N_active).
+- Jupiter is kept at index 4 (Sun=0, Venus=1, Earth=2, Mars=3, Jupiter=4),
+  preserving the indexing the analysis code relies on.
 """
 
 import numpy as np
-from amuse.units import units, constants
-from amuse.datamodel import Particles
-from amuse.ext.orbital_elements import new_binary_from_orbital_elements
+import rebound
 
-from .config import SimulationConfig, DEFAULT_PLANET_DATA
+from .config import SimulationConfig
+
+# 1 Earth mass in solar masses (M_sun / M_earth = 332946.0487)
+MEARTH_TO_MSUN = 1.0 / 332946.0487
 
 
-def create_massive_bodies(config: SimulationConfig) -> Particles:
+def _new_sim(config: SimulationConfig) -> rebound.Simulation:
+    """Create an empty REBOUND simulation with units and integrator configured."""
+    sim = rebound.Simulation()
+    sim.units = ('yr', 'AU', 'Msun')
+    sim.integrator = 'whfast'
+    # dt is finalised in _finalise_integrator() once periods are known.
+    sim.dt = config.dt
+    return sim
+
+
+def _finalise_integrator(sim: rebound.Simulation, config: SimulationConfig,
+                         verbose: bool = False) -> None:
+    """Clamp the WHFast timestep to <= P_min / 20 for the innermost body.
+
+    The original code ran dt = 0.1 yr with Huayno; WHFast is a fixed-step
+    integrator so we make sure the innermost planet (Venus, P ~ 0.62 yr) is
+    sampled well enough for a stable symplectic integration.
     """
-    Create Sun + planets for the solar system.
+    periods = []
+    for p in sim.particles[1:sim.N_active if sim.N_active > 0 else sim.N]:
+        try:
+            orb = p.orbit(primary=sim.particles[0])
+            if orb.P > 0:
+                periods.append(orb.P)
+        except Exception:
+            pass
+    if periods:
+        p_min = min(periods)
+        dt = min(config.dt, p_min / 20.0)
+    else:
+        dt = config.dt
+    sim.dt = dt
+    if verbose:
+        print(f"  WHFast timestep: {dt:.4f} yr")
 
-    Args:
-        config: Simulation configuration
+
+def _add_by_elements(sim, m_msun, a, e, inc_deg, Omega_deg, omega_deg, f_deg):
+    """Add a particle by heliocentric Keplerian elements (angles in degrees)."""
+    sim.add(
+        primary=sim.particles[0],
+        m=m_msun,
+        a=a,
+        e=e,
+        inc=np.deg2rad(inc_deg),
+        Omega=np.deg2rad(Omega_deg),
+        omega=np.deg2rad(omega_deg),
+        f=np.deg2rad(f_deg),
+    )
+
+
+def create_solar_system(config: SimulationConfig):
+    """
+    Build Sun + planets as a REBOUND simulation in the COM frame.
 
     Returns:
-        Particles set containing Sun and planets
+        (sim, names): the simulation and the list of massive-body names.
     """
-    star_mass = config.star_mass | units.MSun
-    planet_data = config.planet_data
+    sim = _new_sim(config)
 
-    # Create Sun
-    sun = Particles(1)
-    sun.mass = star_mass
-    sun.position = [0, 0, 0] | units.AU
-    sun.velocity = [0, 0, 0] | units.km / units.s
-    sun.name = 'Sun'
+    # Sun at the origin
+    sim.add(m=config.star_mass, x=0, y=0, z=0, vx=0, vy=0, vz=0)
+    names = ['Sun']
 
-    # Create planets
-    planets = Particles()
+    # Planets via orbital elements; preserve the original RNG call order/seed.
     np.random.seed(config.random_seed)
-
-    for name, data in planet_data.items():
-        mass = data['mass'] | units.MEarth
-        a = data['a'] | units.AU
+    for name in config.active_planet_names:
+        data = config.planet_data[name]
+        mass_msun = data['mass'] * MEARTH_TO_MSUN
+        a = config.jupiter_initial_a if name == 'Jupiter' else data['a']
         e = data['e']
-        inc = data['i'] | units.deg
+        inc = data['i']
 
-        # Override Jupiter's semi-major axis if specified
-        if name == 'Jupiter':
-            a = config.jupiter_initial_a | units.AU
+        true_anomaly = np.random.uniform(0, 360)
+        arg_perihelion = np.random.uniform(0, 360)
+        long_asc_node = np.random.uniform(0, 360)
 
-        # Random orbital angles
-        true_anomaly = np.random.uniform(0, 360) | units.deg
-        arg_perihelion = np.random.uniform(0, 360) | units.deg
-        long_asc_node = np.random.uniform(0, 360) | units.deg
+        _add_by_elements(sim, mass_msun, a, e, inc,
+                         long_asc_node, arg_perihelion, true_anomaly)
+        names.append(name)
 
-        # Create planet using orbital elements
-        binary = new_binary_from_orbital_elements(
-            star_mass,
-            mass,
-            a,
-            e,
-            true_anomaly=true_anomaly,
-            inclination=inc,
-            longitude_of_the_ascending_node=long_asc_node,
-            argument_of_periapsis=arg_perihelion
-        )
+    sim.N_active = len(names)
+    sim.move_to_com()
+    _finalise_integrator(sim, config, verbose=False)
 
-        planet = binary[1]
-        planet.name = name
-        planets.add_particle(planet)
-
-    # Combine Sun + planets
-    bodies = Particles()
-    bodies.add_particles(sun)
-    bodies.add_particles(planets)
-
-    # Move to center of mass frame
-    bodies.move_to_center()
-
-    return bodies
+    return sim, names
 
 
-def create_structured_disk(config: SimulationConfig,
-                           massive_bodies: Particles) -> Particles:
+def add_planetesimals(sim: rebound.Simulation, config: SimulationConfig,
+                      n_massive: int) -> int:
     """
-    Create a structured protoplanetary disk with specific regions.
+    Add test-particle planetesimals to an existing solar-system simulation.
 
-    Regions:
-    - Inner disk (0.7-3 AU): 50%
-    - Mid disk feeding the belt (3-10 AU): 30%
-    - Co-orbital seeds near Jupiter: 15%
-    - Outer disk (10-30 AU): 5%
+    Dispatches on config:
+    - trojan_emphasis=True  -> structured 4-zone disk (L4/L5 biased co-orbitals)
+    - else                  -> uniform disk (burn-in / source-tracking)
 
-    Based on user-defined distribution.
+    Massless particles (m=0); sim.N_active is set so they perturb nothing.
+
+    Returns:
+        Number of planetesimals added.
     """
+    if config.trojan_emphasis:
+        n_added = _add_structured_disk(sim, config)
+    else:
+        n_added = _add_uniform_disk(sim, config)
+
+    sim.N_active = n_massive
+    _assign_planetesimal_hashes(sim, n_massive)
+    _finalise_integrator(sim, config, verbose=False)
+    return n_added
+
+
+def _assign_planetesimal_hashes(sim, n_massive):
+    """Tag planetesimal j with hash j+1 so snapshots stay aligned to a fixed
+    slot even after escapers are removed mid-run (hash 0 = unset)."""
+    for j, p in enumerate(sim.particles[n_massive:]):
+        p.hash = j + 1
+
+
+def _add_structured_disk(sim: rebound.Simulation, config: SimulationConfig) -> int:
+    """Structured protoplanetary disk: inner 50%, mid 30%, co-orbital 15%, outer 5%."""
     np.random.seed(config.random_seed + 1)
-    
+
     n = config.n_planetesimals
-    planetesimals = Particles(n)
-    planetesimals.mass = 0 | units.kg
-    
-    sun = massive_bodies[0]
-    star_mass = sun.mass
-    
-    # Find Jupiter for co-orbital region center
     jupiter_a = config.jupiter_initial_a
-    
-    # Helper for power-law sampling
+
     def sample_powerlaw(r_min, r_max, count, p=-1.5):
         u = np.random.random(count)
         if abs(p + 1) < 1e-8:
-            res = r_min * (r_max / r_min) ** u
-        else:
-            term1 = r_min**(p + 1)
-            term2 = r_max**(p + 1) - r_min**(p + 1)
-            res = (term1 + u * term2) ** (1 / (p + 1))
-        return res
+            return r_min * (r_max / r_min) ** u
+        term1 = r_min ** (p + 1)
+        term2 = r_max ** (p + 1) - r_min ** (p + 1)
+        return (term1 + u * term2) ** (1 / (p + 1))
 
-    # Assign regions
     u_regions = np.random.random(n)
-    
-    # Pre-allocate arrays
     a_values = np.zeros(n)
-    true_anoms = np.random.uniform(0, 360, n)  # Default uniform angles
-    
-    # 1. Inner disk (50%)
+    true_anoms = np.random.uniform(0, 360, n)
+
     mask_inner = u_regions < 0.50
-    n_inner = np.sum(mask_inner)
+    n_inner = int(np.sum(mask_inner))
     if n_inner > 0:
         a_values[mask_inner] = sample_powerlaw(0.7, 3.0, n_inner)
-        
-    # 2. Mid disk (30%)
+
     mask_mid = (u_regions >= 0.50) & (u_regions < 0.80)
-    n_mid = np.sum(mask_mid)
+    n_mid = int(np.sum(mask_mid))
     if n_mid > 0:
         a_values[mask_mid] = sample_powerlaw(3.0, 10.0, n_mid)
-        
-    # 3. Co-orbital seeds (15%)
+
     mask_coorb = (u_regions >= 0.80) & (u_regions < 0.95)
-    n_coorb = np.sum(mask_coorb)
+    n_coorb = int(np.sum(mask_coorb))
     if n_coorb > 0:
-        # Gaussian centered at Jupiter's a
         a_values[mask_coorb] = jupiter_a + 0.2 * np.random.randn(n_coorb)
-        
-        # Bias angles toward L4/L5
-        # L4 is +60, L5 is -60 (or 300)
+        # Bias co-orbital angles toward L4 (+60) / L5 (-60) of Jupiter's angle.
         centers = np.where(np.random.random(n_coorb) < 0.5, 60, -60)
         offsets = 15 * np.random.uniform(-1, 1, n_coorb)
-        # We need to respect Jupiter's actual position if it's not at angle=0?
-        # The user's code assumed Jupiter angle=0? 
-        # Yes, new_binary... usually places the primary at origin or we assume J is defined.
-        # But wait, true_anomaly in binary creation is for the PARTICLE, relative to periapsis?
-        # Typically in these simple setups, we assume circular coplanar for reference.
-        # Let's align with Jupiter's current angle if possible, but user code just set true_anom directly.
-        # Assuming all planets start random, we should probably check Jupiter's angle if we want EXACT L4/L5 relative to J.
-        # However, `create_massive_bodies` randomizes anomalies. 
-        # TO DO IT RIGHT: We need Jupiter's mean anomaly/true anomaly.
-        
-        # Find Jupiter in massive_bodies
-        jupiter = None
-        for b in massive_bodies:
-            if b.name == 'Jupiter': jupiter = b
-            
-        jupiter_angle_deg = 0.0
-        if jupiter is not None:
-            # Approximate current angle from position
-            pos = jupiter.position.value_in(units.AU)
-            jupiter_angle_deg = np.degrees(np.arctan2(pos[1], pos[0]))
-            
+        jupiter = sim.particles[config.jupiter_index]
+        jupiter_angle_deg = np.degrees(np.arctan2(jupiter.y, jupiter.x))
         true_anoms[mask_coorb] = centers + offsets + jupiter_angle_deg
-        
-    # 4. Outer disk (5%)
+
     mask_outer = u_regions >= 0.95
-    n_outer = np.sum(mask_outer)
+    n_outer = int(np.sum(mask_outer))
     if n_outer > 0:
         a_values[mask_outer] = sample_powerlaw(10.0, 30.0, n_outer, p=-2.0)
-        
-    a_values = a_values | units.AU
-    true_anoms = true_anoms | units.deg
-    
-    # Shared properties
+
     e_values = 0.05 * np.random.random(n)
-    i_values = (3.0 * np.random.random(n)) | units.deg
-    long_asc = np.random.uniform(0, 360, n) | units.deg
-    arg_peri = np.random.uniform(0, 360, n) | units.deg
-    
-    # Creation loop
+    i_values = 3.0 * np.random.random(n)
+    long_asc = np.random.uniform(0, 360, n)
+    arg_peri = np.random.uniform(0, 360, n)
+
     for k in range(n):
-        binary = new_binary_from_orbital_elements(
-            star_mass,
-            0 | units.kg,
-            a_values[k],
-            e_values[k],
-            true_anomaly=true_anoms[k],
-            inclination=i_values[k],
-            longitude_of_the_ascending_node=long_asc[k],
-            argument_of_periapsis=arg_peri[k]
-        )
-        planetesimals[k].position = binary[1].position
-        planetesimals[k].velocity = binary[1].velocity
-        
-    planetesimals.velocity -= massive_bodies.center_of_mass_velocity()
-    
+        _add_by_elements(sim, 0.0, a_values[k], e_values[k], i_values[k],
+                         long_asc[k], arg_peri[k], true_anoms[k])
+
     print(f"Created structured disk with {n} particles:")
     print(f"  Inner (0.7-3 AU): {n_inner} ({n_inner/n:.1%})")
     print(f"  Mid (3-10 AU): {n_mid} ({n_mid/n:.1%})")
     print(f"  Co-orbital (~{jupiter_a} AU): {n_coorb} ({n_coorb/n:.1%})")
     print(f"  Outer (10-30 AU): {n_outer} ({n_outer/n:.1%})")
+    return n
 
-    return planetesimals
 
-
-def create_planetesimals(config: SimulationConfig,
-                         massive_bodies: Particles) -> Particles:
-    """
-    Create planetesimals (test particles) for the simulation.
-
-    For 'source_tracking' simulations, uses broader disk parameters.
-    If 'trojan_emphasis' is True, creates particles centered on L4/L5.
-
-    Args:
-        config: Simulation configuration
-        massive_bodies: The massive bodies (for COM velocity)
-
-    Returns:
-        Particles set containing planetesimals
-    """
-    if config.trojan_emphasis:
-        return create_structured_disk(config, massive_bodies)
-
-    np.random.seed(config.random_seed + 1)  # Different seed from planets
+def _add_uniform_disk(sim: rebound.Simulation, config: SimulationConfig) -> int:
+    """Uniform-in-a disk with Rayleigh e/i (burn-in and source-tracking)."""
+    np.random.seed(config.random_seed + 1)
 
     n = config.n_planetesimals
-
-    # Choose disk extent based on simulation type
     if config.sim_type == 'source_tracking':
-        a_min = config.disk_a_min
-        a_max = config.disk_a_max
+        a_min, a_max = config.disk_a_min, config.disk_a_max
     else:
-        a_min = config.planetesimal_a_min
-        a_max = config.planetesimal_a_max
+        a_min, a_max = config.planetesimal_a_min, config.planetesimal_a_max
 
     e_max = config.planetesimal_e_max
     i_max = config.planetesimal_i_max
 
-    # Get Sun for orbital calculations
-    sun = massive_bodies[0]
-    star_mass = sun.mass
+    a_values = np.random.uniform(a_min, a_max, n)
+    e_values = np.clip(np.random.rayleigh(e_max / 2, n), 0, e_max)
+    i_values = np.clip(np.random.rayleigh(i_max / 2, n), 0, i_max)
+    true_anomaly = np.random.uniform(0, 360, n)
+    arg_perihelion = np.random.uniform(0, 360, n)
+    long_asc_node = np.random.uniform(0, 360, n)
 
-    planetesimals = Particles(n)
-    planetesimals.mass = 0 | units.kg  # Test particles
-
-    # Generate orbital elements
-    # Semi-major axis: uniform in a (or could use a^(-1/2) for surface density)
-    a_values = np.random.uniform(a_min, a_max, n) | units.AU
-
-    # Eccentricity: Rayleigh distribution peaked at low e
-    e_values = np.random.rayleigh(e_max / 2, n)
-    e_values = np.clip(e_values, 0, e_max)
-
-    # Inclination: Rayleigh distribution peaked at low i
-    i_values = np.random.rayleigh(i_max / 2, n)
-    i_values = np.clip(i_values, 0, i_max) | units.deg
-
-    # Random angles (uniform)
-    true_anomaly = np.random.uniform(0, 360, n) | units.deg
-    arg_perihelion = np.random.uniform(0, 360, n) | units.deg
-    long_asc_node = np.random.uniform(0, 360, n) | units.deg
-
-    # Convert orbital elements to positions and velocities
     for i in range(n):
-        binary = new_binary_from_orbital_elements(
-            star_mass,
-            0 | units.kg,  # Test particle
-            a_values[i],
-            e_values[i],
-            true_anomaly=true_anomaly[i],
-            inclination=i_values[i],
-            longitude_of_the_ascending_node=long_asc_node[i],
-            argument_of_periapsis=arg_perihelion[i]
-        )
-        planetesimals[i].position = binary[1].position
-        planetesimals[i].velocity = binary[1].velocity
-
-    # Adjust for center of mass motion
-    com_velocity = massive_bodies.center_of_mass_velocity()
-    planetesimals.velocity -= com_velocity
-
-    return planetesimals
+        _add_by_elements(sim, 0.0, a_values[i], e_values[i], i_values[i],
+                         long_asc_node[i], arg_perihelion[i], true_anomaly[i])
+    return n
 
 
-def create_trojan_disk(config: SimulationConfig,
-                       massive_bodies: Particles,
-                       n_l4: int = 5000,
-                       n_l5: int = 5000) -> Particles:
+def add_trojan_disk(sim: rebound.Simulation, config: SimulationConfig,
+                    n_l4: int = 5000, n_l5: int = 5000) -> int:
     """
-    Create planetesimals specifically in Jupiter's L4 and L5 Trojan regions.
+    Add planetesimals specifically in Jupiter's L4 and L5 regions.
 
-    Useful for targeted injection after source tracking analysis.
-
-    Args:
-        config: Simulation configuration
-        massive_bodies: The massive bodies (need Jupiter's position)
-        n_l4: Number of particles near L4
-        n_l5: Number of particles near L5
-
-    Returns:
-        Particles set containing Trojan-region planetesimals
+    Useful for targeted injection after source-tracking analysis. Massless
+    test particles; caller is responsible for sim.N_active if needed (it is
+    left unchanged here since the massive set is untouched).
     """
     np.random.seed(config.random_seed + 2)
 
-    # Find Jupiter
-    jupiter = None
-    for body in massive_bodies:
-        if hasattr(body, 'name') and body.name == 'Jupiter':
-            jupiter = body
-            break
+    jupiter = sim.particles[config.jupiter_index]
+    jupiter_a = np.sqrt(jupiter.x ** 2 + jupiter.y ** 2 + jupiter.z ** 2)
+    jupiter_angle = np.arctan2(jupiter.y, jupiter.x)
 
-    if jupiter is None:
-        # Fall back to index 4 (typical position)
-        jupiter = massive_bodies[4]
-
-    sun = massive_bodies[0]
-    star_mass = sun.mass
-
-    # Jupiter's orbital elements
-    jupiter_a = jupiter.position.length().value_in(units.AU)
-    jupiter_angle = np.arctan2(
-        jupiter.y.value_in(units.AU),
-        jupiter.x.value_in(units.AU)
-    )
-
-    # L4 at +60°, L5 at -60° from Jupiter
     l4_angle = jupiter_angle + np.deg2rad(60)
     l5_angle = jupiter_angle - np.deg2rad(60)
 
-    planetesimals = Particles(n_l4 + n_l5)
-    planetesimals.mass = 0 | units.kg
-
-    def generate_trojans(n, center_angle, jupiter_a):
-        """Generate trojans near a Lagrange point."""
-        # Semi-major axis: within 7% of Jupiter
+    def generate(n, center_angle):
         a = np.random.uniform(jupiter_a * 0.93, jupiter_a * 1.07, n)
-
-        # Angular offset from L-point: ±25°
         angle_offset = np.random.uniform(-25, 25, n)
         angles = center_angle + np.deg2rad(angle_offset)
+        e = np.clip(np.random.rayleigh(0.05, n), 0, 0.15)
+        inc = np.clip(np.random.rayleigh(2, n), 0, 10)
+        return a, angles, e, inc
 
-        # Small eccentricity and inclination
-        e = np.random.rayleigh(0.05, n)
-        e = np.clip(e, 0, 0.15)
+    a_l4, ang_l4, e_l4, i_l4 = generate(n_l4, l4_angle)
+    a_l5, ang_l5, e_l5, i_l5 = generate(n_l5, l5_angle)
 
-        i = np.random.rayleigh(2, n)
-        i = np.clip(i, 0, 10)
-
-        return a, angles, e, i
-
-    # Generate L4 trojans
-    a_l4, angles_l4, e_l4, i_l4 = generate_trojans(n_l4, l4_angle, jupiter_a)
-
-    # Generate L5 trojans
-    a_l5, angles_l5, e_l5, i_l5 = generate_trojans(n_l5, l5_angle, jupiter_a)
-
-    # Combine
-    a_all = np.concatenate([a_l4, a_l5]) | units.AU
-    angles_all = np.concatenate([angles_l4, angles_l5])
+    a_all = np.concatenate([a_l4, a_l5])
+    ang_all = np.concatenate([ang_l4, ang_l5])
     e_all = np.concatenate([e_l4, e_l5])
-    i_all = np.concatenate([i_l4, i_l5]) | units.deg
+    i_all = np.concatenate([i_l4, i_l5])
 
-    # Convert to Cartesian (simplified: circular approximation for initial placement)
     for idx in range(n_l4 + n_l5):
-        a = a_all[idx]
-        angle = angles_all[idx]
-        e = e_all[idx]
-        inc = i_all[idx]
+        # omega = Omega = 0, so the true anomaly is the position angle directly.
+        _add_by_elements(sim, 0.0, a_all[idx], e_all[idx], i_all[idx],
+                         0.0, 0.0, np.rad2deg(ang_all[idx]))
+    return n_l4 + n_l5
 
-        # Use orbital elements for proper velocity
-        binary = new_binary_from_orbital_elements(
-            star_mass,
-            0 | units.kg,
-            a,
-            e,
-            true_anomaly=np.rad2deg(angle) | units.deg,
-            inclination=inc,
-            longitude_of_the_ascending_node=0 | units.deg,
-            argument_of_periapsis=0 | units.deg
-        )
-        planetesimals[idx].position = binary[1].position
-        planetesimals[idx].velocity = binary[1].velocity
 
-    # Adjust for COM
-    com_velocity = massive_bodies.center_of_mass_velocity()
-    planetesimals.velocity -= com_velocity
+def sim_from_state(massive_pos, massive_vel, massive_mass, names,
+                   planetesimal_pos, planetesimal_vel,
+                   config: SimulationConfig) -> rebound.Simulation:
+    """
+    Rebuild a REBOUND simulation from saved Cartesian state arrays.
 
-    return planetesimals
+    Used to continue a run from a saved checkpoint (e.g. migration continuing
+    from a burn-in state). Arrays are in AU and AU/yr; masses in Msun.
+    """
+    sim = _new_sim(config)
+    for i in range(len(massive_mass)):
+        sim.add(m=float(massive_mass[i]),
+                x=float(massive_pos[i, 0]), y=float(massive_pos[i, 1]), z=float(massive_pos[i, 2]),
+                vx=float(massive_vel[i, 0]), vy=float(massive_vel[i, 1]), vz=float(massive_vel[i, 2]))
+    n_massive = len(massive_mass)
+
+    for j in range(len(planetesimal_pos)):
+        sim.add(m=0.0,
+                x=float(planetesimal_pos[j, 0]), y=float(planetesimal_pos[j, 1]), z=float(planetesimal_pos[j, 2]),
+                vx=float(planetesimal_vel[j, 0]), vy=float(planetesimal_vel[j, 1]), vz=float(planetesimal_vel[j, 2]))
+
+    sim.N_active = n_massive
+    _assign_planetesimal_hashes(sim, n_massive)
+    _finalise_integrator(sim, config, verbose=False)
+    return sim

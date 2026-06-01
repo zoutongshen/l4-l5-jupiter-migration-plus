@@ -10,7 +10,6 @@ Defines all parameters for:
 
 from dataclasses import dataclass, field
 from typing import Optional, Dict, List, Literal
-from amuse.units import units
 
 
 # Default planet data (mass in Earth masses, a in AU, e dimensionless, i in degrees)
@@ -22,6 +21,17 @@ DEFAULT_PLANET_DATA = {
     'Saturn':  {'mass': 95.16,  'a': 9.58,  'e': 0.0565, 'i': 2.49},
     'Uranus':  {'mass': 14.54,  'a': 19.22, 'e': 0.0457, 'i': 0.77},
     'Neptune': {'mass': 17.15,  'a': 30.11, 'e': 0.0113, 'i': 1.77},
+}
+
+# Named planet subsets. 'all' = faithful to the original AMUSE setup. Dropping
+# the terrestrials lets WHFast take a much larger timestep (innermost body is
+# then Jupiter, P~12 yr instead of Venus, P~0.6 yr) -> ~16x faster, with no
+# meaningful effect on Jupiter's Trojans. Saturn is kept in 'giants' because its
+# secular resonances DO matter for Trojan stability.
+PLANET_SETS = {
+    'all': ['Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'],
+    'giants': ['Jupiter', 'Saturn', 'Uranus', 'Neptune'],
+    'jupiter_saturn': ['Jupiter', 'Saturn'],
 }
 
 
@@ -101,8 +111,13 @@ class SimulationConfig:
     # Star mass
     star_mass: float = 1.0  # Solar masses
 
-    # Planet data (can override defaults)
+    # Planet data table (mass/orbit for every known body; subset chosen below)
     planet_data: Dict = field(default_factory=lambda: DEFAULT_PLANET_DATA.copy())
+
+    # Which planets to actually include: 'all' (faithful to original AMUSE setup),
+    # 'giants' (Sun + Jupiter/Saturn/Uranus/Neptune, ~16x faster), or
+    # 'jupiter_saturn'. See PLANET_SETS.
+    planet_set: Literal['all', 'giants', 'jupiter_saturn'] = 'all'
 
     # Jupiter initial semi-major axis (can differ from planet_data for migration)
     jupiter_initial_a: float = 5.2  # AU
@@ -150,6 +165,16 @@ class SimulationConfig:
             os.makedirs('results/pkl', exist_ok=True)
             self.output_file = f"results/pkl/{self.name}.pkl"
 
+    @property
+    def active_planet_names(self) -> List[str]:
+        """Ordered list of planets actually simulated, per `planet_set`."""
+        return [n for n in PLANET_SETS[self.planet_set] if n in self.planet_data]
+
+    @property
+    def jupiter_index(self) -> int:
+        """Index of Jupiter in the particle list (Sun is index 0)."""
+        return 1 + self.active_planet_names.index('Jupiter')
+
     @classmethod
     def burnin(cls, duration_kyr: float = 50, jupiter_a: float = 5.2,
                input_file: Optional[str] = None, **kwargs) -> 'SimulationConfig':
@@ -169,11 +194,15 @@ class SimulationConfig:
     def source_tracking(cls, duration_kyr: float = 100, **kwargs) -> 'SimulationConfig':
         """Create configuration for source tracking (pure disk) simulation."""
         name = f"jupiter_source_tracking_{int(duration_kyr)}kyr"
+        # trojan_emphasis=False so the broad uniform disk (disk_a_min..disk_a_max)
+        # is actually used -- the whole point of source tracking is to start with
+        # a wide disk and see which regions feed L4/L5.
+        kwargs.setdefault('trojan_emphasis', False)
         return cls(
             name=name,
             sim_type='source_tracking',
-            planetesimal_a_min=2.0,
-            planetesimal_a_max=35.0,
+            disk_a_min=2.0,
+            disk_a_max=35.0,
             end_time=duration_kyr * 1000,
             migration=MigrationConfig(enabled=False),
             **kwargs
