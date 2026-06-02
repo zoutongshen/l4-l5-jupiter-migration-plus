@@ -21,7 +21,7 @@ from .bodies import (
     add_trojan_disk,
     sim_from_state,
 )
-from .migration import attach_migration
+from .migration import attach_migration, MigrationDriver
 from .analysis import (
     compute_trojan_counts,
     compute_orbital_elements,
@@ -46,6 +46,7 @@ __all__ = [
     'sim_from_state',
     # Migration
     'attach_migration',
+    'MigrationDriver',
     # Analysis
     'compute_trojan_counts',
     'compute_orbital_elements',

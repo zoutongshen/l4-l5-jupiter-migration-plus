@@ -74,10 +74,10 @@ def test_migration_exponential_inward():
     config.migration = MigrationConfig(enabled=True, tau_a=tau,
                                        tau_e=tau / 2, direction='inward')
     sim, _ = create_solar_system(config)
-    _ = attach_migration(sim, config)
+    driver = attach_migration(sim, config)
 
     t_test = tau / 2  # half an e-fold
-    sim.integrate(t_test)
+    driver.advance(t_test)
     mpos = np.array([[p.x, p.y, p.z] for p in sim.particles])
     mvel = np.array([[p.vx, p.vy, p.vz] for p in sim.particles])
     mass = np.array([p.m for p in sim.particles])
@@ -102,9 +102,9 @@ def test_migration_sign_convention(tau_a, direction, grows):
     config.migration = MigrationConfig(enabled=True, tau_a=tau_a,
                                        tau_e=abs(tau_a) / 2, direction=direction)
     sim, _ = create_solar_system(config)
-    _ = attach_migration(sim, config)
+    driver = attach_migration(sim, config)
 
-    sim.integrate(1000.0)
+    driver.advance(1000.0)
     a_jup = sim.particles[4].orbit(primary=sim.particles[0]).a
     if grows:
         assert a_jup > a0, f"expected outward (a>{a0}), got {a_jup:.4f}"

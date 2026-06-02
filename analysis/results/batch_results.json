@@ -1,0 +1,50 @@
+[
+  {
+    "direction": "insitu",
+    "dur": 50,
+    "seed": 42,
+    "slope": 1.803108712239384e-06,
+    "jupiter_a_final": 5.201883686007825,
+    "final_l4": 150,
+    "final_l5": 130,
+    "retention": 77.34806629834254,
+    "finite": true,
+    "secs": 2232.2674198150635
+  },
+  {
+    "direction": "inward",
+    "dur": 50,
+    "seed": 42,
+    "slope": 1.075672409158417e-06,
+    "jupiter_a_final": 5.194612310610367,
+    "final_l4": 197,
+    "final_l5": 167,
+    "retention": 84.84848484848484,
+    "finite": true,
+    "secs": 2464.9510400295258
+  },
+  {
+    "direction": "inward",
+    "dur": 50,
+    "seed": 1042,
+    "slope": -7.445861606249437e-07,
+    "jupiter_a_final": 5.199626560128707,
+    "final_l4": 121,
+    "final_l5": 67,
+    "retention": 49.473684210526315,
+    "finite": true,
+    "secs": 2463.893979072571
+  },
+  {
+    "direction": "outward",
+    "dur": 50,
+    "seed": 42,
+    "slope": -3.1422008140676247e-07,
+    "jupiter_a_final": 5.201626938832346,
+    "final_l4": 106,
+    "final_l5": 155,
+    "retention": 78.37837837837837,
+    "finite": true,
+    "secs": 2248.194407939911
+  }
+]

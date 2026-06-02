@@ -191,9 +191,11 @@ def run_simulation(config: SimulationConfig, verbose: bool = True) -> Dict:
     sim.exit_max_distance = ESCAPE_DISTANCE_AU
     n_lost = 0
 
-    rebx = None
+    migration_driver = None
     if config.migration.enabled:
-        rebx = attach_migration(sim, config, jupiter_index=jidx)  # keep reference alive
+        # Jupiter-only migration driver (O(1) per nudge, independent of the
+        # particle count -- see migration.py for why REBOUNDx is not used).
+        migration_driver = attach_migration(sim, config, jupiter_index=jidx)
 
     end_time = config.end_time
     n_snapshots = config.n_snapshots
@@ -242,9 +244,16 @@ def run_simulation(config: SimulationConfig, verbose: bool = True) -> Dict:
 
     checkpoint_file = f"results/pkl/checkpoints/{config.name}_checkpoint.pkl"
 
+    def integrate_chunk(s, sub_target):
+        return _integrate_with_escape(s, sub_target, n_massive)
+
     for snapshot_count in range(1, n_snapshots + 1):
         target = snapshot_count * snapshot_interval
-        n_lost += _integrate_with_escape(sim, target, n_massive)
+        if migration_driver is not None:
+            # Migrate Jupiter in fine sub-steps across this snapshot interval.
+            n_lost += migration_driver.advance(target, integrate_fn=integrate_chunk)
+        else:
+            n_lost += _integrate_with_escape(sim, target, n_massive)
         record(snapshot_count)
 
         if snapshot_count % config.checkpoint_interval == 0:
