@@ -7,25 +7,32 @@ and examiner. Background reasoning: `MSc_PROJECT_PLAN.md`.
 
 ## Working title
 
-**Capture Rates, Loss Rates, and the Origin of the L4/L5 Jupiter Trojan
-Asymmetry during Type II Migration**
+**Capture, Loss and Exchange: A Rate-Resolved Origin for the L4/L5 Jupiter
+Trojan Asymmetry**
 
 *Alternatives:*
-- Capture or Loss? A Rate-Resolved Study of the L4/L5 Jupiter Trojan Asymmetry
-- How Jupiter's Migration Through the Gas Disk Builds the Trojan Asymmetry
+- Capture or Loss? Separating the Two Channels Behind the L4/L5 Trojan Asymmetry
+- The Migration Rate That Builds the Trojan Asymmetry
+
+*Dropped 2026-08-31:* "...during Type II Migration". Both published thresholds
+for producing the asymmetry (Pirani's `v_lim ~ 0.17 q Omega r`, Li's control at
+`1.5e-4 AU/yr`) sit at or above the Type II ceiling for a full-mass Jupiter, so a
+title promising Type II promises a regime where the answer may be "nothing
+happens". See `MSc_PROJECT_PLAN.md` Section 12.4-12.5.
 
 ---
 
 ## Description (brief — this is the version being submitted)
 
 Jupiter's L4 Trojan swarm contains about 45% more asteroids than its L5
-counterpart, a primordial signature of Jupiter's migration. Two explanations
-exist, and they require opposite directions of drift: L4 has a higher capture
-rate as Jupiter migrates inward (Pirani et al. 2019), or L5 has a higher loss
-rate as it migrates outward (Li et al. 2023). Both report only the final
-population ratio; neither rate has been measured on its own. This project will
-use time-resolved N-body integrations across migration directions and speeds to
-determine which rate builds the asymmetry.
+counterpart, a signature of Jupiter's migration. Two mechanisms are proposed,
+requiring opposite directions of drift: an excess captured on the leading side
+during inward migration through the gas disc (Pirani et al. 2019), or an excess
+lost from the trailing side during a fast outward jump (Li et al. 2023). Each has
+been demonstrated only in its own regime, never against the other. This project
+will use N-body integrations to measure capture, loss and exchange between the
+swarms within single runs, and to locate the migration rate at which the
+asymmetry is strongest.
 
 ---
 
@@ -39,23 +46,33 @@ than its trailing (L5) swarm — a bias-corrected ratio of 1.45 +/- 0.05
 erosion cannot produce, and which must therefore date from the epoch when Jupiter
 was still migrating. Two explanations exist, and they attribute the imbalance to
 different physical rates. Writing the evolution of each swarm as
-dN/dt = C(t) - L(t) N, with C the capture rate and L the fractional loss rate,
-the inward-migration model of Pirani et al. (2019) is a claim that C4 > C5, while
-the fast outward-jump model of Li et al. (2023) is a claim that L4 < L5. Every
-published study to date reports only the final population ratio, which is the
-time-integrated outcome of both rates together; neither C nor L has ever been
-measured separately, and the balance between them as a function of Jupiter's
-drift speed and direction is unknown. This project will measure the two rates
-directly and determine which of them builds the observed asymmetry.
+dN/dt = C(t) - L(t) N + T(t), with C the capture rate, L the fractional loss rate
+and T the net exchange with the other swarm, the inward-migration model of Pirani
+et al. (2019) is a claim about C and about residence time on horseshoe orbits,
+while the fast outward-jump model of Li et al. (2023) is a claim that L4 < L5.
+Pieces of this ledger exist. Di Sisto et al. (2014) fit per-swarm fractional loss
+rates for the present-day, non-migrating system and conclude that four billion
+years of erosion supply only about a tenth of the asymmetry, so the rest must be
+primordial; Li et al. (2023) report per-swarm survival fractions for a fast jump,
+in a setup where capture is zero by construction and symmetric capture is assumed
+rather than measured; Pirani et al. (2019) plot per-side populations during
+inward migration, but as net numbers and for horseshoe residence rather than
+swarm membership. No study has measured capture and loss inside the same
+integration, separated gross flux from net, counted exchange between the swarms,
+or placed the two mechanisms on a common dimensionless migration-rate axis. This
+project will do so, and determine which channel builds the observed asymmetry.
 
 The work uses REBOUND N-body integrations of massless test particles in the
-Sun-Jupiter-Saturn system, with Jupiter migrating under a Type II prescription in
-which the drift rate and the total displacement are both set by the disc
-viscosity, so that the migration speed is a physical parameter rather than a free
-knob. Three scenarios are compared: inward Type II drift; outward drift driven by
-a Jupiter-Saturn resonant pair, as in the Grand Tack; and, as a post-gas
-reference case, a fast outward jump of the kind invoked for the giant-planet
-instability. The central methodological step is to instrument the co-orbital
+Sun-Jupiter-Saturn system. The control parameter is the dimensionless migration
+rate alpha = adot_J / (2 a_J n_J mu) of Sicardy & Dubois (2003), which is the
+quantity both published mechanisms are actually governed by, and it is swept from
+the Type II regime set by disc viscosity (alpha ~ 1e-3) up to the island-merger
+limit alpha = 0.7265 reached only by an instability-driven jump. Three scenarios
+are compared: inward drift through the gas disc, with Jupiter's mass growing, as
+that growth is what converts a transient horseshoe excess into permanent tadpole
+membership; outward drift driven by a Jupiter-Saturn resonant pair (Masset &
+Snellgrove 2001; Morbidelli & Crida 2007); and, as a post-gas reference case, a
+fast outward jump of the kind invoked for the giant-planet instability. The central methodological step is to instrument the co-orbital
 dynamics directly. Each particle is classified continuously from its resonant
 angle sigma = lambda - lambda_J as librating about L4, librating about L5, on a
 horseshoe orbit, or escaped, and its libration amplitude is tracked at a cadence
@@ -84,5 +101,6 @@ amplitudes actually observed — an open problem in the current literature.
 ## One-line version, for saying out loud
 
 *"The L4/L5 Trojan imbalance is either because more asteroids were caught on the
-leading side, or because more were lost from the trailing side. Nobody has
-measured those two rates separately. I will."*
+leading side, or because more were lost from the trailing side. The two have only
+ever been studied in separate regimes, so nobody knows where one takes over from
+the other. I will measure both in the same simulation and find the crossover."*
