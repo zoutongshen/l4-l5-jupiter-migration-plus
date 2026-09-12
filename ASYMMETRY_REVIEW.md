@@ -8,7 +8,8 @@ Scope: **dynamical explanations only**, whether simulated or analytic. Observati
 bias and collisional grinding are excluded as candidate *mechanisms*, but retained
 where they act as constraints a dynamical model must respect.
 
-Companion documents: `MSc_PROJECT_PLAN.md` (the migration project, now parked as a
+Companion documents: `VOKROUHLICKY_DISISTO_REVIEW.md` (the two anchor papers read in
+full, side by side), `MSc_PROJECT_PLAN.md` (the migration project, now parked as a
 fallback) and `literature/READING_LIST.md`.
 
 ---
@@ -26,21 +27,43 @@ fallback) and `literature/READING_LIST.md`.
 | Nesvorný et al. 2013 §3.4 | 1.3 ± 0.1 | H < 12, families removed |
 | Yoshida & Terai 2017 / Uehata et al. 2022 | 1.40 ± 0.15 | Subaru HSC, D > 2 km |
 | **Vokrouhlický et al. 2024 §5.2** | **f45 = 1.43 ± 0.05**; f45 = 1 excluded at **7.9σ** | debiased CSS background, families removed |
-| **Bottke et al. 2023 §2.2** | **9 vs 9 — symmetric** | **D > 100 km** |
+| Bottke et al. 2023 §2.2 | 9 vs 9 | D > 100 km; consistent with 1.43 (binomial p = 0.30) |
+| Vokrouhlický et al. 2024 Fig. 15 | 46 vs 26 (1.77) | H < 10, complete MPC counts, families included |
 
-Adopt **1.43 ± 0.05** (Vokrouhlický et al. 2024). It is the only bias-corrected,
-family-subtracted determination. Note the paper quotes 1.45 ± 0.05 in its abstract
-(H < 15) and 1.43 ± 0.05 in Conclusion 6 and the Fig. 25 caption; state which you use.
+Adopt **1.43 ± 0.05 at H ≈ 13.8** (Vokrouhlický et al. 2024, Fig. 25 caption). It is
+the only bias-corrected, family-subtracted determination. The paper's bookkeeping is
+inconsistent: the abstract gives 1.45 ± 0.05 "for H < 15", Conclusion 6 gives
+1.43 ± 0.05 "at magnitude H = 15", and the introduction's naive MPC estimate is
+1.45 ± 0.05 at H ≤ 13.8. Cite the Fig. 25 value with its magnitude limit.
 
-### 1.2 The constraint nobody models
+### 1.2 Is the ratio size-dependent? Not demonstrably
 
-**The asymmetry is size-dependent.** Vokrouhlický et al. 2024 Fig. 25 finds f45 ≈ 1
-within uncertainty below H ≈ 9–9.5, with the deviation from symmetry appearing only
-beyond H ≈ 10. Bottke et al. 2023 make the same statement at the bright end: the
-D > 100 km population is 9 objects in L4 and 9 in L5.
+An earlier version of this section claimed the asymmetry switches on only below
+~50 km, and called that the largest unclaimed hole in the field. Checked against the
+figure, the data do not support it.
 
-**Every dynamical mechanism in the literature predicts a size-independent ratio.**
-None of them addresses this. It is the largest unclaimed hole in the field.
+- **Vokrouhlický et al. 2024 Fig. 25** (PDF p. 31) plots the cumulative background
+  ratio f45(<H). The model median is nearly flat: ≈ 1.3 at H ≈ 9 and 1.43 at H ≈ 13.8.
+  The caption's "the largest Trojans, below magnitude ≃ 9 − 9.5, exhibit symmetry"
+  means only that the 1σ band is wide enough to include 1 there. It includes 1.43
+  just as well, and the caption adds that "the statistical robustness increases with
+  increasing H".
+- **Bottke et al. 2023's 9 vs 9 at D > 100 km** would turn up 30% of the time if the
+  true ratio were 1.43.
+- **The brightest well-counted bin leans the other way.** Fig. 15 gives 46 L4 vs 26 L5
+  objects with H < 10 in the complete MPC catalogue. A symmetric population produces
+  that or more only 1.2% of the time; a ratio of 1.43 does so 23% of the time. The
+  count includes family members; removing the six Table 1 family largest remnants
+  brighter than H = 10 (four in L4, two in L5) still leaves 42 vs 24.
+- **More data won't sharpen the bright end.** Every large Trojan is already known, so
+  it is small-number limited for good.
+
+So the size-independent ratio that every dynamical mechanism predicts is *consistent*
+with the data. Di Sisto et al. 2019 (§2.1) assume exactly that when scaling escape
+rates to km-sized bodies. The one genuinely size-dependent L4/L5 feature in this
+literature is in inclination, not number, and it is the families (§3.4). The
+unexplained ΔH ≈ 0.4 mag offset (§1.3) remains, but that is an albedo/shape question,
+not a number-ratio one (G5).
 
 ### 1.3 Which L4-vs-L5 observables actually differ
 
@@ -67,8 +90,8 @@ The full observable inventory:
 
 | Observable | Status | Number |
 |---|---|---|
-| Number ratio, H-resolved | Measured, unexplained | 1.43 ± 0.05; ≈ 1 below H ≈ 9.5 |
-| **Inclination distribution** | **Different, unexplained** | KS D = 0.221; ⟨i⟩ = 10.4° vs 14.2° |
+| Number ratio | Measured, unexplained | 1.43 ± 0.05 at H ≈ 13.8; no demonstrated size dependence (§1.2) |
+| **Inclination distribution** | **Different, unexplained** | KS D = 0.221; background medians ≈ 11.5° vs 17.5° (read off Vokrouhlický Fig. 26). Raw means including families: 10.4° vs 14.2° (Di Sisto 2014) |
 | Eccentricity distribution | No difference | p = 0.08 |
 | **Libration amplitude** | **No difference** | p = 0.17 |
 | Magnitude-distribution slopes | No difference | equivalent to H ≈ 14 |
@@ -101,8 +124,11 @@ resolved."
 | Li et al. 2023a | GP instability | swift_rmvs3 / 0.5 yr | Sun + Jupiter only | 500/swarm | 1.50 → 1.68 | Yes |
 | Li et al. 2023b (FFP, indirect) | any | RKF7-8 + swift / 0.05 yr | Sun, Jup, FFP | 500/swarm | 1.65 → 1.81 | Yes |
 | Li et al. 2023b (FFP, direct) | any | RKF7-8 + swift / 0.05 yr | Sun, Jup, FFP | 500/swarm | **1.86** | Yes, by construction |
-| Di Sisto et al. 2014 | Gyr | EVORB / 0.2 yr | Sun + 4 giants | 2972 real + 2 × 18,200 | ×1.07 amplifier | Yes, tiny |
-| Di Sisto et al. 2019 | Gyr | EVORB / 7.3 d | Sun + Venus–Neptune | 2972 real | ×1.02 amplifier | Yes, tinier |
+| Di Sisto et al. 2014 | Gyr | EVORB / 0.2 yr | Sun + 4 giants | 2972 real + 2 × 18,200 | ×1.07 ± 0.03 amplifier | Yes, 3.0σ |
+| Di Sisto et al. 2019 | Gyr | EVORB / 7.3 d | Sun + Venus–Neptune | 2972 real | ×1.02 ± 0.02 amplifier | **No** (0.9σ) |
+
+The Di Sisto amplifier errors are binomial, computed here from the papers' escape
+counts (§3.3); neither paper quotes one.
 
 ### 2.2 What each one claims
 
@@ -205,8 +231,10 @@ production runs.
 
 | | 2014 | 2019 |
 |---|---|---|
-| L4 escape fraction, 4.5 Gyr | ~23% (no error) | 23.6 ± 0.2% |
-| L5 escape fraction, 4.5 Gyr | **28.3%** (no error) | **25.1 ± 0.2%** |
+| L4 escape fraction, 4.5 Gyr | 458/1975 = 23.2% (paper: "~23%") | 466/1975 = 23.6% (paper: ± 0.2%) |
+| L5 escape fraction, 4.5 Gyr | **282/997 = 28.3%** | **250/997 = 25.1%** (paper: ± 0.2%) |
+| Binomial error, L4 / L5 (derived) | ± 1.0% / ± 1.4% | ± 1.0% / ± 1.4% |
+| L5 − L4 significance (derived) | **z = 3.0**, p = 0.002 | **z = 0.9**, p = 0.37 |
 | Survival-rate fit, L4 | −3.9929e−11 ± 2.45e−13 yr⁻¹ (t > 2 Gyr) | 7.0398e−11 ± 8e−14 (full span) |
 | Survival-rate fit, L5 | −5.11663e−11 ± 4.14e−13 yr⁻¹ (t > 2 Gyr) | 7.5590e−11 ± 1.3e−13 (full span) |
 | Primordial N0(L4)/N0(L5) | **1.3 ± 0.2** | **1.373 ± 0.204** |
@@ -222,57 +250,148 @@ numerics.
 
 The same group, on the same input orbits, revised its headline by a factor of ~3.5
 and never analysed why. The 2019 paper says only "in agreement with the results of
-D14, although the difference is smaller."
+D14, although the difference is smaller." Under counting statistics the two
+amplifiers, 1.071 ± 0.025 and 1.020 ± 0.023, differ by 1.5σ. For two runs of the *same*
+objects that is an upper bound on the noise, so the revision is partly noise and
+possibly partly systematic (G4). The 2019 "± 0.2%" comes from repeated 80% subsamples
+of the same trajectories. It is not a counting error, and with binomial errors the
+2019 L4/L5 difference is not significant.
 
 ### 3.4 The argument, and where it fails
 
 Di Sisto's reasoning is a four-link chain:
 
 1. Fictitious particles show L4 ≡ L5 dynamically. **Demonstrated.**
-2. Real L5 escapes faster than real L4. **Demonstrated.**
+2. Real L5 escapes faster than real L4. **Demonstrated in 2014 (3.0σ); not
+   significant in 2019 (0.9σ)** (§3.3).
 3. Therefore the difference lies in the initial *distributions*. **Asserted.**
-4. Therefore the operative variable is *inclination* (⟨i⟩ = 10.4° vs 14.2°). **Asserted.**
+4. Therefore the relevant distributional difference is *inclination* (⟨i⟩ = 10.4° vs
+   14.2°). **Implied, never stated.**
 
-Link 4 is contradicted by his own data. Section 2.2, verbatim:
+Link 3 is stated outright (2014 §3.3, arXiv p. 18): "Since the dynamics appear equal,
+then the difference must lie in the distribution of the Trojans around each Lagrange
+point." Link 4 is not. The next sentence turns straight to the inclination difference
+("As we mentioned in Sect (2.1), the inclinations of the observed Trojans in L4 show an
+excess…"), and the scenarios offered next (Nesvorný's ice giant, differential
+collisional evolution) explain where that difference came from, not how it would drive
+escape. Quote the passage when citing it; don't paraphrase it as a causal claim.
 
-> "While there appears to be **little correlation** between both sub-sets in the (i, a)
+Link 4 also sits uneasily with his own data. 2014 §2.2 (arXiv p. 9), on the escaped
+(red) versus stable (black) asteroids in Figs. 1 and 3:
+
+> "While there appears to be little correlation between both sub-sets in the (i, a)
 > plane, the (e, a) and (e, D) planes show that the escaped asteroids are preferably
-> those with **larger libration amplitude or with larger orbital eccentricity**."
+> those with larger libration amplitude or with larger orbital eccentricity."
 
-So his own escape statistics point at **D and e**, not at inclination. And the paper
-reports a and e as essentially identical between the swarms — ⟨a⟩ = 5.2062 vs
-5.2068 au, ⟨e⟩ = 0.072 vs 0.074.
+This is a visual impression of scatter plots, with no statistical test, and it concerns
+which *individual* asteroids escape, not the L4/L5 asymmetry. It is weak evidence either
+way, and the paper contains a point on each side:
+
+- *Against an inclination effect:* Fig. 7 (§2.2). The time-weighted inclination
+  distributions keep their shape over 4.5 Gyr: "the dynamical evolution of Trojans
+  doesn't change their original inclination properties."
+- *For an inclination effect:* §2.1 (arXiv p. 6) cites Tsiganis et al. (2005): "The
+  'effective' stability region shrinks with increasing orbital inclination."
+
+The paper reports a and e as essentially identical between the swarms: ⟨a⟩ = 5.2062 vs
+5.2068 au, ⟨e⟩ = 0.072 vs 0.074. So the variables his plots associate with escape (D
+and e) do not obviously differ between the swarms, and the one that does differ (i) has
+an effect on escape that nobody has measured.
+
+**The inclination gap Di Sisto invokes has two parts, and only one of them is
+families.** His ⟨i⟩ values come from all 2972 numbered Trojans, families included, and
+he notes they agree with Slyusarev (2013). Vokrouhlický et al. 2024 §5.2 says such
+earlier inclination anomalies "are readily explained by the population of the principal
+Trojan families."
+
+- **Families explain the *low-inclination L4 excess among small bodies*.** Eurybates
+  (875 members, sin I_P = 0.129, I ≈ 7.4°, all at H ≥ 9.82) and Arkesilaos (235, I ≈
+  8.9°) sit exactly there. Di Sisto's own size split (§2.1) says the L4 excess at
+  i ≲ 10° "is maintained for the smaller Trojans but it is not noticed for the greater
+  ones."
+- **Families don't explain *L5 being hotter at all sizes*,** which Di Sisto also
+  reports. That part survives family removal and debiasing, and the gap grows.
+  Vokrouhlický's background medians are A ≈ 0.20 vs ≈ 0.30 (read off Fig. 26), i.e.
+  ≈ 11.5° vs ≈ 17.5°, and the KS distance barely changes at H < 12 (0.221 → 0.193).
+
+Di Sisto's §2.3 reviews the family literature and computes proper elements, but he
+never separates family members from the background in his escape statistics (G1).
+
+**Don't confuse this with the 2019 inclination argument.** Di Sisto et al. 2019 §4.2
+says "the only variable that affects the result of an encounter is the different mean
+initial inclination." That is an Öpik-theory argument about what happens *after*
+escape (L4 escapees collide with Jupiter about three times as often as L5 escapees),
+not about the escape rate. The 2019 Fig. 2 repeats the red/black scatter plots, but
+the text says nothing about inclination and escape.
 
 ---
 
 ## 4. Candidate research gaps
 
-### G1 — Di Sisto's explanation does not survive contact with Vokrouhlický 2024
+### G1 — Di Sisto's explanation has never been tested against Vokrouhlický 2024
 
 **Recommended headline.** Put the two papers side by side, which nobody has done:
 
-| | Drives escape? (Di Sisto) | Differs between swarms? (Vokrouhlický) |
+| | Associated with escape? (Di Sisto 2014 §2.2, by eye) | Differs between swarms? (Vokrouhlický 2024, KS) |
 |---|---|---|
-| Libration amplitude | **Yes** | **No** (p = 0.17) |
-| Eccentricity | **Yes** | **No** (p = 0.08) |
-| Inclination | **"little correlation"** | **Yes** (p ≤ 10⁻²⁰) |
+| Libration amplitude | Yes: escapers "preferably those with larger libration amplitude" | Not detected (p = 0.17) |
+| Eccentricity | Yes: "…or with larger orbital eccentricity" | Not detected (p = 0.08) |
+| Inclination | "little correlation" in the (i, a) plane | **Yes** (p ≤ 10⁻²⁰) |
 
-**The variables that drive escape do not differ between the swarms, and the variable
-that differs does not drive escape.** Di Sisto's link 3 — "the difference must lie in
-the distribution of the Trojans around each Lagrange point" — has no support left.
-Both papers are in `literature/`; neither cites the other on this point, because
-Vokrouhlický's measurement postdates both Di Sisto papers.
+**As far as anyone has checked, the variables associated with escape do not differ
+between the swarms, and the variable that differs has no demonstrated effect on
+escape.** This is an untested mismatch, not a refutation. Every entry in the left
+column is a visual reading of scatter plots, and both "not detected" entries are null
+results (§3.4). Di Sisto's link 3 ("the difference must lie in the distribution of the
+Trojans around each Lagrange point") is therefore unsupported: nobody has shown which
+distributional difference would produce 23.6% vs 25.1%, and at 0.9σ nobody has shown
+that difference is real (§3.3). Both papers are in
+`literature/`; neither cites the other on this point, because Vokrouhlický's
+measurement postdates both Di Sisto papers.
 
-*The test.* Measure escape probability explicitly as a function of (i, e, D, size) on
-a grid that actually samples libration amplitude — which Di Sisto's does not — then
-propagate the **measured** L4 and L5 distributions through it and ask whether
-23.6% vs 25.1% falls out.
+*The test*, in three steps, cheapest first.
 
-- If it does, link 3 is proven and the operative variable is finally identified.
-- If it does not, Di Sisto's conclusion is wrong, and the Gyr contribution to the
-  asymmetry is *unexplained* rather than merely small.
+1. **Is there anything to explain?** The 2019 difference is 0.9σ (§3.3). First
+   establish the present-day escape asymmetry with a real error bar (G4), mainly by
+   cloning the marginal objects; more real objects help less than they seem.
+2. **Is it families?** Cross-match the integrated sample against Vokrouhlický's public
+   family catalogue (https://sirrah.troja.mff.cuni.cz/~mira/tmp/trojans/) and report
+   escape fractions for background and family members separately.
+   - Why it matters: families can bias the escape fraction either way. Fragments are kicked mostly in libration
+     amplitude (V24: families are "most extended in the daP coordinate"), so a family has a
+     stable core and a halo reaching towards the unstable edge. An old family's halo has
+     already leaked away, leaving mostly stable members that *dilute* the escape fraction. A
+     young family (V24 leaves open whether Hektor's dense core is a recent cratering event)
+     has been filtered for less time than the background and can *leak faster*. Ages are
+     unknown, so the sign is too. Sharp L4 families diluting and diffuse L5 families leaking
+     would both push L5's escape above L4's, so the morphology difference (G2) and the escape
+     difference could be one phenomenon.
+   - Scale: if ≈ 6% of the 2019 L4 sample were effectively stable family members and
+     both backgrounds eroded identically, L4 would show exactly 23.6% against L5's
+     25.1%. Eurybates alone is ≈ 11% of today's L4 catalogue.
+   - The cross-match alone, with no integration, takes an afternoon and bounds the
+     effect.
+3. **Is it inclination?** Measure escape probability as a function of (A, B, C) on a
+   grid that samples the angles and libration amplitude, which Di Sisto's does not.
+   Propagate Vokrouhlický's **debiased, family-free** distributions through it and
+   predict the escape asymmetry.
+   - Vokrouhlický's own Fig. 14 motivates this. The stable zone shrinks with
+     inclination: its low-B edge falls from C ≈ 2.0 at A ≤ 0.25 to C ≈ 1.76 at
+     A = 0.65. So inclination can drive escape *through* the (D, e) boundary while
+     showing "little correlation" in an (i, a) scatter plot.
+   - The integration is gravity-only with massless particles, so size cannot enter the
+     map; it enters only through the distributions. Propagate them H-binned as well as
+     whole to get the size dependence of the erosion contribution with no extra
+     integration.
 
-Either outcome is publishable. Vokrouhlický explicitly leaves the door open: "we
+- If step 3 reproduces the asymmetry found in step 1, link 3 is proven and the
+  operative variable identified.
+- If it doesn't, link 3 fails, and the Gyr contribution is *unexplained* rather than
+  merely small.
+- If step 1 finds no asymmetry, Gyr erosion contributes nothing and the whole
+  asymmetry is primordial, which is a clean result in itself.
+
+Every outcome is publishable. Vokrouhlický explicitly leaves the door open: "we
 leave a more thorough analysis and a possible explanation for future studies."
 
 *Why it fits.* Non-migration; squarely on the asymmetry; built on the paper Simon
@@ -295,16 +414,17 @@ And the candidate causes, also his: "the families in L5, while also existing, se
 be blurred by either higher ejection velocities, dynamical diffusion at their
 particular location or some other effect." He tests none of the three.
 
-Critically, this is **in tension with his own 100 Myr stability experiment** (28
-clones per cell across 1040 cells in the C–B plane, at 7 values of A), which found
+Critically, this is **in tension with his own 100 Myr stability experiment** (1,040
+cells in the C–B plane, 28 orbits per cell spread over 7 values of A), which found
 "no statistically meaningful differences, implying that the orbital stability of the
-L4 and L5 regions is the same." If dynamical diffusion is the cause, it must
+L4 and L5 regions is the same" (a comparison of 50%-stability curves by eye; no
+statistic is given). If dynamical diffusion is the cause, it must
 therefore be Gyr-scale and conditioned on where the families actually sit — precisely
 the Di Sisto regime, and invisible at 100 Myr.
 
 *The test.* Seed synthetic families at the real L4 and L5 family locations in
 (A, B, C) and measure differential spreading over Gyr. Highest scientific upside;
-shares all of G1's machinery.
+shares all of G1's machinery. G1 step 2 gives a first empirical look for free.
 
 ### G3 — Reconcile the disagreement about present-day symmetry
 
@@ -320,33 +440,68 @@ to run rather than the headline — but note both large-grid symmetry tests have
 spots: Di Sisto's samples a single angular configuration, Vokrouhlický's runs only
 100 Myr.
 
-### G4 — How robust are the published numbers?
+### G4 — Is present-day erosion asymmetric at all?
 
-Two problems, one investigation.
+This is now the first question, not the safety net. Counting statistics alone (§3.3)
+show:
 
-**(a) The 2014 → 2019 revision.** A factor of 3.5, unexplained. The candidate causes
-are separable and testable one at a time: the planet set (4 giants vs Venus–Neptune),
-the timestep (0.2 yr vs 7.3 d), and the escape threshold (1 vs 2.1 R_Hill).
+- **2014:** 23.2% vs 28.3%, z = 3.0. **2019:** 23.6% vs 25.1%, z = 0.9, not
+  significant.
+- **Counting noise could account for the whole "factor of 3.5 revision", but maybe not
+  all of it.** The two amplifiers, 1.071 ± 0.025 and 1.020 ± 0.023, differ by 1.5σ
+  under binomial errors. For two runs of the same objects, that is an upper bound on
+  the run-to-run noise: a change of setup re-randomizes only the marginal escapers,
+  while deep-stable and fast-unstable objects behave the same way in both runs. Part
+  of the shift may therefore be systematic (planet set, timestep). Clones measure the
+  split.
+- **The escape threshold is ruled out as a cause.** 2019's 2.1 R_Hill criterion is
+  strictly more inclusive than 2014's 1 R_Hill (a trajectory that reaches 1 R_Hill has
+  already passed 2.1), so it cannot explain L5's drop from 282 to 250 escapers. That
+  leaves the planet set, the timestep, and noise.
+- **2019's "± 0.2%" is not a counting error.** It comes from repeated 80% subsamples of
+  the same trajectories; the binomial errors are ± 1.0% (L4) and ± 1.4% (L5).
+- **2019's linear escape rates don't match its own fractions.** 7.04 and 7.56 × 10⁻¹¹
+  yr⁻¹ integrate to 31.7% and 34.0% over 4.5 Gyr, not 23.6% and 25.1%, and the
+  normalization is never stated.
 
-**(b) Chaos sampling.** Both papers integrate each real Trojan exactly once in a
-chaotic system, so the escape fractions carry an unquantified trajectory-sampling
-error on top of Poisson. Clone ensembles would produce the first genuine error bar
-and settle whether 23.6% vs 25.1% is significant at all.
+*The test.* Integrate the complete modern sample (H ≲ 13.8) for 4.5 Gyr and clone its
+marginal objects. Two design points:
+
+- **Clones matter more than extra objects.** The complete background is only
+  ≈ 2,040 L4 + ≈ 1,410 L5 (Vokrouhlický's introduction), barely more than Di Sisto's
+  2,972. Going fainter adds objects but brings the survey bias back.
+- **Clones give each object's escape probability.** That removes the chaotic noise
+  from "how will *these* swarms erode" and separates noise from systematics in the
+  2014 → 2019 shift.
+
+Whether the *distributions* differ in how easily objects escape is a separate question.
+It is limited by the finite number of real objects, and is answered without that limit
+by the synthetic grid of G1 step 3. Report escape fractions with honest errors,
+separately for background and family members (G1 step 2). Either answer is a result: an escape asymmetry at a stated
+significance, or none, in which case the Gyr contribution is zero.
 
 This matters downstream: Li et al. 2023a builds a ×1.1 Gyr correction on the *2014*
-number, which the same group's 2019 paper superseded.
+number.
 
-### G5 — Size dependence
+### G5 — Size dependence: dropped as framed
 
-D > 100 km is 9:9, and f45 → 1 below H ≈ 9–9.5, yet every dynamical model predicts a
-size-independent ratio. Either a size-dependent mechanism is required, or part of the
-small-end asymmetry is the albedo/shape artefact proposed by McNeill et al. (2021)
-and disputed by Schemel & Brown (2021). Related and also unexplained: Vokrouhlický's
-ΔH ≈ 0.4 mag offset between the differential distributions beyond H ≈ 11, which would
-need an albedo split of roughly 0.05 (L4) versus 0.07 (L5) — right at the edge of
-what Grav et al. (2011, 2012) exclude, but not excluded.
+The premise ("D > 100 km is 9:9, f45 → 1 below H ≈ 9–9.5") does not survive the
+figure (§1.2). The ratio is consistent with being size-independent, which is what
+every dynamical model predicts, so there is no size dependence of the number ratio to
+explain.
 
-Highest scientific value; least certain to be tractable in twelve months.
+Two observational loose ends remain, both outside this project's dynamical scope:
+
+- **Vokrouhlický's ΔH ≈ 0.4 mag offset** between the differential distributions beyond
+  H ≈ 11. With equal size distributions, an albedo explanation needs L4 *brighter*:
+  p_L4/p_L5 = 10^(0.4 × 0.4) ≈ 1.45, roughly 0.07 (L4) vs 0.05 (L5).
+  - Vokrouhlický et al. 2024 (§5.2) print the reverse, 0.05 (L4) vs 0.07 (L5), and
+    their formula "1 − 10^(−0.4ΔH) ≃ 0.44" evaluates to 0.31. An earlier version of
+    this section copied their numbers.
+  - The shape alternative has the correct sign: McNeill et al. (2021) find L4 more
+    elongated, hence brighter on average; Schemel & Brown (2021) dispute it.
+- **The L5 "vacancy" at H ≈ 9.5–10** (Vokrouhlický Fig. 15: 46 vs 26 at H < 10).
+  Probably small numbers; an afternoon's statistics check.
 
 ### G6 — Back-extrapolation
 
@@ -362,10 +517,19 @@ origin model is required to hit.
 
 ## 5. Feasibility — read before choosing
 
-Measured from `analysis/results/batch_results.json`: **≈ 45 s of CPU per kyr** at
-N = 10⁴ particles with `planet_set='all'` (8 massive bodies, dt ≈ 0.031 yr, clamped
-by Venus). Extrapolated, **4.5 Gyr ≈ 6,400 CPU-years.** Di Sisto is not reproducible
-in the current configuration, and any gap chosen must be scoped against that number.
+Measured from `analysis/results/batch_results.json`: **≈ 45–49 s of CPU per kyr** at
+N = 10⁴ particles with `planet_set='all'` (8 massive bodies, dt ≈ 0.031 yr, clamped by
+Venus; single-threaded workers).
+
+- **Extrapolated, 4.5 Gyr ≈ 6.4 CPU-years per 10⁴ particles.** That is ≈ 2 CPU-years
+  for Di Sisto's 2,972 and ≈ 8 for the ≈ 12,400-object modern catalogue. An earlier
+  version of this section said 6,400 CPU-years, a factor-1000 slip.
+- **This matches Di Sisto et al. 2019's own experience:** 156 jobs of ~20 Trojans at a
+  7.3 d step, "several computers … for several months".
+- **A Di Sisto-scale 4.5 Gyr run is feasible** in weeks on a small cluster, and roughly
+  ten times cheaper with the levers below.
+- The extrapolation comes from 50 kyr migration runs; confirm it with a Trojan-only
+  benchmark.
 
 Three levers, all already present in the code:
 
@@ -379,8 +543,9 @@ Three levers, all already present in the code:
 - **Snapshot volume** — each 50 kyr / 10⁴-particle run is 92 MB in the
   all-particles-all-snapshots format.
 
-For reference, Di Sisto used a 0.2 yr timestep with Sun + 4 giants; Vokrouhlický used
-swift_rmvs4 at 0.25 yr. Both are ~10× the current timestep.
+For reference: Di Sisto et al. 2019 used 7.3 d (0.02 yr) with Venus–Neptune; Di Sisto
+et al. 2014 states 0.2 yr only for a pre-integration; Vokrouhlický et al. 2024 used
+swift_rmvs4 at 0.25 yr with the giants only, ~8× the current timestep.
 
 **Reusable as-is:** the REBOUND/WHFast setup and unit convention
 (`bodies.py:25–58`), the timestep clamp, `add_trojan_disk`, the escape-detection and
@@ -431,15 +596,26 @@ Cited by papers in `literature/`, but absent:
 
 ## 7. Recommendation
 
-Take **G1** to Simon as the headline, with **G2** as its natural extension. Together
-they form a coherent twelve-month project: build the resonant-angle and
-libration-amplitude diagnostic, use it to measure escape probability as a function of
-(i, e, D), test whether the observed distributions reproduce the observed escape
-asymmetry, and then apply the same machinery to the family-morphology question.
+Take **G1** to Simon as the headline, with **G4's question as its first step** and
+**G2** as the extension. Reading both anchor papers in full
+(`VOKROUHLICKY_DISISTO_REVIEW.md`) changed the order of work:
 
-Both are non-migration, both build on the paper Simon named, both address questions
-the original authors explicitly left open, and both reuse the one piece of the parked
-migration project that survives the reframe.
+1. **G1 step 2, the family cross-match** (days, no integration): how much of Di Sisto's
+   sample is family members, per swarm.
+2. **G4, is the escape asymmetry real?** One 4.5 Gyr campaign on the complete modern
+   sample, family members flagged and marginal objects cloned. Feasible (§5).
+3. **G1 step 3, the inclination-resolved escape map**, propagated through
+   Vokrouhlický's debiased, family-free distributions. The same integrations serve.
+4. **G2, family morphology**, from the flagged family members of step 2 plus synthetic
+   families.
 
-**G4** is the safety net: a convergence study on a published result that moved by a
-factor of 3.5 is a self-contained contribution that cannot fail to produce an answer.
+All four are non-migration, build on the paper Simon named, address questions the
+original authors left open, and reuse the resonant-angle and libration-amplitude
+machinery, the one piece of the parked migration project that survives the reframe.
+Each has a publishable answer either way. G4 in particular either measures an escape
+asymmetry at a stated significance or shows the Gyr contribution is zero.
+
+**In practice these share one integration** of the catalogued Trojans plus clones:
+survey bias changes which Trojans are catalogued, not how they move, so it is
+handled by weighting objects with Vokrouhlický's debiased density rather than by
+simulating extra particles. See `MSc_PROJECT_PLAN.md` §2.
