@@ -69,8 +69,8 @@ seeded into the main run.**
 
 | | **Main run** (Stages 3–5) | **Family run** (Stage 6) |
 |---|---|---|
-| Particles | Every catalogued Jupiter Trojan (≈ 12,400) at its real orbit, plus ~4 clones each | Synthetic fragments thrown from each real family's location at 10–100 m/s |
-| Count | ≈ 80,000 | ≈ 10,000 |
+| Particles | Every catalogued Jupiter Trojan (≈ 16,000 as of Sept 2026) at its real orbit, plus ~4 clones each | Synthetic fragments thrown from each real family's location at 10–100 m/s |
+| Count | ≈ 100,000 | ≈ 10,000 |
 | Duration | 4.5 Gyr | 1–4.5 Gyr |
 | Real or artificial | Real orbits only | Artificial, but modelling a real event (the family-forming collision) |
 | Answers | Q1, Q2, Q3, Q5 | Q4 |
@@ -96,14 +96,15 @@ his debiased distributions are published in: **A** (inclination), **B** (eccentr
 **C** (libration amplitude). All three follow in closed form from osculating elements
 plus Jupiter's (his Eqs. 1–3).
 
-### 2.6 Survey bias: handled by weighting, not by extra particles
+### 2.6 Survey bias
 
-Bias decides which Trojans are catalogued, not how they move. Vokrouhlický publishes
-the bias-corrected, family-free density n(A, B, C) per swarm as a fitted function (his
-Eqs. 6–8, Table 3). Each real object gets w_i = n(A_i, B_i, C_i) / n_obs(A_i, B_i, C_i),
-and a swarm's debiased escape fraction is Σ w_i p_i / Σ w_i. Thinly sampled regions
-then produce large error bars, which is honest; synthetic particles there would be an
-extra assumption.
+- **H ≤ 13.8 (3,753 objects today) is complete:** the catalogue contains essentially
+  every Trojan that bright, so this subset *is* the true population and needs no
+  correction. All population numbers come from it.
+- **Fainter objects are incomplete.** They are simulated, because they add statistics
+  on the dynamics, but never used for population numbers.
+- **Vokrouhlický's debiased model** (his Eqs. 6–8, Table 3) is needed only if a result
+  must extend below H ≈ 13.8, as weights w_i = n(A_i, B_i, C_i) / n_obs(A_i, B_i, C_i).
 
 ### 2.7 Which question uses which particles
 
@@ -112,10 +113,10 @@ probability, is the basic unit of all of it.
 
 | | Objects | Magnitude cut | Swarms | Output |
 |---|---|---|---|---|
-| **Q1** | Background only (family members excluded) | **H ≤ 13.8** — the complete sample, because this is a statement about the *population* and the debiasing weights are only reliable where selection is characterised | L4 and L5 **separately** | Debiased escape fraction per swarm, with errors |
-| **Q2** | Family members **and** background | none — a like-for-like comparison at matched (A, B, C) needs no debiasing, and faint objects add statistics | L4 and L5 separately | Escape difference between family and background at matched position, per family; repeated at several membership cutoffs |
+| **Q1** | Background only (family members excluded) | **H ≤ 13.8** — the complete sample, so no debiasing is needed | L4 and L5 **separately** | Escape fraction per swarm, with errors |
+| **Q2** | Family members **and** background | (i) H ≤ 13.8, to compare with Q1; (ii) none | L4 and L5 separately | (i) **Contamination:** swarm escape fraction with families included vs excluded. (ii) **Check:** family vs background escape at matched (A, B, C) — should agree, since dynamics depends only on the orbit; a mismatch means the cells are too coarse. Both repeated at several membership cutoffs |
 | **G3** | Background | none | L4 and L5 **separately**, then compared | Is P_esc(A, B, C) the same function in both swarms? |
-| **Q3** | Background | none | **Pooled** into one map, then applied to each swarm's distribution | Predicted L4/L5 difference, compared with Q1 |
+| **Q3** | Background | none for the map; H ≤ 13.8 for the distributions it is applied to | **Pooled** into one map, then applied to each swarm's distribution | Predicted L4/L5 difference, compared with Q1 |
 | **Q4** | Family members, **plus the separate family run** (§2.2) | none | L4 and L5 separately | Spread in proper elements vs time |
 | **Q5** | Everything | none | L4 and L5 separately | Residence times, escape-time distributions, state sequence before escape |
 | **G6** | Everything | none | L4 and L5 separately | Escape rate vs time |
@@ -134,12 +135,13 @@ difference matches the measured one.
 
 Pooling is only legitimate if G3 passes, so **G3 runs first**.
 
-**Why Q3 uses background only.** Family members sit in tight clumps, so their outcomes
-are correlated rather than independent samples of a cell — they would inflate the
-apparent statistics and skew whichever cells they fall in. They are also excluded from
-Vokrouhlický's n(A, B, C) by construction, so background-map × background-distribution
-is the consistent pairing. Adding family members back is a robustness check, not the
-headline.
+**Why families are separated at all.** Not because they move differently — gravity sees
+only the orbit, so a family member and a background object on the same orbit share an
+escape probability. They are separated because they are not independent samples: one
+collision put hundreds of fragments on nearly one orbit, so in a swarm average that
+orbit gets hundreds of votes where it is really one parent body. The 1.43 ratio counts
+the background for the same reason. Adding family members back into Q3's map is a
+robustness check, not the headline.
 
 ---
 
@@ -186,17 +188,34 @@ extrapolated.
    (live 2026-09-10; mirror into the repo): `trojans-hcm_20230405_GS` (proper elements),
    `trojans_L4_families_2023Apr`, `trojans_L5_families_2023Apr` (membership).
 3. **Master table,** one row per object: designation, swarm, H, `complete` flag
-   (H ≤ 13.8), family or `background`, proper elements, (A, B, C), and a `disisto2013`
-   flag.
+   (H ≤ 13.8), family or `background` (one column per membership cutoff, Stage 1.6),
+   proper elements, (A, B, C), and a `disisto2013` flag. Membership is per object,
+   from clustering, so objects inside a family's region can still be background.
+   Objects discovered after April 2023 carry no family label in Vokrouhlický's files;
+   almost all are fainter than H = 13.8, so Q1 is unaffected, and they are labelled
+   with our own proper elements after Stage 2.
 4. **Reconstruct Di Sisto's sample.** He used no private catalogue: his input was the
    MPC's *numbered* Jupiter Trojans as of March 2013, i.e. today's catalogue filtered
    by date and orbit quality. Since asteroid numbers are issued sequentially, the
    filter is a number threshold. Checked 2026-09-12 against JPL SBDB: of 16,391
    Trojans (10,633 numbered), **the 2,972nd numbered one is (329008)** — so
    `number ≤ 329008` reproduces his count exactly.
-   *Confirm* that (329008) was numbered around March 2013, from the MPC numbering
-   circulars, and that the swarm split comes out near his 1,975 L4 / 997 L5. His
-   L4/L5 membership rule is unstated, so expect small differences.
+   The swarm split comes out 1,974 L4 / 998 L5 against his 1,975 / 997 (checked
+   2026-09-14). Still to confirm from the MPC numbering circulars that (329008) dates
+   from March 2013.
+
+   **Where his bias sits** (JPL magnitudes, checked 2026-09-14):
+
+   | H | His sample (L4 / L5, ratio) | Today's catalogue (L4 / L5, ratio) |
+   |---|---|---|
+   | ≤ 12 | 535 (313 / 222) 1.41 | 535 (313 / 222) 1.41 |
+   | 12–13.8 | 2,115 (1,393 / 722) 1.93 | 3,218 (1,935 / 1,283) 1.51 |
+   | > 13.8 | 322 (268 / 54) 4.96 | 12,638 (8,167 / 4,471) 1.83 |
+
+   His H ≤ 12 part was already complete and matches the debiased 1.43. In 12–13.8 he
+   had 72% of the L4 objects but only 56% of the L5 ones. Stage 5.1 splits his escape
+   fractions at H = 12 to see whether his L4/L5 escape difference lives in the biased
+   part.
 5. **The cross-match,** on three samples, answering two different questions:
    - *Is the published result contaminated?* Family share per swarm in the
      `disisto2013` subset — a claim about the literature.
@@ -309,22 +328,25 @@ sample was families?" — the first thing to show Simon.
    - **Compare:** escape fraction per swarm, `disisto2013` subset, using his escape
      criterion — 1 Hill radius for 2014, 2.1 for 2019 (we record both).
    - **Against:** 23.2 / 28.3% (2014) and 23.6 / 25.1% (2019).
+   - **Split at H = 12** (Stage 1.4): does his L4/L5 escape difference live in the
+     complete bright part or the biased faint part?
    - **"Agreement" means within ~2–3%,** not exact: his counts carry ± 1.0% (L4) and
      ± 1.4% (L5) binomial error plus the chaotic scatter of one realisation per
      object. Our clones remove that scatter on our side; his numbers keep it.
    - **A real mismatch** (say 15% or 35%) means a systematic difference — planet set,
      timestep, integrator, escape bookkeeping — and must be diagnosed before any of
      our numbers are trusted. That diagnosis is gap G4, so it is a result either way.
-2. **Q1.** Complete, non-family objects: per-object escape probabilities from clones,
-   debiased by the Vokrouhlický weights (§2), giving per-swarm escape fractions with
-   errors. Is L5 higher, and by how much?
-3. **Q2.** The same for family members, per family and per swarm, compared with
-   background objects at matched (A, B, C). Repeat at each membership cutoff from
-   Stage 1.6 and quote the spread — the dominant systematic on every family result,
-   and worse for L5.
+2. **Q1.** Complete (H ≤ 13.8), non-family objects: per-object escape probabilities
+   from clones, giving per-swarm escape fractions with errors. Is L5 higher, and by
+   how much?
+3. **Q2.** (i) Swarm escape fractions from the complete sample with families included
+   vs excluded — the contamination effect. (ii) Family vs background escape at matched
+   (A, B, C), per family — expected to agree; a mismatch means the cells are too coarse.
+   Repeat both at each membership cutoff from Stage 1.6 and quote the spread — the
+   dominant systematic on every family result, and worse for L5.
 4. **P_esc(A, B, C)** from all real objects, both swarms pooled. Check that L4 and L5
    objects at the same position escape at the same rate — the symmetry test, G3.
-5. **Q3.** Apply P_esc to each swarm's debiased distribution and compare the predicted
+5. **Q3.** Apply P_esc to each swarm's complete-sample background distribution and compare the predicted
    L4/L5 difference with the measured one from step 2. Then P_esc against A at fixed
    (B, C): does escape rise with inclination, as Vokrouhlický's Fig. 14 suggests?
    - Prediction matches measurement → the inclination difference explains the erosion
@@ -401,9 +423,9 @@ About six weeks of slack in months 9–12.
 - **Rate:** ≈ 6.4 CPU-years per 10⁴ particles for 4.5 Gyr with all planets at
   dt ≈ 0.031 yr, extrapolated from `analysis/results/batch_results.json`. Stage 0.6
   replaces this with a measured number.
-- **Particles:** ≈ 12,400 real × 4 clones ≈ 50,000, plus the pass-2 top-up ≈ 30,000 —
-  order 8 × 10⁴.
-- **Cost:** ≈ 50 CPU-years with all planets, ≈ 5 giants-only at dt ≈ 0.1–0.25 yr. Both
+- **Particles:** ≈ 16,000 real × 4 clones ≈ 64,000, plus the pass-2 top-up ≈ 40,000 —
+  order 10⁵.
+- **Cost:** ≈ 65 CPU-years with all planets, ≈ 6 giants-only at dt ≈ 0.1–0.25 yr. Both
   are upper bounds; escaped particles stop costing. Days to a couple of weeks of wall
   time on a few hundred ALICE cores.
 - **Storage:** proper elements every 1 Myr for 10⁵ particles over 4.5 Gyr ≈ 10 GB.
