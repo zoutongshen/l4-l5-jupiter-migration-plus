@@ -6,8 +6,8 @@
 
 Background, with every number sourced:
 
-- `ASYMMETRY_REVIEW.md` — the field, the models, the research gaps G1–G6.
-- `VOKROUHLICKY_DISISTO_REVIEW.md` — the two anchor papers, side by side.
+- `docs/ASYMMETRY_REVIEW.md` — the field, the models, the research gaps G1–G6.
+- `docs/VOKROUHLICKY_DISISTO_REVIEW.md` — the two anchor papers, side by side.
 - `literature/READING_LIST.md`.
 
 ---
@@ -421,7 +421,7 @@ About six weeks of slack in months 9–12.
 ## 6. Compute budget
 
 - **Rate:** ≈ 6.4 CPU-years per 10⁴ particles for 4.5 Gyr with all planets at
-  dt ≈ 0.031 yr, extrapolated from `analysis/results/batch_results.json`. Stage 0.6
+  dt ≈ 0.031 yr, extrapolated from `migration/results/batch_results.json`. Stage 0.6
   replaces this with a measured number.
 - **Particles:** ≈ 16,000 real × 4 clones ≈ 64,000, plus the pass-2 top-up ≈ 40,000 —
   order 10⁵.

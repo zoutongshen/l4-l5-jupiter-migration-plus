@@ -1,6 +1,6 @@
 # Vokrouhlický et al. 2024 and Di Sisto et al. 2014/2019, Side by Side
 
-**Drafted 2026-09-10.** Companion to `ASYMMETRY_REVIEW.md`, whose research gaps (G1–G6)
+**Drafted 2026-09-10.** Companion to `docs/ASYMMETRY_REVIEW.md`, whose research gaps (G1–G6)
 this document re-ranks in §6. All three papers were read in full:
 
 - **V24.** Vokrouhlický, Nesvorný, Brož, Bottke, Deienno, Fuls & Shelly, *Orbital and
@@ -334,7 +334,7 @@ identically.
   identical". Permanence maps show no difference "even on Gyr timescales".
 - With every angle pinned to the Lagrange geometry, the grid samples one angular
   configuration: libration amplitude is not an independent dimension
-  (`ASYMMETRY_REVIEW.md` §3.1).
+  (`docs/ASYMMETRY_REVIEW.md` §3.1).
 
 **Real Trojans, D19.**
 
@@ -565,7 +565,7 @@ L4/L5 feature in either paper is D14's small-body low-i excess, which is the fam
 ## 6. Research gaps worth our time
 
 Ranked by payoff × tractability within twelve months, using the G labels of
-`ASYMMETRY_REVIEW.md` §4. **Feasibility, corrected** (`ASYMMETRY_REVIEW.md` §5): a
+`docs/ASYMMETRY_REVIEW.md` §4. **Feasibility, corrected** (`docs/ASYMMETRY_REVIEW.md` §5): a
 4.5 Gyr integration of 10⁴ particles costs ≈ 6 CPU-years in the current all-planets
 setup, roughly ten times less with giants only and a longer step. Di Sisto's own
 2,972-particle runs took "several computers … for several months". Gyr integrations of
@@ -636,16 +636,16 @@ empirical look. Highest scientific upside.
 ### Dropped
 
 - **"Explain the size dependence of the number ratio."** There is none in the data
-  (`ASYMMETRY_REVIEW.md` §1.2).
+  (`docs/ASYMMETRY_REVIEW.md` §1.2).
 
 ### Suggested order
 
 The family cross-match (days) → the G4 campaign, with families flagged → the G1 escape
 map, reusing the same integrations → G2 from the flagged families plus synthetic
 families. The resonant-angle and libration-amplitude diagnostic
-(`ASYMMETRY_REVIEW.md` §5) is needed from the second step on.
+(`docs/ASYMMETRY_REVIEW.md` §5) is needed from the second step on.
 
 **In practice these share one integration** of the catalogued Trojans plus clones:
 survey bias changes which Trojans are catalogued, not how they move, so it is
 handled by weighting objects with Vokrouhlický's debiased density rather than by
-simulating extra particles. See `MSc_PROJECT_PLAN.md` §2.
+simulating extra particles. See `docs/MSc_PROJECT_PLAN.md` §2.

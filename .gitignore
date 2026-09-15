@@ -1,19 +1,19 @@
-# Ignore large simulation data files (too big for GitHub)
-simulation_data/**/*.pkl
+# --- Data: lives on the external SSD, reached through symlinks ---
+/data
+migration/results/pkl
 
-# Ignore macOS system files
+# --- Python and tools ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+
+# --- LaTeX build output ---
+.texpadtmp/
+
+# --- macOS ---
 .DS_Store
-.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
-
-# Ignore Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# Ignore Python cache
-__pycache__/
-*.py[cod]
-*$py.class

@@ -8,8 +8,8 @@ Scope: **dynamical explanations only**, whether simulated or analytic. Observati
 bias and collisional grinding are excluded as candidate *mechanisms*, but retained
 where they act as constraints a dynamical model must respect.
 
-Companion documents: `VOKROUHLICKY_DISISTO_REVIEW.md` (the two anchor papers read in
-full, side by side), `MSc_PROJECT_PLAN.md` (the migration project, now parked as a
+Companion documents: `docs/VOKROUHLICKY_DISISTO_REVIEW.md` (the two anchor papers read in
+full, side by side), `docs/MSc_PROJECT_PLAN.md` (the migration project, now parked as a
 fallback) and `literature/READING_LIST.md`.
 
 ---
@@ -517,7 +517,7 @@ origin model is required to hit.
 
 ## 5. Feasibility — read before choosing
 
-Measured from `analysis/results/batch_results.json`: **≈ 45–49 s of CPU per kyr** at
+Measured from `migration/results/batch_results.json`: **≈ 45–49 s of CPU per kyr** at
 N = 10⁴ particles with `planet_set='all'` (8 massive bodies, dt ≈ 0.031 yr, clamped by
 Venus; single-threaded workers).
 
@@ -535,9 +535,9 @@ Three levers, all already present in the code:
 
 - **`planet_set='giants'`** — drops the four terrestrials and lets the timestep rise
   from 0.031 to 0.1 yr. Saturn must stay: its secular resonances drive Trojan
-  instability (Marzari & Scholl 2002). `MSc_PROJECT_PLAN.md` §4 records that dropping
+  instability (Marzari & Scholl 2002). `docs/MSc_PROJECT_PLAN.md` §4 records that dropping
   the terrestrials "doesn't work" as an untested open item — resolve that first.
-- **`add_trojan_disk`** (`analysis/simulation/bodies.py:232`) — seeds L4 and L5
+- **`add_trojan_disk`** (`migration/simulation/bodies.py:232`) — seeds L4 and L5
   directly instead of the structured disk, where ~85% of particles are never
   co-orbital. Written, exported, and never called by any script.
 - **Snapshot volume** — each 50 kyr / 10⁴-particle run is 92 MB in the
@@ -598,7 +598,7 @@ Cited by papers in `literature/`, but absent:
 
 Take **G1** to Simon as the headline, with **G4's question as its first step** and
 **G2** as the extension. Reading both anchor papers in full
-(`VOKROUHLICKY_DISISTO_REVIEW.md`) changed the order of work:
+(`docs/VOKROUHLICKY_DISISTO_REVIEW.md`) changed the order of work:
 
 1. **G1 step 2, the family cross-match** (days, no integration): how much of Di Sisto's
    sample is family members, per swarm.
@@ -618,4 +618,4 @@ asymmetry at a stated significance or shows the Gyr contribution is zero.
 **In practice these share one integration** of the catalogued Trojans plus clones:
 survey bias changes which Trojans are catalogued, not how they move, so it is
 handled by weighting objects with Vokrouhlický's debiased density rather than by
-simulating extra particles. See `MSc_PROJECT_PLAN.md` §2.
+simulating extra particles. See `docs/MSc_PROJECT_PLAN.md` §2.

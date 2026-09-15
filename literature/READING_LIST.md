@@ -1,6 +1,6 @@
 # Reading list — L4/L5 Jupiter Trojan asymmetry under migration
 
-Assembled 2026-08-24 for `MSc_PROPOSAL.md` / `MSc_PROJECT_PLAN.md`.
+Assembled 2026-08-24 for `docs/MSc_PROPOSAL.md` / `docs/MSc_PROJECT_PLAN.md`.
 31 PDFs downloaded into the subfolders below. Paywalled items are listed at the
 end with links — Leiden has access to all of them.
 
@@ -152,14 +152,14 @@ not a scenario needing its own chapter.
 
 **Concrete edits.**
 
-- `MSc_PROPOSAL.md` line ~57: *"outward drift driven by a Jupiter-Saturn resonant
+- `docs/MSc_PROPOSAL.md` line ~57: *"outward drift driven by a Jupiter-Saturn resonant
   pair, as in the Grand Tack"* → **"outward drift driven by a Jupiter-Saturn
   resonant pair (Masset & Snellgrove 2001; Morbidelli & Crida 2007)"**. Deleting
   four words costs nothing and removes the whole argument.
-- `MSc_PROJECT_PLAN.md` §1.4: retitle the Raymond & Morbidelli bullet
+- `docs/MSc_PROJECT_PLAN.md` §1.4: retitle the Raymond & Morbidelli bullet
   *"gas-disc outward migration — rates"*, and keep only the `ȧ ~ 4×10⁻⁵ au/yr`
   number.
-- `MSc_PROJECT_PLAN.md` §6 Phase 4: the optional direction-reversal run stays, but
+- `docs/MSc_PROJECT_PLAN.md` §6 Phase 4: the optional direction-reversal run stays, but
   call it a **direction reversal** (a sign flip in `ȧ_J`), not a Grand Tack. Same
   simulation, no baggage.
 - Introduction: at most one sentence — *"one specific realisation of such an

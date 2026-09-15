@@ -1,7 +1,7 @@
 # MSc Research Project — Proposal
 
 **Draft 2026-08-22.** Title and two-paragraph scope, for signature by supervisor
-and examiner. Background reasoning: `MSc_PROJECT_PLAN.md`.
+and examiner. Background reasoning: `docs/MSc_PROJECT_PLAN.md`.
 
 ---
 
@@ -18,7 +18,7 @@ Trojan Asymmetry**
 for producing the asymmetry (Pirani's `v_lim ~ 0.17 q Omega r`, Li's control at
 `1.5e-4 AU/yr`) sit at or above the Type II ceiling for a full-mass Jupiter, so a
 title promising Type II promises a regime where the answer may be "nothing
-happens". See `MSc_PROJECT_PLAN.md` Section 12.4-12.5.
+happens". See `docs/MSc_PROJECT_PLAN.md` Section 12.4-12.5.
 
 ---
 
