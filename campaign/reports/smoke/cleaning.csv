@@ -1,0 +1,6 @@
+label_region,swarm,n,failed_1myr,of_which_removed
+JPL,L4,1,1,1
+MPC,L5,1,1,1
+V24+JPL,L4,6,0,0
+V24+JPL+MPC,L4,124,2,2
+V24+JPL+MPC,L5,68,0,0

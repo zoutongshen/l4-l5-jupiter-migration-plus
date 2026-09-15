@@ -1,0 +1,10 @@
+{
+  "cpu_s": 63.537993,
+  "wall_s_max_chunk": 32.10545611381531,
+  "n_sessions": 2,
+  "n_trojans": 200,
+  "t_end_yr": 100001.92572075124,
+  "dt_yr": 0.11860936251156566,
+  "check_every_steps": 8,
+  "cpu_s_per_trojan_myr": 3.1768384729622925
+}

@@ -1,0 +1,5 @@
+n_trojans,safe_mode,check_every_steps,cpu_s_per_trojan_myr_integration,cpu_s_per_trojan_myr_with_sampling,cpu_s_per_particle_step
+500,1,8,0.8767,2.013,1.04e-07
+500,0,8,0.5894,1.2,6.99e-08
+2000,1,8,0.8715,1.64,1.034e-07
+2000,0,8,0.6253,1.111,7.417e-08

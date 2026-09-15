@@ -1,0 +1,16 @@
+label_region,swarm,n,n_complete,n_mpc_swarm_disagrees,n_v24_catalogue_swarm_disagrees,median_H
+JPL,L4,60,1,0,0,15.58
+JPL,L5,20,1,0,0,15.215
+JPL+MPC,L4,19,2,1,0,15.15
+JPL+MPC,L5,3,0,0,0,15.44
+MPC,L4,5,0,0,0,15.277
+MPC,L5,2,0,1,1,16.856
+V24,L4,18,0,0,0,15.895
+V24,L5,21,2,0,0,16.18
+V24+JPL,L4,547,1,0,0,15.86
+V24+JPL,L5,17,0,0,0,15.88
+V24+JPL+MPC,L4,9789,1835,0,0,14.61
+V24+JPL+MPC,L5,5936,1211,0,0,14.47
+V24+MPC,L4,8,0,0,0,15.98
+none,L4,20,1,0,0,16.8
+none,L5,14,0,0,0,16.849

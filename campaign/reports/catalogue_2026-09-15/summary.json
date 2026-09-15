@@ -1,0 +1,50 @@
+{
+  "raw_date": "2026-09-15",
+  "t0_jd_tdb": 2461200.5,
+  "jupiter_at_t0": {
+    "a": 5.20254,
+    "e": 0.048255,
+    "inc": 1.303604,
+    "Omega": 100.518216,
+    "omega": 273.551933,
+    "M": 102.587499,
+    "varpi": 14.070149,
+    "lam": 116.657648
+  },
+  "n_candidates": 16479,
+  "n_in_run": 16445,
+  "in_run_by_swarm": {
+    "L4": 10446,
+    "L5": 5999
+  },
+  "v24_selected_by_swarm": {
+    "L4": 10362,
+    "L5": 5974
+  },
+  "jpl_tjn_by_swarm": {
+    "L4": 10415,
+    "L5": 5976
+  },
+  "mpc_by_its_own_label": {
+    "L4": 9821,
+    "L5": 5941
+  },
+  "complete_v24_by_swarm": {
+    "L4": 1836,
+    "L5": 1213
+  },
+  "disisto2013_by_swarm": {
+    "L4": 1975,
+    "L5": 999
+  },
+  "off_epoch_in_run": 1668,
+  "v24_proper_matched_in_run": 12380,
+  "v24_family_members_in_run": 1895,
+  "v24_family_overlaps": 0,
+  "abc_at_t0_vs_v24_proper_spearman": {
+    "n": 12373,
+    "A_vs_sini_p": 0.9576816048532698,
+    "B_vs_e_p": 0.9803652565611326,
+    "sqrt(C-1.5)_vs_da_p": 0.9732186472580003
+  }
+}
