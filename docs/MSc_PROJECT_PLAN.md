@@ -1,6 +1,7 @@
 # MSc Research Project — Working Plan
 
-**Status:** plan, not yet started. Rewritten 2026-09-12.
+**Status:** Stages 0–3 under way (first 10 Myr pilot), set at the 2026-09-15 meeting. Rewritten 2026-09-12.
+The research question is still being settled; the setup decisions below are fixed.
 **Length:** 1 year. **Supervisor:** Simon Portegies Zwart.
 **Repo:** `L4-L5-Jupiter-Migration-Plus`. **Compute:** ALICE (Leiden HPC).
 
@@ -23,8 +24,8 @@ not statistically significant (0.9σ). Meanwhile Vokrouhlický et al. 2024 publi
 first debiased, family-free description of both swarms, and found the only significant
 orbital difference between them is in inclination.
 
-This project integrates every catalogued Trojan for 4.5 Gyr, with clones for
-statistics, and each object labelled by swarm and family. It measures whether the
+This project integrates every catalogued Trojan for 4.5 Gyr, each object once (no
+clones) and labelled by swarm and family. It measures whether the
 swarms really do erode differently, whether families explain it, and whether the
 inclination difference explains it.
 
@@ -55,11 +56,11 @@ back-extrapolating today's escape rate to primordial times (G6).
 | | |
 |---|---|
 | Code | REBOUND, WHFast |
-| Massive bodies | Sun + giant planets (Jupiter–Neptune), terrestrial masses folded into the Sun. Alternative: Venus–Neptune, to match Di Sisto 2019 — pending §8.4. Saturn is mandatory either way: its secular resonances drive Trojan instability |
+| Massive bodies | **Decided 2026-09-15:** Sun with the Mercury, Venus, Earth–Moon and Mars masses folded in; Jupiter, Saturn, Uranus and Neptune kept as separate bodies with their system (planet + moons) masses, DE440 |
 | Test particles | **Massless. They feel the Sun and planets, never each other.** So particles of different kinds cannot interfere, and chunking them across jobs is bookkeeping, not physics |
 | Start | Present day. Planets from JPL Horizons at the catalogue epoch; Trojans from their catalogued orbits at the same epoch |
 | End | +4.5 Gyr forward, or when the particle escapes |
-| Timestep | From the Stage 0.6 benchmark; expect 0.1–0.25 yr giants-only |
+| Timestep | **Decided 2026-09-15:** 1% of Jupiter's orbital period, ≈ 0.1186 yr. Stage 0.6 measures its cost and checks it against dt/2 |
 | Not included | Collisions, Yarkovsky, gas, migration, planetary mass growth. Nothing but gravity |
 
 ### 2.2 Two runs, and nothing else
@@ -69,20 +70,20 @@ seeded into the main run.**
 
 | | **Main run** (Stages 3–5) | **Family run** (Stage 6) |
 |---|---|---|
-| Particles | Every catalogued Jupiter Trojan (≈ 16,000 as of Sept 2026) at its real orbit, plus ~4 clones each | Synthetic fragments thrown from each real family's location at 10–100 m/s |
-| Count | ≈ 100,000 | ≈ 10,000 |
+| Particles | Every catalogued Jupiter Trojan at its real orbit, once: the union of the V24, JPL (TJN) and MPC definitions | Synthetic fragments thrown from each real family's location at 10–100 m/s |
+| Count | ≈ 16,500 | ≈ 10,000 |
 | Duration | 4.5 Gyr | 1–4.5 Gyr |
 | Real or artificial | Real orbits only | Artificial, but modelling a real event (the family-forming collision) |
 | Answers | Q1, Q2, Q3, Q5 | Q4 |
 
 Only Trojans are simulated as particles — not the main belt, not anything else.
 
-### 2.3 Why clones
+### 2.3 No clones (decided 2026-09-15)
 
-A single 4.5 Gyr trajectory in a chaotic system is one coin-flip, not a probability.
-Running each object as several near-identical copies gives the fraction of its clones
-that escape, p_i — that object's escape probability. Clone construction and budget:
-Stage 3.
+Each object is integrated once. A single 4.5 Gyr trajectory in a chaotic system is one
+draw, so escape fractions carry binomial errors over objects, and those errors include
+each object's chaotic scatter; per-object escape probabilities are not measured.
+At the meeting, cloning was judged to cost more in complexity than it returns.
 
 ### 2.4 What is recorded per particle
 
@@ -98,25 +99,26 @@ plus Jupiter's (his Eqs. 1–3).
 
 ### 2.6 Survey bias
 
-- **H ≤ 13.8 (3,753 objects today) is complete:** the catalogue contains essentially
-  every Trojan that bright, so this subset *is* the true population and needs no
-  correction. All population numbers come from it.
+- **H ≤ 13.6 is taken as complete** (meeting 2026-09-15, slightly inside V24's
+  H ≈ 13.7–13.8 limit): the catalogue contains essentially every Trojan that bright, so
+  this subset *is* the true population and needs no correction. All population numbers
+  come from it. Flagged `complete` in the master table.
 - **Fainter objects are incomplete.** They are simulated, because they add statistics
   on the dynamics, but never used for population numbers.
 - **Vokrouhlický's debiased model** (his Eqs. 6–8, Table 3) is needed only if a result
-  must extend below H ≈ 13.8, as weights w_i = n(A_i, B_i, C_i) / n_obs(A_i, B_i, C_i).
+  must extend below H ≈ 13.6, as weights w_i = n(A_i, B_i, C_i) / n_obs(A_i, B_i, C_i).
 
 ### 2.7 Which question uses which particles
 
-**Every clone of every listed object is used throughout** — p_i, the per-object escape
-probability, is the basic unit of all of it.
+**Every listed object is used throughout**, one trajectory each; the magnitude cut
+below is the `complete` flag, H ≤ 13.6.
 
 | | Objects | Magnitude cut | Swarms | Output |
 |---|---|---|---|---|
-| **Q1** | Background only (family members excluded) | **H ≤ 13.8** — the complete sample, so no debiasing is needed | L4 and L5 **separately** | Escape fraction per swarm, with errors |
-| **Q2** | Family members **and** background | (i) H ≤ 13.8, to compare with Q1; (ii) none | L4 and L5 separately | (i) **Contamination:** swarm escape fraction with families included vs excluded. (ii) **Check:** family vs background escape at matched (A, B, C) — should agree, since dynamics depends only on the orbit; a mismatch means the cells are too coarse. Both repeated at several membership cutoffs |
+| **Q1** | Background only (family members excluded) | **H ≤ 13.6** — the complete sample, so no debiasing is needed | L4 and L5 **separately** | Escape fraction per swarm, with errors |
+| **Q2** | Family members **and** background | (i) H ≤ 13.6, to compare with Q1; (ii) none | L4 and L5 separately | (i) **Contamination:** swarm escape fraction with families included vs excluded. (ii) **Check:** family vs background escape at matched (A, B, C) — should agree, since dynamics depends only on the orbit; a mismatch means the cells are too coarse. Both repeated at several membership cutoffs |
 | **G3** | Background | none | L4 and L5 **separately**, then compared | Is P_esc(A, B, C) the same function in both swarms? |
-| **Q3** | Background | none for the map; H ≤ 13.8 for the distributions it is applied to | **Pooled** into one map, then applied to each swarm's distribution | Predicted L4/L5 difference, compared with Q1 |
+| **Q3** | Background | none for the map; H ≤ 13.6 for the distributions it is applied to | **Pooled** into one map, then applied to each swarm's distribution | Predicted L4/L5 difference, compared with Q1 |
 | **Q4** | Family members, **plus the separate family run** (§2.2) | none | L4 and L5 separately | Spread in proper elements vs time |
 | **Q5** | Everything | none | L4 and L5 separately | Residence times, escape-time distributions, state sequence before escape |
 | **G6** | Everything | none | L4 and L5 separately | Escape rate vs time |
@@ -156,22 +158,23 @@ project start; stages overlap.
 
 1. **Environment.** Project conda env on ALICE (never base) with REBOUND. Confirm
    allocation and queue limits.
-2. **Fix giants-only mode.** Remove hard-coded `jupiter_index=4` defaults
-   (`run_batch.py`, `01_burnin.py`, `simulation/analysis.py`, `visualization.py`,
-   `migration.py`); with `planet_set='giants'` index 4 is Neptune. Add a pytest.
+2. ~~Fix giants-only mode.~~ **Moot (2026-09-15):** the migration-era code is frozen in
+   `migration/`; the present-day code is new in `campaign/` and finds bodies by name.
 3. **Real planets at the real epoch.** `create_solar_system` currently randomises
    planet angles (`bodies.py:89–99`). Replace with JPL Horizons states at the
    catalogue epoch. Build and cache the initial simulation locally — ALICE compute
    nodes have no network.
-4. **Real Trojans in,** from MPC elements at the same epoch.
-   *Check:* propagate 20 known Trojans 1,000 yr and compare with Horizons.
+4. **Real Trojans in,** from JPL SBDB elements at the same epoch (Horizons states for
+   objects whose orbit epoch differs).
+   *Check:* propagate 20 known Trojans ±400 yr and compare with Horizons (Horizons'
+   small-body ephemerides do not reach +1,000 yr comfortably).
 5. **Escape bookkeeping.** `runner.py` currently removes particles past a distance and
    records no escape time. Record per particle: time of leaving the libration zone;
    first encounter within 1 and 2.1 Hill radii of any planet; which planet. Keep
    distance-based removal as a backstop.
-6. **Benchmark.** 1,000 real Trojans, 1 Myr, all planets vs giants-only, at
-   dt = 0.02, 0.05, 0.1, 0.25 yr. Measure CPU per particle-Gyr; check escape
-   statistics agree across settings over 100 Myr.
+6. **Benchmark.** Planet set and timestep are fixed (§2.1), so this measures rather than
+   chooses: CPU per particle-Myr; the sampling interval for encounter checks; dt vs
+   dt/2 over 1 Myr for 1,000 real Trojans.
 
 **Deliverable:** working giants mode, validated real-epoch initialisation, cost table.
 **Done when:** the 1,000-yr propagation matches Horizons and cost is measured, not
@@ -181,18 +184,21 @@ extrapolated.
 
 **Goal:** the master table, and the cheapest decisive test in the project.
 
-1. **Catalogue.** MPCORB, with Vokrouhlický's Trojan selection: 4.95 < a < 5.45 au,
-   e < 0.6, I < 50°, 20° < |σ| < 130°. A 1 Myr cleaning integration removes comets
-   posing as Trojans.
+1. **Catalogue.** JPL SBDB, with Vokrouhlický's Trojan selection: 4.95 < a < 5.45 au,
+   e < 0.6, I < 50°, 20° < |σ| < 130°, applied at the common epoch. Compared with JPL's
+   TJN class and the MPC Jupiter Trojan list; the run integrates the union of all three.
+   The first 1 Myr of the pilot is the cleaning integration.
 2. **Vokrouhlický's catalogue** from https://sirrah.troja.mff.cuni.cz/~mira/tmp/trojans/
-   (live 2026-09-10; mirror into the repo): `trojans-hcm_20230405_GS` (proper elements),
-   `trojans_L4_families_2023Apr`, `trojans_L5_families_2023Apr` (membership).
+   (mirrored 2026-09-15 to `data/raw/v24/`): `greeks-hcm_20230405_GS` (L4 proper
+   elements) and `trojans-hcm_20230405_GS` (L5 proper elements — the "trojans" directory
+   is the L5 camp only), `trojans_L4_families_2023Apr`, `trojans_L5_families_2023Apr`
+   (membership).
 3. **Master table,** one row per object: designation, swarm, H, `complete` flag
-   (H ≤ 13.8), family or `background` (one column per membership cutoff, Stage 1.6),
+   (H ≤ 13.6), family or `background` (one column per membership cutoff, Stage 1.6),
    proper elements, (A, B, C), and a `disisto2013` flag. Membership is per object,
    from clustering, so objects inside a family's region can still be background.
    Objects discovered after April 2023 carry no family label in Vokrouhlický's files;
-   almost all are fainter than H = 13.8, so Q1 is unaffected, and they are labelled
+   almost all are fainter than H = 13.6, so Q1 is unaffected, and they are labelled
    with our own proper elements after Stage 2.
 4. **Reconstruct Di Sisto's sample.** He used no private catalogue: his input was the
    MPC's *numbered* Jupiter Trojans as of March 2013, i.e. today's catalogue filtered
@@ -267,36 +273,17 @@ sample was families?" — the first thing to show Simon.
 **Deliverable:** a co-orbital diagnostics module, plus validation plots.
 **Done when:** Validations A and B pass. **Do not launch Stage 4 before this.**
 
-### Stage 3 — Clones and pilot (weeks 10–13)
+### Stage 3 — Pilot (weeks 10–13)
 
-**Goal:** the particle set, sized to the budget.
+**Goal:** the particle set and configuration, proven end to end.
 
-1. **Clones.** Sample each clone from the object's published orbit covariance
-   (JPL `sbdb.api?cov=mat`), so every clone is an orbit the observations genuinely
-   allow. Typical numbered-Trojan uncertainties are small — Eurybates has
-   σ_q ≈ 5 km — and chaos amplifies any such separation to the libration scale within
-   a few Myr, so the results should be insensitive to the seeding. **Test that:** one
-   batch from the covariance, one seeded 10³× tighter; escape fractions must agree.
-   Objects on regular orbits will not diverge at all, which is the answer for them
-   (p_i = 0 or 1), not a failure.
-2. **Clone budget, two passes.** "Marginal" cannot be judged from a short pilot:
-   Trojans show *stable chaos* (Milani 1993) — trajectories diverge on ~10⁵ yr while
-   the object still survives 4.5 Gyr with certainty. What matters is uncertainty of
-   the *outcome*, visible only at the end.
-   - **Pass 1:** 4 clones per object, full 4.5 Gyr.
-   - **Marginal := clones disagree** (some escape, some survive). Unanimous objects
-     need nothing more.
-   - **Pass 2:** top marginal objects up to ~16 clones. A minority (~25% of Trojans
-     escape at all), and escaped clones stop costing CPU.
-   - **Why ~16 is enough:** for ~1,400 objects with 20% marginal, the chaos-induced
-     error on a swarm escape fraction is ≈ 0.4% at 4 clones and ≈ 0.2% at 16, against
-     ≈ 1.2% from object counts. Re-derive with the pass-1 marginal fraction before
-     committing to pass 2.
-3. **Pilot.** Everything for 10 Myr at the Stage 0.6 planet set and timestep. Measure
-   wall time, memory, output volume; test escape bookkeeping, diagnostics, and
-   checkpoint/restart on ALICE.
-4. **Freeze and pre-register.** Fix particle counts, clone counts, planet set,
-   timestep, output cadence. Write down the Stage 5 analyses before seeing results.
+1. ~~Clones~~ and 2. ~~Clone budget~~: **removed at the 2026-09-15 meeting** (§2.3).
+   The old design is in git history (`git show 86dc33e:docs/MSc_PROJECT_PLAN.md`).
+3. **Pilot.** The whole catalogue for 10 Myr at the §2.1 planet set and timestep, on
+   the laptop (`campaign/configs/pilot_10myr.toml`). Measure wall time, memory, output
+   volume; test escape bookkeeping, diagnostics, and checkpoint/restart.
+4. **Freeze and pre-register.** Fix particle set, planet set, timestep, output cadence.
+   Write down the Stage 5 analyses before seeing results.
 
 **Deliverable:** frozen particle set and configuration; pilot report.
 **Done when:** projected cost fits the allocation.
@@ -332,13 +319,12 @@ sample was families?" — the first thing to show Simon.
      complete bright part or the biased faint part?
    - **"Agreement" means within ~2–3%,** not exact: his counts carry ± 1.0% (L4) and
      ± 1.4% (L5) binomial error plus the chaotic scatter of one realisation per
-     object. Our clones remove that scatter on our side; his numbers keep it.
+     object. Without clones, our numbers carry the same kind of scatter.
    - **A real mismatch** (say 15% or 35%) means a systematic difference — planet set,
      timestep, integrator, escape bookkeeping — and must be diagnosed before any of
      our numbers are trusted. That diagnosis is gap G4, so it is a result either way.
-2. **Q1.** Complete (H ≤ 13.8), non-family objects: per-object escape probabilities
-   from clones, giving per-swarm escape fractions with errors. Is L5 higher, and by
-   how much?
+2. **Q1.** Complete (H ≤ 13.6), non-family objects: per-swarm escape fractions with
+   binomial errors. Is L5 higher, and by how much?
 3. **Q2.** (i) Swarm escape fractions from the complete sample with families included
    vs excluded — the contamination effect. (ii) Family vs background escape at matched
    (A, B, C), per family — expected to agree; a mismatch means the cells are too coarse.
@@ -397,7 +383,7 @@ present-day erosion of the Jupiter Trojans.
 | 0 Set-up | ■ | | | | | | | | | | | |
 | 1 Data + cross-match | ■ | ■ | | | | | | | | | | |
 | 2 Diagnostics + validation | | ■ | ■ | | | | | | | | | |
-| 3 Clones + pilot | | | ■ | | | | | | | | | |
+| 3 Pilot | | | ■ | | | | | | | | | |
 | 4 Campaign | | | | ■ | ■ | | | | | | | |
 | 5 Erosion analysis | | | | | ■ | ■ | ■ | ■ | | | | |
 | 6 Families | | | | | | | ■ | ■ | ■ | | | |
@@ -413,7 +399,7 @@ About six weeks of slack in months 9–12.
 |---|---|---|
 | End of Stage 1 | Do family shares differ between swarms by more than a few percent? | Q2 weakens; Q1 and Q3 carry the project |
 | End of Stage 2 | Do our proper elements match Vokrouhlický's? | Don't launch. Fix, or bin by his catalogue values at t = 0 and drop Stage 6.1 |
-| End of Stage 3 | Does the campaign fit the allocation? | Fewer clones; giants only; complete sample only |
+| End of Stage 3 | Does the campaign fit the allocation? | Complete sample only; longer sampling interval |
 | Stage 5.1 | Do our escape fractions match the published ones within ~2–3%? | Diagnose the systematic (planet set, timestep, escape criterion) before interpreting our own numbers |
 
 ---
@@ -423,12 +409,12 @@ About six weeks of slack in months 9–12.
 - **Rate:** ≈ 6.4 CPU-years per 10⁴ particles for 4.5 Gyr with all planets at
   dt ≈ 0.031 yr, extrapolated from `migration/results/batch_results.json`. Stage 0.6
   replaces this with a measured number.
-- **Particles:** ≈ 16,000 real × 4 clones ≈ 64,000, plus the pass-2 top-up ≈ 40,000 —
-  order 10⁵.
-- **Cost:** ≈ 65 CPU-years with all planets, ≈ 6 giants-only at dt ≈ 0.1–0.25 yr. Both
-  are upper bounds; escaped particles stop costing. Days to a couple of weeks of wall
-  time on a few hundred ALICE cores.
-- **Storage:** proper elements every 1 Myr for 10⁵ particles over 4.5 Gyr ≈ 10 GB.
+- **Particles:** ≈ 16,500, no clones (§2.3).
+- **Cost:** to be replaced by the Stage 0.6 measurement. The old extrapolation, scaled
+  to giants-only at dt ≈ 0.12 yr and 16,500 particles, is of order 1 CPU-year — an
+  upper bound, since escaped particles stop costing.
+- **Storage:** 10 kyr window summaries for 16,500 particles are ≈ 0.8 GB per 10 Myr;
+  a 4.5 Gyr run needs a coarser cadence (e.g. 1 Myr windows, ≈ 4 GB).
 
 ---
 
@@ -436,7 +422,7 @@ About six weeks of slack in months 9–12.
 
 | Risk | Fallback |
 |---|---|
-| Cost higher than estimated | Giants only; fewer clones; complete sample only |
+| Cost higher than estimated | Complete sample only; ALICE job arrays |
 | Vokrouhlický's catalogue disappears | Mirror it now (Stage 1.2) |
 | Proper-element validation fails | Bin by his catalogue values at t = 0; replace Stage 6.1 with libration-amplitude and e/i dispersions |
 | L5 family membership too interloper-ridden | Quote results across cutoffs; fall back to tight-cutoff core vs everything else, which brackets the answer |
@@ -456,8 +442,8 @@ About six weeks of slack in months 9–12.
    comparison of binary fractions per swarm, which has never been measured.
 2. **Static vs dynamic** is Q5, and costs nothing extra. Confirm this is what he meant.
 3. **Registration form** was signed with the migration title. Does it need amending?
-4. **Planet set:** giants only (Vokrouhlický's choice, cheaper) or Venus–Neptune
-   (Di Sisto 2019's, directly comparable)?
+4. ~~**Planet set.**~~ **Answered 2026-09-15:** inner planets folded into the Sun, the
+   four giants separate, dt = 1% of Jupiter's period (§2.1).
 5. **Scope:** collisions and Yarkovsky out — confirm.
 6. **Pre-registered analysis** (Stage 3.4): does he want to see it before the campaign?
 
@@ -469,3 +455,8 @@ Bookkeeping starts when the project does. Planning-stage deliberation is in git
 history, not here.
 
 - **2026-09-12** — Plan written.
+- **2026-09-15** — Meeting with Simon; research question still open, but a first run
+  agreed: Stages 0–3, **no clones**, whole catalogue with H ≤ 13.6 as the complete
+  flag, V24's Trojan definition compared with the JPL and MPC labels, inner planets
+  folded into the Sun, giants separate, dt = 1% P_J, 10 Myr pilot. Repo restructured
+  (`docs/`, `migration/`, `campaign/`, data on the external SSD).
