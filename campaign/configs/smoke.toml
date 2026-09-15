@@ -1,0 +1,23 @@
+# Smoke test: the full chain (build -> run -> merge -> report) on a small subset.
+# Throwaway: delete data/runs/smoke/ and campaign/reports/smoke/ before rerunning.
+
+[run]
+ic_id = "2026-09-15_giants"
+t_end_yr = 1.0e5
+n_chunks = 2
+subset = 200
+seed = 20260915
+
+[integrator]
+check_every_steps = 8
+safe_mode = 1
+corrector = 0
+
+[diagnostics]
+window_yr = 1.0e4
+checkpoint_every_windows = 2
+
+[escape]
+record_hill_radii = 2.1
+remove_hill_radii = 1.0
+r_max_au = 100.0

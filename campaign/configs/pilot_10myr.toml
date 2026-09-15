@@ -1,0 +1,25 @@
+# Stage 3.3 pilot, set up at the 2026-09-15 meeting:
+#   whole catalogue (union of V24, JPL TJN and MPC definitions), no clones;
+#   Sun + Mercury..Mars folded, Jupiter..Neptune separate; WHFast, dt = 1% P_J (from ic.json).
+# Freeze this file once the run has started: the launcher refuses to resume
+# with a config that differs from the copy in data/runs/pilot_10myr/.
+
+[run]
+ic_id = "2026-09-15_giants"
+t_end_yr = 1.0e7
+n_chunks = 8
+seed = 20260915
+
+[integrator]
+check_every_steps = 8        # confirm with s0_benchmark.py before launching
+safe_mode = 1
+corrector = 0
+
+[diagnostics]
+window_yr = 1.0e4
+checkpoint_every_windows = 10
+
+[escape]
+record_hill_radii = 2.1
+remove_hill_radii = 1.0
+r_max_au = 100.0

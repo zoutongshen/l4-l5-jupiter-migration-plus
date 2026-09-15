@@ -1,0 +1,25 @@
+# Stage 0.6 accuracy benchmark (k1): 1,000 catalogue Trojans for 1 Myr.
+# The benchmark_k*/halfdt runs share seed and subset, so they integrate the same objects.
+# Compare with: s0_benchmark.py compare
+
+[run]
+ic_id = "2026-09-15_giants"
+t_end_yr = 1.0e6
+n_chunks = 1
+subset = 1000
+seed = 20260915
+
+[integrator]
+check_every_steps = 1
+dt_scale = 1.0
+safe_mode = 1
+corrector = 0
+
+[diagnostics]
+window_yr = 1.0e4
+checkpoint_every_windows = 10
+
+[escape]
+record_hill_radii = 2.1
+remove_hill_radii = 1.0
+r_max_au = 100.0

@@ -6,9 +6,15 @@ dependencies:
   - numpy
   - scipy
   - matplotlib
+  - pandas
+  - pyarrow
+  - h5py
+  - requests
   - ipykernel
   - pytest
   - pip
   - pip:
-      - rebound
-      - reboundx
+      - rebound==4.6.0
+      - reboundx==4.6.2
+# After creating or updating the env, from the repo root:
+#   conda run -n trojan-rb pip install --no-deps -e campaign

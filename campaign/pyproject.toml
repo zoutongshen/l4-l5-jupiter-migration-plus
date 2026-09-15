@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trojans"
+version = "0.1.0"
+description = "Present-day integrations of the catalogued Jupiter Trojans"
+requires-python = ">=3.12"
+
+[tool.hatch.build.targets.wheel]
+packages = ["trojans"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# No .pytest_cache directories in the repo.
+addopts = "-p no:cacheprovider"
