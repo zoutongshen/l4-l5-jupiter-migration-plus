@@ -1,0 +1,48 @@
+{
+  "reference": "benchmark_k1",
+  "n_trojans": 1000,
+  "benchmark_k4": {
+    "cpu_s": 2559.785183,
+    "n_hill_record": 24,
+    "n_hill_record_ref": 24,
+    "hill_record_only_here": 0,
+    "hill_record_only_ref": 0,
+    "median_abs_dt_hill_record_yr": 0.17791404376839637,
+    "n_removed": 24,
+    "n_removed_ref": 24,
+    "removed_disagree": 0,
+    "final_class_agreement": 1.0,
+    "final_C_median_rel_diff": 4.158888623351231e-05
+  },
+  "benchmark_k8": {
+    "cpu_s": 1788.3319569999999,
+    "n_hill_record": 24,
+    "n_hill_record_ref": 24,
+    "hill_record_only_here": 0,
+    "hill_record_only_ref": 0,
+    "median_abs_dt_hill_record_yr": 0.7116561750697201,
+    "n_removed": 24,
+    "n_removed_ref": 24,
+    "removed_disagree": 0,
+    "final_class_agreement": 1.0,
+    "final_C_median_rel_diff": 4.162554250797257e-05
+  },
+  "benchmark_halfdt": {
+    "cpu_s": 2340.089542,
+    "n_hill_record": 24,
+    "n_hill_record_ref": 24,
+    "hill_record_only_here": 1,
+    "hill_record_only_ref": 1,
+    "median_abs_dt_hill_record_yr": 349.7790100466158,
+    "n_removed": 24,
+    "n_removed_ref": 24,
+    "removed_disagree": 2,
+    "final_class_agreement": 0.998,
+    "final_C_median_rel_diff": 4.8130455979844555e-05
+  },
+  "benchmark_k1": {
+    "cpu_s": 6659.747825,
+    "n_hill_record": 24,
+    "n_removed": 24
+  }
+}
