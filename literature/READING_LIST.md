@@ -118,7 +118,7 @@ Ordered by how much you need them.
 `99_course_background/`
 - Bošković et al. (2025), TOI-178 — the exoplanet resonant-chain extension. Plan §10.3 already ruled it out (it needs new simulations). Outlook paragraph only.
 - AMUSE book pp. 320-338 — course background, not science input.
-- `Debes2025.pdf` at repo root — white-dwarf planets, unrelated. Move or delete it.
+- Debes et al. (2025), metal-polluted white dwarfs with JWST/MIRI — white-dwarf planets, unrelated.
 
 ---
 
