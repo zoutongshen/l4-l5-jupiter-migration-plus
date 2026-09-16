@@ -42,10 +42,19 @@ plt.rcParams.update({
 })
 
 
+def well_determined(events: pd.DataFrame) -> np.ndarray:
+    """JPL orbit condition code <= 4. Poorer orbits escape far more often, and the
+    two swarms hold different shares of them, so mixing them in biases the comparison."""
+    return (pd.to_numeric(events["condition_code"], errors="coerce") <= 4).to_numpy()
+
+
 def samples(events: pd.DataFrame) -> dict:
+    v24 = events["v24_selected"].to_numpy()
+    good = well_determined(events)
     return {
         "all integrated": np.ones(len(events), bool),
-        "V24-selected": events["v24_selected"].to_numpy(),
+        "V24-selected": v24,
+        "V24-selected, well determined (U <= 4)": v24 & good,
         "complete (H <= 13.6), V24-selected": (events["complete"] & events["v24_selected"]).to_numpy(),
         "Di Sisto 2013 numbered": events["disisto2013"].to_numpy(),
     }
@@ -70,6 +79,37 @@ def escape_table(events: pd.DataFrame) -> pd.DataFrame:
                          "encounter_2.1RH": k21, "frac_2.1RH": f21, "err_2.1RH": e21,
                          "removed_1RH": k1, "frac_1RH": f1, "err_1RH": e1,
                          "removed_other": int(((sel["removal_reason"] != "alive") & (sel["removal_reason"] != "hill")).sum())})
+    return pd.DataFrame(rows)
+
+
+def ratio_table(escapes: pd.DataFrame) -> pd.DataFrame:
+    """The asymmetry: escape-fraction ratio, Di Sisto's erosion amplifier, and N4/N5.
+
+    amplifier = S4/S5 = (1 - f4) / (1 - f5), the factor by which erosion multiplies
+    N4/N5 over the run. Errors are binomial and propagated in quadrature; with only
+    a handful of escapers they are indicative, not exact.
+    """
+    rows = []
+    for sample, group in escapes.groupby("sample", sort=False):
+        g = group.set_index("swarm")
+        n4, n5 = int(g.at["L4", "n"]), int(g.at["L5", "n"])
+        f4, f5 = g.at["L4", "frac_2.1RH"], g.at["L5", "frac_2.1RH"]
+        e4, e5 = g.at["L4", "err_2.1RH"], g.at["L5", "err_2.1RH"]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            escape_ratio = f5 / f4
+            escape_ratio_err = escape_ratio * np.sqrt((e4 / f4) ** 2 + (e5 / f5) ** 2)
+        amplifier = (1 - f4) / (1 - f5)
+        amplifier_err = amplifier * np.sqrt((e4 / (1 - f4)) ** 2 + (e5 / (1 - f5)) ** 2)
+        rows.append({
+            "sample": sample,
+            "N4/N5 at t0": n4 / n5,
+            "N4/N5 at t_end": (n4 * (1 - f4)) / (n5 * (1 - f5)),
+            "escape ratio L5/L4": escape_ratio,
+            "escape ratio err": escape_ratio_err,
+            "amplifier S4/S5": amplifier,
+            "amplifier err": amplifier_err,
+            "n_escapers L4+L5": int(g.at["L4", "encounter_2.1RH"] + g.at["L5", "encounter_2.1RH"]),
+        })
     return pd.DataFrame(rows)
 
 
@@ -98,7 +138,7 @@ def _direct_labels(ax, x, ends: dict):
 
 
 def fig_escape(events, t_run_end, out):
-    names = ["all integrated", "complete (H <= 13.6), V24-selected"]
+    names = ["V24-selected, well determined (U <= 4)", "complete (H <= 13.6), V24-selected"]
     fig, axes = plt.subplots(1, 2, figsize=(9, 3.4), sharey=True, constrained_layout=True)
     grid = np.linspace(0, t_run_end, 400)
     for ax, name in zip(axes, names):
@@ -124,7 +164,7 @@ def fig_escape(events, t_run_end, out):
 
 
 def fig_libration(events, cls, t_end, out):
-    names = ["all integrated", "complete (H <= 13.6), V24-selected"]
+    names = ["V24-selected, well determined (U <= 4)", "complete (H <= 13.6), V24-selected"]
     swarm = events["swarm"].to_numpy()
     off = not_own_tadpole(cls, swarm)
     fig, axes = plt.subplots(1, 2, figsize=(9, 3.4), sharey=True, constrained_layout=True)
@@ -193,8 +233,10 @@ def main() -> None:
 
     out = paths.make_output_dir(paths.report_dir(args.run_id), args.resume)
     escapes = escape_table(events)
+    ratios = ratio_table(escapes)
     cleaning = cleaning_table(events, cls, t_end)
     escapes.to_csv(out / "escapes.csv", index=False, float_format="%.5f")
+    ratios.to_csv(out / "ratios.csv", index=False, float_format="%.5f")
     cleaning.to_csv(out / "cleaning.csv", index=False)
     write_json(out / "cost.json", cost)
     fig_escape(events, float(t_end[-1]), out)
@@ -215,7 +257,21 @@ def main() -> None:
         "`encounter_2.1RH`: first entry within 2.1 Hill radii (Di Sisto 2019's escape criterion). "
         "`removed_1RH`: entry within 1 Hill radius (Di Sisto 2014's), where the particle is removed.",
         "",
+        "**Read the orbit-quality row, not the raw one.** Objects with JPL condition code >= 5 "
+        "escape at percent level here, and L4 carries twice L5's share of them (mostly recent "
+        "discoveries with short arcs), so the raw sample shows an L4 excess that is an observational "
+        "artefact rather than dynamics.",
+        "",
         _md_table(show),
+        "",
+        "## The asymmetry",
+        "",
+        "`amplifier S4/S5` = (1 - f4) / (1 - f5) is Di Sisto's erosion amplifier: the factor by "
+        "which this run multiplies N4/N5. For reference, over 4.5 Gyr Di Sisto 2014 got "
+        "1.071 +- 0.025 and Di Sisto 2019 got 1.020 +- 0.023. Errors are binomial, propagated in "
+        "quadrature, and are only indicative where a swarm has a handful of escapers.",
+        "",
+        _md_table(ratios),
         "",
         "![escape](fig_escape.png)",
         "",

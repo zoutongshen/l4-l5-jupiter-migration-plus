@@ -1,0 +1,6 @@
+sample,N4/N5 at t0,N4/N5 at t_end,escape ratio L5/L4,escape ratio err,amplifier S4/S5,amplifier err,n_escapers L4+L5
+all integrated,1.74129,1.71185,0.42819,0.05475,0.98309,0.00220,380
+V24-selected,1.73452,1.71151,0.38890,0.06052,0.98674,0.00186,273
+"V24-selected, well determined (U <= 4)",1.59461,1.59706,1.67434,0.52234,1.00154,0.00098,41
+"complete (H <= 13.6), V24-selected",1.51360,1.51570,2.27040,2.07088,1.00139,0.00163,5
+Di Sisto 2013 numbered,1.97598,1.98092,5.92793,6.84111,1.00250,0.00181,4
