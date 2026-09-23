@@ -172,9 +172,26 @@ def main() -> None:
     routh = constants.routh_trojan_mass_limit() / constants.GIANT_MASS["jupiter"]
     lo, hi = threshold_bracket(table)
     cpu_h = ladder["cpu_s"].sum() / 3600.0
-    top = table.iloc[-1]
     massless = table[table["m_jup"] == 0.0]
     hektor = table[np.isclose(table["m_jup"], 1e-9)]
+
+    # The setup check is the rung ABOVE Routh, not whichever rung happens to be
+    # last: on a partial ladder the last finished rung is some low one, and
+    # reading it as the control would report a healthy run as broken.
+    above_routh = table[table["m_jup"] > routh]
+    if above_routh.empty:
+        control = ("No rung above the Routh limit has finished, so the check that the setup "
+                   "reproduces known physics is still outstanding. Treat every number below as provisional.")
+    else:
+        top = above_routh.iloc[-1]
+        control = (
+            f"The control rung above Routh ({top['m_jup']:g} M_Jup) leaves {top['f_librating']:.0%} librating"
+            + (" -- as it must, or nothing below it is trustworthy." if top["f_librating"] < 0.05
+               else " -- **this should be ~0%; the setup is suspect.**"))
+
+    bracket = (f"- Empirical: survival drops below 50% between **{lo:g} and {hi:g} M_Jup**."
+               if np.isfinite(lo) and np.isfinite(hi) else
+               "- Empirical: survival has not yet dropped below 50% at any finished rung.")
 
     shown = table[["m_jup", "mu", "n", "n_librating", "f_librating", "f_L4", "f_L5",
                    "n_horseshoe", "n_circulating", "n_removed", "median_t_leave_yr", "max_dE_rel"]]
@@ -188,15 +205,15 @@ def main() -> None:
         "",
         "## Where the threshold falls",
         "",
-        f"- Empirical: survival drops below 50% between **{lo:g} and {hi:g} M_Jup**.",
+        bracket,
         f"- Routh (1875) linear limit for this model: **{routh:.1f} M_Jup** "
-        f"(mu = {constants.coorbital_mu(constants.routh_trojan_mass_limit()):.4f}).",
+        f"(mu = {constants.coorbital_mu(constants.routh_trojan_mass_limit()):.6f}).",
         f"- Liberato & Winter (2020): mu = {settings['liberato_winter_mu']}, i.e. **24.0 M_Jup**.",
         "",
-        f"The control rung above Routh ({top['m_jup']:g} M_Jup) leaves "
-        f"{top['f_librating']:.0%} librating"
-        + (" -- as it must, or nothing below it is trustworthy." if top["f_librating"] < 0.05
-           else " -- **this should be ~0%; the setup is suspect.**"),
+        control,
+        "",
+        f"Rungs finished: {len(table)}/{len(settings['rungs_mjup'])}."
+        + ("" if len(table) == len(settings["rungs_mjup"]) else " **This ladder is incomplete.**"),
         "",
         "## Where the real Trojans sit",
         "",
