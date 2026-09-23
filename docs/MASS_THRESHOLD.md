@@ -109,6 +109,43 @@ Trojans, integrated for 1 Myr at 14 masses from 0 to 50 $M_{\rm Jup}$, one massi
 Trojan per simulation, reporting the fraction still librating and the L4/L5 split
 at each rung. Results in `campaign/reports/mass_ladder/report.md`.
 
+### What it found
+
+**The knee is at 1–3 $M_{\rm Jup}$, an order of magnitude below the published
+limits.** Survival is flat at 97% from zero mass to 0.1 $M_{\rm Jup}$ — seven
+orders of magnitude, the same three objects leaving at every rung — then falls to
+48% at 3 $M_{\rm Jup}$ and to zero by 24. Liberato & Winter's $\mu = 0.023313$
+turns out to mark where survival reaches *zero*, not where it starts to fall, and
+Routh's 40.9 $M_{\rm Jup}$ is 13× past the 50% point.
+
+That gap is the interesting part. The published limits come from the planar
+circular restricted problem with a particle at the exact equilateral point; real
+catalogue Trojans carry eccentricity, inclination and finite libration amplitude
+under four giant planets, and come apart far earlier. The idealised threshold is
+an upper bound, not the operative one.
+
+For the thesis the consequence is the flat part: real Trojans sit nine orders of
+magnitude below the knee, so the campaign's massless test particles are safe with
+enormous margin — now measured rather than assumed. The L4/L5 split is flat in
+mass too (largest $|z| = 2.31$ at 10 $M_{\rm Jup}$, ~6 independent looks, ~24% by
+chance, and at a mass no real Trojan has).
+
+### And their mutual gravity?
+
+`s4_run_swarm.py` gives the 200 largest catalogue Trojans their real H-derived
+masses and full mutual gravity, against the identical objects massless.
+**Self-gravity is real but dynamically negligible over 1 Myr**: it perturbs
+132/200 objects where a physically meaningless 0.15 mm nudge perturbs 10, so it is
+a force doing work rather than chaos — but the largest change in $a$ is
+$1.9\times10^{-4}$ of $a$, nothing changed libration class, and every object
+survived both arms. Details and caveats in `campaign/reports/swarm/report.md`.
+
+A methodological note that cost some time: Trojan orbits are chaotic well inside
+1 Myr, so two runs of the same system separate regardless of what started them
+apart. A raw per-object $|\Delta a|$ between two arms measures the Lyapunov time,
+not the force. The calibration arms — the same system displaced by a known,
+meaningless amount at $t_0$ — are what make the comparison mean anything.
+
 ### A methodological finding worth keeping
 
 **WHFast cannot do this experiment.** Measured over 20 kyr with one massive
