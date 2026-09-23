@@ -64,3 +64,43 @@ def timestep(a_jupiter_au: float) -> float:
 def hill_radius(a_planet_au: float, planet: str) -> float:
     """Hill radius of a giant about the central mass, in au (circular approximation)."""
     return a_planet_au * (GIANT_MASS[planet] / (3.0 * CENTRAL_MASS)) ** (1.0 / 3.0)
+
+
+# --- co-orbital stability limits on a finite Trojan mass --------------------
+#
+# Gascheau (1843) / Routh (1875): the equilateral configuration of three finite
+# masses is linearly stable iff 27 (m1 m2 + m2 m3 + m3 m1) < (m1 + m2 + m3)^2.
+# Liberato & Winter (2020, MNRAS 496, 3700) integrated the co-orbital region and
+# found stability in practice disappears well below that, at mu = 0.023313.
+
+LIBERATO_WINTER_MU = 0.023313     # practical co-orbital limit, Liberato & Winter (2020)
+
+
+def routh_stable(m1: float, m2: float, m3: float) -> bool:
+    """Gascheau-Routh linear stability of the equilateral three-body configuration."""
+    return 27.0 * (m1 * m2 + m2 * m3 + m3 * m1) < (m1 + m2 + m3) ** 2
+
+
+def routh_trojan_mass_limit(m_planet: float = None, m_central: float = None) -> float:
+    """Largest Trojan mass, in Msun, that keeps Sun + Jupiter + Trojan linearly stable.
+
+    Writing S = m1 + m2, the criterion rearranges to m3^2 - 25 S m3 + (S^2 - 27 m1 m2) > 0,
+    and the configuration is stable below the smaller root. For this project's masses that
+    is 0.0390 Msun -- about 41 Jupiter masses, ten orders of magnitude above the largest
+    real Trojan.
+    """
+    m1 = CENTRAL_MASS if m_central is None else m_central
+    m2 = GIANT_MASS["jupiter"] if m_planet is None else m_planet
+    s = m1 + m2
+    b, c = -25.0 * s, s * s - 27.0 * m1 * m2
+    return 0.5 * (-b - math.sqrt(b * b - 4.0 * c))
+
+
+def coorbital_mu(m_trojan_msun: float = 0.0) -> float:
+    """Co-orbital mass parameter (m_J + m_T) / (M_central + m_J + m_T).
+
+    Reduces to the restricted-problem mu = 9.5385e-4 for a massless Trojan, so it
+    is directly comparable to ``LIBERATO_WINTER_MU`` and to Routh's 0.0385.
+    """
+    m_j = GIANT_MASS["jupiter"]
+    return (m_j + m_trojan_msun) / (CENTRAL_MASS + m_j + m_trojan_msun)

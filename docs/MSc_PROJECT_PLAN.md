@@ -57,7 +57,7 @@ back-extrapolating today's escape rate to primordial times (G6).
 |---|---|
 | Code | REBOUND, WHFast |
 | Massive bodies | **Decided 2026-09-15:** Sun with the Mercury, Venus, Earth–Moon and Mars masses folded in; Jupiter, Saturn, Uranus and Neptune kept as separate bodies with their system (planet + moons) masses, DE440 |
-| Test particles | **Massless. They feel the Sun and planets, never each other.** So particles of different kinds cannot interfere, and chunking them across jobs is bookkeeping, not physics |
+| Test particles | **Massless. They feel the Sun and planets, never each other.** So particles of different kinds cannot interfere, and chunking them across jobs is bookkeeping, not physics. *Justified 2026-09-23: the co-orbital threshold sits at 40.9 M_Jup (Routh) / 24.0 M_Jup (Liberato & Winter 2020), ten orders of magnitude above the largest real Trojan — see `docs/MASS_THRESHOLD.md` and `campaign/reports/mass_ladder/`* |
 | Start | Present day. Planets from JPL Horizons at the catalogue epoch; Trojans from their catalogued orbits at the same epoch |
 | End | +4.5 Gyr forward, or when the particle escapes |
 | Timestep | **Decided 2026-09-15:** 1% of Jupiter's orbital period, ≈ 0.1186 yr. Stage 0.6 measures its cost and checks it against dt/2 |

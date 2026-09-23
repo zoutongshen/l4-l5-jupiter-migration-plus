@@ -50,8 +50,34 @@ def planet_setup(states: pd.DataFrame) -> dict:
     }
 
 
-def build_simulation(states: pd.DataFrame, spkids, dt_yr: float) -> rebound.Simulation:
-    """WHFast simulation of the massive bodies plus the requested Trojans (massless)."""
+def build_simulation(states: pd.DataFrame, spkids, dt_yr: float, trojan_mass=0.0,
+                     self_gravity: bool = False) -> rebound.Simulation:
+    """WHFast simulation of the massive bodies plus the requested Trojans.
+
+    ``trojan_mass`` is the mass in solar masses given to each Trojan: a scalar for
+    all of them, or one value per entry of ``spkids``. The default 0.0 reproduces
+    the massless test particles the campaign runs on, byte for byte.
+
+    With a single massive Trojan, REBOUND's ``testparticle_type = 1`` is exact
+    rather than an approximation: the Trojan acts on the planets, and "test
+    particles do not act on each other" is vacuous when there is only one. Several
+    massive Trojans in one box is a different experiment and needs
+    ``self_gravity=True``, which makes them active particles at O(N^2) cost.
+    """
+    spkids = np.asarray(spkids, dtype="int64")
+    trojans = states[states["body"] == "trojan"].set_index("spkid").loc[spkids]
+    masses = np.broadcast_to(np.asarray(trojan_mass, dtype=float), (len(trojans),))
+    if (masses < 0).any():
+        raise ValueError("Trojan masses must be non-negative")
+    any_massive = bool((masses > 0).any())
+    if any_massive and len(trojans) > 1 and not self_gravity:
+        raise ValueError(
+            f"{len(trojans)} massive Trojans in one simulation with self_gravity=False. They would "
+            "perturb the planets but not each other, and their masses would pile up in the co-orbital "
+            "region: that is neither the mass ladder nor the real swarm. Use one Trojan per simulation "
+            "(n_chunks == subset) for the ladder, or self_gravity=True for the swarm."
+        )
+
     sim = rebound.Simulation()
     sim.G = constants.G
     sim.integrator = "whfast"
@@ -62,11 +88,12 @@ def build_simulation(states: pd.DataFrame, spkids, dt_yr: float) -> rebound.Simu
         sim.add(m=row.m, x=row.x, y=row.y, z=row.z, vx=row.vx, vy=row.vy, vz=row.vz,
                 hash=MASSIVE_HASH[row.body])
     sim.N_active = len(massive)
-    sim.testparticle_type = 0
+    sim.testparticle_type = 1 if any_massive else 0
 
-    trojans = states[states["body"] == "trojan"].set_index("spkid").loc[np.asarray(spkids, dtype="int64")]
-    for spkid, row in zip(trojans.index, trojans.itertuples()):
-        sim.add(m=0.0, x=row.x, y=row.y, z=row.z, vx=row.vx, vy=row.vy, vz=row.vz, hash=int(spkid))
+    for spkid, row, m in zip(trojans.index, trojans.itertuples(), masses):
+        sim.add(m=float(m), x=row.x, y=row.y, z=row.z, vx=row.vx, vy=row.vy, vz=row.vz, hash=int(spkid))
+    if self_gravity and any_massive:
+        sim.N_active = sim.N
 
     sim.move_to_com()
     return sim

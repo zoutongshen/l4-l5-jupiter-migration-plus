@@ -52,6 +52,8 @@ class Settings:
     r_max_au: float = 100.0
     safe_mode: int = 1
     corrector: int = 0
+    trojan_mass_msun: float = 0.0
+    self_gravity: bool = False
 
     @property
     def check_interval_yr(self) -> float:
@@ -311,10 +313,17 @@ class ChunkRunner:
 
 
 def settings_from_config(config: dict, dt_yr: float) -> Settings:
-    """Settings from a run config; ``[integrator] dt_scale`` (benchmarks only) rescales the IC time step."""
+    """Settings from a run config.
+
+    ``[integrator] dt_scale`` (benchmarks only) rescales the IC time step.
+    ``[particles]`` (mass runs only) gives the Trojans mass; absent, they stay massless.
+    """
     fields = {**config.get("integrator", {}), **config.get("diagnostics", {}), **config.get("escape", {})}
     dt_scale = float(fields.pop("dt_scale", 1.0))
-    return Settings(t_end_yr=float(config["run"]["t_end_yr"]), dt_yr=dt_yr * dt_scale, **fields)
+    particles = config.get("particles", {})
+    return Settings(t_end_yr=float(config["run"]["t_end_yr"]), dt_yr=dt_yr * dt_scale,
+                    trojan_mass_msun=float(particles.get("trojan_mass_msun", 0.0)),
+                    self_gravity=bool(particles.get("self_gravity", False)), **fields)
 
 
 def write_settings(directory: Path, settings: Settings) -> None:

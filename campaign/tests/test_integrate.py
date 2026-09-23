@@ -155,3 +155,66 @@ def test_giants_energy_is_conserved():
     sim.steps(int(1.0e4 / setup["dt_yr"]))
     assert abs((sim.energy() - e0) / e0) < 1e-5
     assert setup["dt_yr"] == pytest.approx(0.01 * setup["jupiter_period_yr"])
+
+
+# --- Trojan mass (the mass ladder, s4_run_ladder.py) ------------------------
+
+def test_trojans_are_massless_by_default():
+    states, _ = _system({100: _lagrange(60.0), 101: _lagrange(-60.0)})
+    sim = initial.build_simulation(states, [100, 101], 0.1)
+    assert sim.N_active == 5
+    assert sim.testparticle_type == 0
+    assert [p.m for p in sim.particles[5:]] == [0.0, 0.0]
+
+
+def test_one_massive_trojan_is_semi_active():
+    states, _ = _system({100: _lagrange(60.0)})
+    m = constants.GIANT_MASS["jupiter"]
+    sim = initial.build_simulation(states, [100], 0.1, trojan_mass=m)
+    # N_active stays 5, so "test particles do not act on each other" is vacuous
+    # for a single one and testparticle_type=1 is the exact six-body problem.
+    assert sim.N_active == 5
+    assert sim.testparticle_type == 1
+    assert sim.particles[5].m == pytest.approx(m)
+
+
+def test_massive_trojan_perturbs_jupiter():
+    states, _ = _system({100: _lagrange(60.0)})
+    jupiter = []
+    for mass in (0.0, constants.GIANT_MASS["jupiter"]):
+        sim = initial.build_simulation(states, [100], 0.05, trojan_mass=mass)
+        sim.integrator = "ias15"
+        sim.integrate(500.0)
+        jupiter.append(np.array([sim.particles[1].x, sim.particles[1].y, sim.particles[1].z]))
+    assert np.linalg.norm(jupiter[0] - jupiter[1]) > 1e-3
+
+
+def test_several_massive_trojans_need_self_gravity():
+    states, _ = _system({100: _lagrange(60.0), 101: _lagrange(62.0)})
+    with pytest.raises(ValueError, match="self_gravity"):
+        initial.build_simulation(states, [100, 101], 0.1, trojan_mass=1e-9)
+
+
+def test_self_gravity_makes_every_trojan_active():
+    states, _ = _system({100: _lagrange(60.0), 101: _lagrange(62.0)})
+    sim = initial.build_simulation(states, [100, 101], 0.1, trojan_mass=1e-9, self_gravity=True)
+    assert sim.N_active == sim.N == 7
+    assert sim.testparticle_type == 1
+
+
+def test_per_object_masses_and_negative_masses():
+    states, _ = _system({100: _lagrange(60.0), 101: _lagrange(62.0)})
+    sim = initial.build_simulation(states, [100, 101], 0.1, trojan_mass=[1e-9, 2e-9], self_gravity=True)
+    assert [p.m for p in sim.particles[5:]] == [1e-9, 2e-9]
+    with pytest.raises(ValueError, match="non-negative"):
+        initial.build_simulation(states, [100], 0.1, trojan_mass=-1.0)
+
+
+def test_settings_read_the_particles_section():
+    base = {"run": {"t_end_yr": 1.0e6}}
+    assert integrate.settings_from_config(base, 0.1).trojan_mass_msun == 0.0
+    assert integrate.settings_from_config(base, 0.1).self_gravity is False
+    loaded = integrate.settings_from_config(
+        {**base, "particles": {"trojan_mass_msun": 1.5e-3, "self_gravity": True}}, 0.1)
+    assert loaded.trojan_mass_msun == pytest.approx(1.5e-3)
+    assert loaded.self_gravity is True

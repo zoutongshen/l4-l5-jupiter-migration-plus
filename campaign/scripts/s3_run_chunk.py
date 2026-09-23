@@ -34,7 +34,9 @@ def main() -> None:
         runner = integrate.ChunkRunner.resume(spkids, settings, ic["giants"], out)
     else:
         paths.make_output_dir(out)
-        sim = initial.build_simulation(states, spkids, settings.dt_yr)
+        sim = initial.build_simulation(states, spkids, settings.dt_yr,
+                                       trojan_mass=settings.trojan_mass_msun,
+                                       self_gravity=settings.self_gravity)
         runner = integrate.ChunkRunner.start(sim, spkids, settings, ic["giants"], out)
 
     session = {**provenance(), "resume": args.resume, "t_start_yr": runner.sim.t, "n_particles": len(spkids)}

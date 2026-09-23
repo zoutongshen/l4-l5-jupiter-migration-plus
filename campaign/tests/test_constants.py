@@ -32,3 +32,30 @@ def test_jupiter_period_and_timestep():
 
 def test_jupiter_hill_radius():
     assert c.hill_radius(5.2026, "jupiter") == pytest.approx(0.355, abs=0.002)
+
+
+# --- co-orbital stability limits -------------------------------------------
+
+def test_routh_criterion_matches_the_restricted_value():
+    # With a massless third body the criterion reduces to m1/m2 > 24.9599.
+    assert c.routh_stable(1.0, 1.0 / 24.96, 0.0)
+    assert not c.routh_stable(1.0, 1.0 / 24.95, 0.0)
+
+
+def test_routh_trojan_mass_limit_is_where_stability_flips():
+    limit = c.routh_trojan_mass_limit()
+    m1, m2 = c.CENTRAL_MASS, c.GIANT_MASS["jupiter"]
+    assert c.routh_stable(m1, m2, limit * 0.999)
+    assert not c.routh_stable(m1, m2, limit * 1.001)
+    # ~41 Jupiter masses, ten orders of magnitude above the largest real Trojan.
+    assert limit / m2 == pytest.approx(40.9, abs=0.1)
+
+
+def test_coorbital_mu_spans_the_published_limits():
+    # A massless Trojan gives the restricted-problem value for Sun-Jupiter.
+    assert c.coorbital_mu(0.0) == pytest.approx(9.5388e-4, rel=1e-4)
+    # Routh's mu_G = 0.0385209 sits just above the finite-mass limit.
+    assert c.coorbital_mu(c.routh_trojan_mass_limit()) == pytest.approx(0.0385209, abs=1e-4)
+    # Liberato & Winter's limit is 24.0 Jupiter masses for this model.
+    m_24 = 24.0 * c.GIANT_MASS["jupiter"]
+    assert c.coorbital_mu(m_24) == pytest.approx(c.LIBERATO_WINTER_MU, rel=1e-3)

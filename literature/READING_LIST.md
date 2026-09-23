@@ -48,6 +48,26 @@ except the ones marked **FULL**.
   A general stability criterion for L4/L5 under **generic dissipation and slow mass change** — i.e. exactly your problem, written analytically. Predicts when libration amplitude grows vs damps, and the leading/trailing asymmetry. **This is the closest thing in the literature to an analytic prediction of your result**, and it is the natural theory to test your `C(t)`, `L(t)` against. Underused by the Trojan community; likely your best differentiator.
 - Murray & Dermott, *Solar System Dynamics*, Ch. 3.11-3.13 (tadpole/horseshoe, libration period, `μ^{1/3}` scalings). Not a PDF here — use the book. You need the `T_lib ≈ 148 yr` derivation and the horseshoe turning-point distance for the binary argument (§10.2 of the plan).
 
+### Tier 2b — the mass threshold (Simon's 2026-09-22 question)
+
+Added 2026-09-23. The worked answer, with the algebra and the numbers for this
+project's masses, is `docs/MASS_THRESHOLD.md`; the measurement is
+`campaign/reports/mass_ladder/`. **Read the note first — these are the sources
+behind it, not a separate reading task.** PDFs still to download.
+
+- **Liberato & Winter (2020)**, *The structure of the co-orbital stable regions as a function of the mass ratio*, MNRAS 496, 3700 — arXiv:2007.13814.
+  **The key paper.** Numerically maps the co-orbital stable region over `9.5e-5 < μ < 2.3e-2` and finds stability disappears at **μ = 0.023313**, well below linear theory's 0.0385. Extract: the polynomial fits for angular and radial width vs μ — they are a ready-made analytic prediction to test the mass ladder against, and nobody has done that with real catalogue orbits.
+- **Ćuk, Hamilton & Holman (2012)**, *Long-term stability of horseshoe orbits*, MNRAS 426, 3051 — arXiv:1206.1888.
+  Why horseshoes are the fragile ones: they must pass within ~5 Hill radii of the secondary, tadpoles stay outside ~4. Needs primary/secondary ≳ 1200. Extract the Hill-radius argument — it is the physical mechanism behind the threshold, and it connects to the binary question (§10.2 of the plan).
+- **Laughlin & Chambers (2002)**, *Extrasolar Trojans: the viability and detectability of planets in the 1:1 resonance*, AJ 124, 592 — arXiv:astro-ph/0204091.
+  The equal-mass co-orbital case: tadpoles stable for μ < 0.03812, horseshoes only for μ < 4e-4. One sentence of context; do not read in full.
+- **Sicardy (2010)**, *Stability of the triangular Lagrange points beyond Gascheau's value*, CeMDA 107, 145.
+  What happens just past the linear limit: stable periodic orbits persist slightly beyond μ_G, then a period-doubling cascade to chaos at μ_∞ = 0.0463. Only needed if the ladder's knee lands above Gascheau.
+- **Levison, Shoemaker & Shoemaker (1997)**, *Dynamical evolution of Jupiter's Trojan asteroids*, Nature 385, 42.
+  The original demonstration that the swarms are **not** indefinitely stable — at zero mass. Cite this whenever "nobody's lifetime is infinite" comes up, so it is not mistaken for a mass effect.
+- **Robutel & Gabern (2006)**, *The resonant structure of Jupiter's Trojan asteroids I*, MNRAS 372, 1463.
+  Paper I, the companion to the 2009 paper above — long-term stability and the diffusion picture. Worth having alongside II.
+
 ## Tier 3 — migration physics: where the "do we need the Grand Tack?" question lives
 
 `04_migration_physics/` — see the **Grand Tack** section below for the verdict.

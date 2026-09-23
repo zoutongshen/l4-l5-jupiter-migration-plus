@@ -13,7 +13,7 @@ The first run is a 10 Myr pilot:
 | Path | What | Rule |
 |---|---|---|
 | `trojans/` | Library: `paths`, constants, fetch, catalogue, initial conditions, integration, diagnostics | Computes and returns; never chooses where to write |
-| `scripts/` | One CLI per step, prefixed by stage (`s0_`, `s1_`, `s3_`) | The only code that writes files, and only to paths from `trojans.paths` |
+| `scripts/` | One CLI per step, prefixed by stage (`s0_`, `s1_`, `s3_`, `s4_`) | The only code that writes files, and only to paths from `trojans.paths` |
 | `configs/` | One TOML per run | Frozen once that run has started |
 | `tests/` | pytest | Writes only to `tmp_path`. `test_layout.py` enforces the repo structure |
 | `slurm/` | ALICE job templates wrapping the same scripts | |
@@ -56,6 +56,15 @@ for example `2026-09-15`.
 | 3 run | `python campaign/scripts/s3_launch_local.py smoke` (or `pilot_10myr`) | `data/runs/<run_id>/` |
 | 3 merge | `python campaign/scripts/s3_merge.py --run-id <run_id>` | `data/runs/<run_id>/merged/` |
 | 3 report | `python campaign/scripts/s3_report.py --run-id <run_id>` | `reports/<run_id>/` |
+| 4 mass ladder | `python campaign/scripts/s4_run_ladder.py --workers 8` | `data/runs/mass_ladder/` |
+| 4 ladder report | `python campaign/scripts/s4_ladder_report.py --run-id mass_ladder` | `reports/mass_ladder/` |
+
+Stage 4 is a side experiment, not part of the 4.5 Gyr campaign: it asks where the
+massless-test-particle assumption breaks (`docs/MASS_THRESHOLD.md`). It does not use
+the chunk pipeline — one massive Trojan per simulation, IAS15 rather than WHFast,
+because WHFast loses `|dE/E| ~ 9e-2` at 24 M_Jup and misplaces the threshold. It
+reuses `trojans.initial.build_simulation`'s `trojan_mass` argument and the
+classification helpers in `trojans.integrate`, and nothing else.
 
 Rerunning any step into an existing directory needs `--resume`. For a launched run,
 `--resume` continues partial chunks from their last checkpoint and refuses a changed
