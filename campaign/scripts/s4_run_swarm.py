@@ -41,6 +41,11 @@ def main() -> None:
     parser.add_argument("--t-end-yr", type=float, default=1.0e6)
     parser.add_argument("--massless", action="store_true",
                         help="the control: identical objects, no masses, no mutual gravity")
+    parser.add_argument("--jitter-au", type=float, default=0.0,
+                        help="displace each Trojan by this much at t0. The chaos calibration: "
+                             "a physically meaningless nudge whose divergence tells you how much "
+                             "of the self-gravity difference is just a chaotic system separating")
+    parser.add_argument("--jitter-seed", type=int, default=20260923)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
 
@@ -50,7 +55,19 @@ def main() -> None:
     spkids = picked["spkid"].to_numpy(dtype="int64")
     masses = np.array([constants.mass_from_H(h) for h in picked["H"]])
 
-    run_id = f"{args.run_id}_massless" if args.massless else f"{args.run_id}_selfgrav"
+    if args.jitter_au > 0:
+        rng = np.random.default_rng(args.jitter_seed)
+        states = states.copy()
+        rows = states.index[states["body"] == "trojan"]
+        for axis in ("x", "y", "z"):
+            states.loc[rows, axis] += rng.normal(0.0, args.jitter_au, len(rows))
+
+    suffix = "massless" if args.massless else "selfgrav"
+    if args.jitter_au > 0:
+        # The magnitude is in the name: several calibration arms bracket how big a
+        # perturbation self-gravity is worth, and they must not overwrite each other.
+        suffix += f"_jitter{args.jitter_au:g}".replace("+", "")
+    run_id = f"{args.run_id}_{suffix}"
     out = paths.make_output_dir(paths.run_dir(run_id), resume=args.resume)
     settings = integrate.Settings(t_end_yr=args.t_end_yr, dt_yr=ic["dt_yr"])
 
@@ -75,6 +92,7 @@ def main() -> None:
         "ic_id": IC_ID, "catalogue_id": ic["catalogue_id"], "n": len(spkids),
         "total_mass_msun": float(total), "albedo": constants.TROJAN_ALBEDO,
         "density_kg_m3": constants.TROJAN_DENSITY_KG_M3, "integrator": "whfast",
+        "n_windows": settings.n_windows,
     })
     session = {**provenance(), "resume": args.resume, "n_particles": len(spkids)}
     cpu0, wall0 = time.process_time(), time.time()

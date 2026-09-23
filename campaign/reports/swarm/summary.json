@@ -1,0 +1,19 @@
+{
+  "n": 200,
+  "t_end_yr": 1000019.257233372,
+  "total_mass_msun": 1.3324318089255335e-11,
+  "total_mass_mearth": 4.436404155598922e-06,
+  "max_abs_da_au": 0.0010113716125488281,
+  "median_abs_da_au": 4.76837158203125e-07,
+  "max_abs_damp_deg": 0.8095378875732422,
+  "n_class_changed": 0,
+  "n_alive_grav": 200,
+  "n_alive_free": 200,
+  "n_moved": 132,
+  "n_at_floor": 38,
+  "resolution_au": 4.76837158203125e-07,
+  "max_rel_da": 0.00019415478163864464,
+  "chaos_n_moved": 10,
+  "ks_stat": 0.61,
+  "ks_p": 5.022256080866513e-35
+}
