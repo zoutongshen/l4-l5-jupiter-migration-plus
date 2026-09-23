@@ -394,3 +394,21 @@ def label_comparison(table: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
         .sort_values(["label_region", "swarm"])
     )
+
+
+def well_determined(table: pd.DataFrame) -> np.ndarray:
+    """JPL orbit condition code <= 4, as the pilot report's cut."""
+    return (pd.to_numeric(table["condition_code"], errors="coerce") <= 4).to_numpy()
+
+
+def largest_per_swarm(table: pd.DataFrame, n_per_swarm: int) -> pd.DataFrame:
+    """The n largest Trojans in each swarm, in the run and on well-determined orbits.
+
+    Largest, not random: mass goes as roughly 10^(-0.6 H), so (624) Hektor at
+    H = 7.3 outweighs a median H = 14.6 Trojan by about 10^4. A random subset
+    carries almost none of the swarm's mass, which would settle the
+    self-gravity question by construction rather than by measurement.
+    """
+    ok = table["in_run"].to_numpy() & well_determined(table) & table["H"].notna().to_numpy()
+    picked = table[ok].sort_values("H").groupby("swarm", group_keys=False).head(n_per_swarm)
+    return picked.sort_values("H").reset_index(drop=True)

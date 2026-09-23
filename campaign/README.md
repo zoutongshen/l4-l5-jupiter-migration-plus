@@ -58,6 +58,7 @@ for example `2026-09-15`.
 | 3 report | `python campaign/scripts/s3_report.py --run-id <run_id>` | `reports/<run_id>/` |
 | 4 mass ladder | `python campaign/scripts/s4_run_ladder.py --workers 8` | `data/runs/mass_ladder/` |
 | 4 ladder report | `python campaign/scripts/s4_ladder_report.py --run-id mass_ladder` | `reports/mass_ladder/` |
+| 4 swarm | `python campaign/scripts/s4_run_swarm.py --n-per-swarm 100` (then `--massless`) | `data/runs/swarm_{selfgrav,massless}/` |
 
 Stage 4 is a side experiment, not part of the 4.5 Gyr campaign: it asks where the
 massless-test-particle assumption breaks (`docs/MASS_THRESHOLD.md`). It does not use

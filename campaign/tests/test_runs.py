@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 
 from trojans import integrate, runs
@@ -24,3 +25,22 @@ def test_settings_from_config():
     assert s.checks_per_window * s.check_interval_yr == pytest.approx(1.0e4, rel=1e-3)
     assert s.n_windows == 100
     assert s.r_max_au == 50.0
+
+
+# --- selection for the self-gravitating swarm run (s4_run_swarm.py) ---------
+
+def test_largest_per_swarm_takes_the_brightest_on_good_orbits():
+    from trojans import catalogue
+
+    table = pd.DataFrame({
+        "spkid": [1, 2, 3, 4, 5, 6, 7],
+        "H": [8.0, 9.0, 10.0, 7.0, 11.0, 6.0, np.nan],
+        "swarm": ["L4", "L4", "L4", "L5", "L5", "L4", "L4"],
+        "in_run": [True, True, True, True, True, False, True],
+        "condition_code": ["0", "2", "4", "1", "9", "0", "0"],
+    })
+    picked = catalogue.largest_per_swarm(table, n_per_swarm=2)
+    # 6 is excluded (not in_run), 5 by condition_code 9, 7 by a missing H.
+    assert sorted(picked["spkid"]) == [1, 2, 4]
+    assert picked["H"].is_monotonic_increasing
+    assert picked.groupby("swarm").size().to_dict() == {"L4": 2, "L5": 1}

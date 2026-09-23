@@ -59,3 +59,27 @@ def test_coorbital_mu_spans_the_published_limits():
     # Liberato & Winter's limit is 24.0 Jupiter masses for this model.
     m_24 = 24.0 * c.GIANT_MASS["jupiter"]
     assert c.coorbital_mu(m_24) == pytest.approx(c.LIBERATO_WINTER_MU, rel=1e-3)
+
+
+# --- real Trojan masses from H ---------------------------------------------
+
+def test_solar_mass_matches_the_accepted_value():
+    assert c.MSUN_KG == pytest.approx(1.98841e30, rel=1e-4)
+
+
+def test_mass_from_H_reproduces_hektor_to_a_factor_of_a_few():
+    # (624) Hektor, H = 7.32, measured 7.9e18 kg. A single albedo and density
+    # cannot do better than a factor of a few -- Hektor is an elongated binary.
+    hektor = c.mass_from_H(7.32) * c.MSUN_KG
+    assert 1e18 < hektor < 1.6e19
+    assert c.diameter_km(7.32) == pytest.approx(173.0, rel=0.05)
+
+
+def test_mass_from_H_scales_as_ten_to_the_minus_zero_point_six_H():
+    assert c.mass_from_H(15.0) / c.mass_from_H(10.0) == pytest.approx(10.0 ** (-0.6 * 5), rel=1e-9)
+    assert c.mass_from_H(10.0) > c.mass_from_H(14.0)
+
+
+def test_real_trojans_are_far_below_the_threshold():
+    # The whole point of the mass ladder: nine to ten orders of magnitude of margin.
+    assert c.mass_from_H(7.32) / c.routh_trojan_mass_limit() < 1e-9

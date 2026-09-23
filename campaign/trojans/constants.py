@@ -96,6 +96,36 @@ def routh_trojan_mass_limit(m_planet: float = None, m_central: float = None) -> 
     return 0.5 * (-b - math.sqrt(b * b - 4.0 * c))
 
 
+# --- real Trojan masses from absolute magnitude -----------------------------
+#
+# Only needed for the self-gravitating swarm run; the campaign's Trojans are
+# massless. Albedo from Grav et al. (2012), WISE/NEOWISE Jovian Trojan taxonomy;
+# density from the two Trojans with measured bulk densities, (624) Hektor and
+# (617) Patroclus, both 1.0 +/- 0.3 g/cm^3.
+
+MSUN_KG = GM_KM3_S2["sun"] * 1e9 / 6.67430e-11      # GM_sun (m^3 s^-2) / CODATA G
+TROJAN_ALBEDO = 0.07
+TROJAN_DENSITY_KG_M3 = 1000.0
+_H_TO_DIAMETER_KM = 1329.0                          # standard D = 1329 p_V^-1/2 10^(-H/5) km
+
+
+def diameter_km(H, albedo: float = TROJAN_ALBEDO):
+    """Diameter in km from absolute magnitude, assuming a fixed albedo."""
+    return _H_TO_DIAMETER_KM / math.sqrt(albedo) * 10.0 ** (-0.4 * H / 2.0)
+
+
+def mass_from_H(H, albedo: float = TROJAN_ALBEDO, density_kg_m3: float = TROJAN_DENSITY_KG_M3):
+    """Mass in Msun from absolute magnitude, as a uniform sphere.
+
+    Crude by construction -- one albedo and one density for the whole population,
+    and mass goes as the cube of a diameter inferred from a single magnitude. Good
+    to a factor of a few per object, which is all the self-gravity question needs:
+    the answer there turns on orders of magnitude, not on individual masses.
+    """
+    radius_m = 0.5 * diameter_km(H, albedo) * 1e3
+    return density_kg_m3 * (4.0 / 3.0) * math.pi * radius_m**3 / MSUN_KG
+
+
 def coorbital_mu(m_trojan_msun: float = 0.0) -> float:
     """Co-orbital mass parameter (m_J + m_T) / (M_central + m_J + m_T).
 

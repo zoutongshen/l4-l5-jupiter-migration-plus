@@ -97,6 +97,10 @@ class ChunkRunner:
         self._order = np.argsort(self.spkids)
         self.n = len(self.spkids)
         self.hill = np.array([giants[p]["hill_radius"] for p in constants.GIANTS])
+        # Where the Trojans start. Not sim.N_active: with a self-gravitating swarm
+        # every particle is active, while the massive bodies are still the first
+        # five and are never removed.
+        self.n_planets = 1 + len(constants.GIANTS)
         self.mass_ratio = constants.GIANT_MASS["jupiter"] / (constants.CENTRAL_MASS + constants.GIANT_MASS["jupiter"])
 
         self.check_index = 0
@@ -174,7 +178,7 @@ class ChunkRunner:
 
     def _sample(self, accumulate: bool) -> None:
         xyz, vxyz, hashes = self._states()
-        n_active = self.sim.N_active
+        n_active = self.n_planets
         sun_x, sun_v = xyz[0], vxyz[0]
         planets = xyz[1:n_active] - sun_x
         jup_x, jup_v = planets[0], vxyz[1] - sun_v
