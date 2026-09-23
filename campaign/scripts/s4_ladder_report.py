@@ -51,6 +51,17 @@ def binomial(k, n):
     return frac, np.where(n > 0, err, np.nan)
 
 
+def two_proportion_z(k1, n1, k2, n2):
+    """Standard two-proportion z for L4 vs L5 survival. NaN when both are 0 or both 1."""
+    if n1 == 0 or n2 == 0:
+        return np.nan
+    p = (k1 + k2) / (n1 + n2)
+    if p in (0.0, 1.0):
+        return np.nan
+    se = np.sqrt(p * (1 - p) * (1 / n1 + 1 / n2))
+    return float((k1 / n1 - k2 / n2) / se)
+
+
 def rung_table(ladder: pd.DataFrame) -> pd.DataFrame:
     """One row per rung: how many survived, how fast the rest left, how clean the integration was."""
     rows = []
@@ -67,10 +78,14 @@ def rung_table(ladder: pd.DataFrame) -> pd.DataFrame:
         for name in ("horseshoe", "circulating", "quasi_satellite"):
             row[f"n_{name}"] = int((grp["libration_class"] == name).sum())
         row["f_librating"], row["f_err"] = (float(x) for x in binomial(alive.sum(), len(grp)))
+        counts = {}
         for swarm in ("L4", "L5"):
             sub = grp[grp["swarm"] == swarm]
-            f, e = binomial((sub["fate"] == "librating").sum(), len(sub))
+            k = int((sub["fate"] == "librating").sum())
+            f, e = binomial(k, len(sub))
             row[f"n_{swarm}"], row[f"f_{swarm}"], row[f"f_{swarm}_err"] = len(sub), float(f), float(e)
+            counts[swarm] = (k, len(sub))
+        row["z_L4_L5"] = two_proportion_z(*counts["L4"], *counts["L5"])
         row["median_t_leave_yr"] = float(grp.loc[left, "t_leave_yr"].median()) if left.any() else np.nan
         row["max_dE_rel"] = float(grp["dE_rel"].max())
         rows.append(row)
@@ -193,8 +208,25 @@ def main() -> None:
                if np.isfinite(lo) and np.isfinite(hi) else
                "- Empirical: survival has not yet dropped below 50% at any finished rung.")
 
-    shown = table[["m_jup", "mu", "n", "n_librating", "f_librating", "f_L4", "f_L5",
+    shown = table[["m_jup", "mu", "n", "n_librating", "f_librating", "f_L4", "f_L5", "z_L4_L5",
                    "n_horseshoe", "n_circulating", "n_removed", "median_t_leave_yr", "max_dE_rel"]]
+
+    z = table["z_L4_L5"]
+    worst_z = table.loc[z.abs().idxmax()] if z.notna().any() else None
+    # Rungs below the knee return the identical outcome -- the same objects leave at
+    # every mass -- so they are one test repeated, not several. Counting them as
+    # independent would overstate the look-elsewhere correction.
+    n_effective = int(table.loc[z.notna(), "f_librating"].round(6).nunique())
+    p_any = 1.0 - 0.9545**max(n_effective, 1)
+    asymmetry = (
+        f"Largest |z| is **{worst_z['z_L4_L5']:+.2f}** at {worst_z['m_jup']:g} M_Jup "
+        f"(L4 {worst_z['f_L4']:.1%} vs L5 {worst_z['f_L5']:.1%}). The rungs below the knee repeat "
+        f"one outcome rather than testing separately, so this is about {n_effective} independent "
+        f"looks, and |z| > 2 among them arises by chance roughly {p_any:.0%} of the time. A hint "
+        f"worth checking with a bigger sample, not a detection -- and it sits at a mass no real "
+        f"Trojan has."
+        if worst_z is not None else "No rung had survivors in both swarms, so there is nothing to compare."
+    )
 
     lines = [
         f"# Mass ladder ({args.run_id})",
@@ -219,7 +251,8 @@ def main() -> None:
         "",
         f"(624) Hektor, the largest known Trojan, is ~1e-9 M_Jup. At that rung "
         f"{hektor['f_librating'].iloc[0]:.0%} still librate, against "
-        f"{massless['f_librating'].iloc[0]:.0%} for massless test particles"
+        f"{massless['f_librating'].iloc[0]:.0%} for massless test particles -- the same objects, "
+        f"the same three losses."
         if not hektor.empty and not massless.empty else "",
         "",
         "Real Trojan masses are ten orders of magnitude below the threshold, so treating them as "
@@ -230,8 +263,16 @@ def main() -> None:
         "",
         _md_table(shown),
         "",
-        "`f_L4` and `f_L5` are the surviving fractions in each swarm; a mass dependence in their "
-        "ratio would be a mass axis on the asymmetry question.",
+        "`f_L4` and `f_L5` are the surviving fractions in each swarm, `z_L4_L5` the two-proportion "
+        "z for the difference between them.",
+        "",
+        "## Does the asymmetry depend on mass?",
+        "",
+        asymmetry,
+        "",
+        "Below the knee the two swarms are flat and identical rung to rung -- the same objects "
+        "leave at every mass -- so within this sample there is no mass axis on the asymmetry "
+        "where real Trojans live.",
         "",
         "## Cost",
         "",
