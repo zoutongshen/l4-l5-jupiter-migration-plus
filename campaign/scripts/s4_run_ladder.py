@@ -29,7 +29,7 @@ import numpy as np
 import pandas as pd
 
 from trojans import constants, diagnostics, initial, integrate, paths, runs
-from trojans.outputs import write_json, write_provenance
+from trojans.outputs import write_json, write_parquet, write_provenance
 
 # Rungs in Jupiter masses. 0 is the massless control that bridges to the pilot;
 # 1e-9 is about (624) Hektor, the largest real Trojan; 24 is Liberato & Winter's
@@ -185,13 +185,13 @@ def main() -> None:
         for i, row in enumerate(pool.imap_unordered(run_one, tasks, chunksize=1), 1):
             rows.append(row)
             if i % 25 == 0 or i == len(tasks):
-                pd.DataFrame(rows).to_parquet(table, index=False)
+                write_parquet(table, pd.DataFrame(rows))
                 rate = i / (time.time() - wall0)
                 print(f"  {i}/{len(tasks)}  {rate*60:.1f}/min  "
                       f"eta {(len(tasks)-i)/rate/60:.1f} min", flush=True)
 
     frame = pd.DataFrame(rows)
-    frame.to_parquet(table, index=False)
+    write_parquet(table, frame)
     cpu_h = frame["cpu_s"].sum() / 3600.0
     print(f"\n{len(frame)} runs, {cpu_h:.2f} CPU-h, {(time.time()-wall0)/60:.1f} min wall")
     print(f"written to {table}")

@@ -21,6 +21,18 @@ def write_json(path: Path, obj) -> None:
     tmp.replace(path)
 
 
+def write_parquet(path: Path, frame) -> None:
+    """A table written whole or not at all, the way write_json writes JSON.
+
+    Long runs checkpoint into these every few results. A crash, a full disk or an
+    unplugged external drive part-way through a plain ``to_parquet`` leaves a file
+    that no longer reads, costing the whole run rather than the last few results.
+    """
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    frame.to_parquet(tmp, index=False)
+    tmp.replace(path)
+
+
 def _git(*args: str) -> str:
     return subprocess.run(
         ["git", *args], cwd=REPO_ROOT, capture_output=True, text=True, check=True
