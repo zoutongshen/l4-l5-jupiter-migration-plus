@@ -242,7 +242,84 @@ Source: `campaign/reports/pilot_10myr/explore_families.csv` (sample `clean`), pr
 
 ---
 
-## 6. Status and what it does not say
+## 6. What an escaper looks like at t₀
+
+**Note on naming:** `D` in `explore_correlates.csv` is the **libration half-amplitude in
+degrees**, not a diameter. Physical size is `diam_km`, derived from H.
+
+Discrimination is the Mann–Whitney AUC — probability that a random escaper exceeds a
+random survivor. 0.5 = no relation. V24 + U ≤ 4 sample, 41 escapers vs 14,302 survivors.
+
+| parameter | escapers | survivors | AUC | p |
+|---|---|---|---|---|
+| V24 B — ecc amplitude | 0.390 | 0.049 | **0.997** | 4e−28 |
+| eccentricity | 0.387 | 0.069 | **0.995** | 6e−28 |
+| libration half-amplitude | 128.4° | 14.9° | **0.975** | 8e−26 |
+| V24 C — libration | 1.959 | 1.569 | 0.936 | 5e−22 |
+| H (mag) | 15.63 | 14.45 | *0.826* | 6e−13 |
+| \|σ\|−60° offset | 29.0° | 8.2° | 0.768 | 3e−09 |
+| semi-major axis | 5.251 | 5.205 | 0.552 | 0.25 |
+| **inclination** | 10.85° | 12.09° | **0.492** | **0.85** |
+| V24 A — incl amplitude | 0.178 | 0.209 | 0.489 | 0.82 |
+
+**Eccentricity and libration amplitude separate almost perfectly. Inclination and
+semi-major axis carry no signal at all.**
+
+### A threshold, not a gradient
+
+| starting e | n | esc | rate | libration half-amp | n | esc | rate |
+|---|---|---|---|---|---|---|---|
+| < 0.05 | 4,252 | 0 | 0% | < 20° | 10,669 | 0 | 0% |
+| 0.05–0.10 | 7,073 | 0 | 0% | 20–40° | 3,641 | 13 | 0.36% |
+| 0.10–0.15 | 2,402 | 1 | 0.04% | 40–60° | 6 | 1 | 16.7% |
+| 0.15–0.20 | 503 | 6 | 1.19% | 60–90° | 2 | 2 | 100% |
+| 0.20–0.30 | 85 | 6 | 7.06% | > 90° | 25 | 25 | 100% |
+| 0.30–0.40 | 9 | 9 | **100%** | | | | |
+| > 0.40 | 19 | 19 | **100%** | | | | |
+
+This is a separatrix. **113 objects (0.8% of the sample) with e > 0.2 supply 34 of the 41
+escapers.** The other 99% sit deep inside the tadpole region and 10 Myr does not touch them.
+
+### The size signal is not dynamics
+
+Escapers are fainter (H 15.63 vs 14.45, AUC 0.826) — median 3.8 km vs 6.5 km. **This
+cannot be physical**: the Trojans are massless test particles in a gravity-only
+integration, so the equations of motion contain no size term. What H tracks is arc length:
+
+- H vs observation arc: Spearman **ρ = −0.791**
+- escapers' arcs 4,735 d vs survivors' 6,410 d (AUC 0.283); 66 obs vs 152 (AUC 0.311)
+- escape rate still climbs with U *inside* the cut: 0.200% at U = 0 → 1.98% at U = 4
+- **remove the high-e tail and the signal vanishes**: e ≤ 0.2 gives H AUC 0.645, p = 0.18,
+  with escape rate flat across H bins (0.067% / 0.000% / 0.062% / 0.29%)
+
+The high-e tail is observationally distinct — 13.3% carries U ≥ 3 against 4.1% of the bulk.
+So part of it is orbit-quality contamination that U ≤ 4 does not remove. This run cannot
+separate that from genuinely high-e, genuinely unstable Trojans; both occupy the same 113
+objects. It is §4.1's artefact, one layer deeper.
+
+### Why families never escape
+
+| parameter | family | background | AUC |
+|---|---|---|---|
+| eccentricity | 0.0685 | 0.0689 | 0.442 |
+| inclination | 8.81° | 12.46° | 0.496 |
+| libration half-amp | 16.99° | 14.49° | 0.552 |
+| H | 14.53 | 14.44 | 0.537 |
+| **fraction with e > 0.2** | **0.00%** | 0.91% | — |
+| **fraction with lib. half-amp > 60°** | **0.00%** | 0.22% | — |
+
+Families are not dynamically special — their medians match the background, and their
+libration amplitude is if anything slightly *larger*. They simply have **no members in
+either escape-prone tail**. That follows from how families are found: V24 identify them as
+clusters in proper-element space, which requires elements stable enough to compute, so an
+object near the separatrix cannot be assigned to a family before any integration runs.
+
+Reproduce: `python campaign/scripts/s3_escaper_profile.py --run-id pilot_10myr`
+→ `campaign/reports/pilot_10myr/escaper_profile.csv`
+
+---
+
+## 7. Status and what it does not say
 
 - **Timespan.** 10 Myr, not 4.5 Gyr. The unstable population empties first, so these
   fractions are not a rate.

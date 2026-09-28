@@ -1,0 +1,33 @@
+kind,param,escapers,survivors,auc,p,lo,hi,n,rate
+discrimination,V24 B - ecc amplitude,0.389616,0.0491329,0.996997,3.50639e-28,,,,
+discrimination,eccentricity,0.386616,0.0687811,0.995032,5.67754e-28,,,,
+discrimination,libration half-amp (deg),128.419,14.9329,0.974568,7.68899e-26,,,,
+discrimination,V24 C - libration,1.95896,1.56903,0.935612,5.00431e-22,,,,
+discrimination,H (mag),15.63,14.45,0.825522,5.59924e-13,,,,
+discrimination,|sigma|-60 offset (deg),29.028,8.15903,0.767986,2.92982e-09,,,,
+discrimination,semi-major axis (au),5.2513,5.2046,0.551698,0.252198,,,,
+discrimination,inclination (deg),10.8453,12.0889,0.491572,0.851936,,,,
+discrimination,V24 A - incl amplitude,0.178253,0.209077,0.489454,0.815326,,,,
+discrimination,diameter (km),3.75817,6.47107,0.174478,5.59924e-13,,,,
+H_confound,H vs data_arc (Spearman),,,-0.790599,0,,,,
+H_confound,data_arc,4735,6410,0.282877,1.51747e-06,,,,
+H_confound,n_obs_used,66,152,0.311196,2.89269e-05,,,,
+H_confound,H | e <= 0.2,15.11,14.45,0.644891,0.18433,,,,
+family_vs_background,eccentricity,0.0685241,0.06893,0.441826,,,,,
+family_vs_background,inclination (deg),8.81122,12.4555,0.496101,,,,,
+family_vs_background,libration half-amp (deg),16.9879,14.4916,0.551715,,,,,
+family_vs_background,H (mag),14.53,14.44,0.537073,,,,,
+family_tail,e > 0.2,0,0.00906466,,,,,,
+family_tail,lib_amp > 60.0,0,0.00216589,,,,,,
+rate_bin,e,0,,,,0,0.05,4252,0
+rate_bin,e,0,,,,0.05,0.1,7073,0
+rate_bin,e,1,,,,0.1,0.15,2402,0.00041632
+rate_bin,e,6,,,,0.15,0.2,503,0.0119284
+rate_bin,e,6,,,,0.2,0.3,85,0.0705882
+rate_bin,e,9,,,,0.3,0.4,9,1
+rate_bin,e,19,,,,0.4,1.01,19,1
+rate_bin,lib_amp,0,,,,0,20,10669,0
+rate_bin,lib_amp,13,,,,20,40,3641,0.00357045
+rate_bin,lib_amp,1,,,,40,60,6,0.166667
+rate_bin,lib_amp,2,,,,60,90,2,1
+rate_bin,lib_amp,25,,,,90,181,25,1
