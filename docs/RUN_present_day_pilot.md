@@ -92,7 +92,31 @@ G = GM_sun · yr² / au³ = 39.4769264212 au³ yr⁻² M☉⁻¹
 This matters for reproducibility: it makes heliocentric elements from JPL convert exactly,
 with no offset between the catalogue's orbit and the one the integrator reconstructs.
 
-### 3.4 Test-particle treatment
+### 3.4 Why the Trojans carry no mass
+
+Massless by choice, not expedience, and now measured rather than assumed.
+
+**1. A Trojan's mass does not enter its own dynamics at any representable level.**
+Co-orbital motion is governed by μ = (m_J + m_T)/(M + m_J + m_T). Adding (624) Hektor,
+the largest known Trojan at 1.35 × 10⁻¹² M☉, moves μ from 0.000953875456 to
+0.000953875457 — a shift of **1.4 × 10⁻⁷ percent**, nine significant figures down, and
+smaller than the integrator's own error. Every other Trojan is smaller still.
+
+**2. The threshold is nine orders of magnitude away, and we located it.** The mass ladder
+(`RUN_mass_ladder.md`) found survival flat at 97% from zero to 0.1 M_Jup, with the
+co-orbital region failing only between 1 and 3 M_Jup. Hektor is 1.4 × 10⁻⁹ M_Jup; the whole
+catalogue summed is 1.8 × 10⁻⁸ M_Jup. Giving the 200 largest their real masses with full
+mutual gravity changed no libration class and left all 200 alive.
+
+**3. It is what the comparison literature does.** Levison+ (1997), Tsiganis+ (2005),
+Robutel & Gabern (2006) and Di Sisto+ (2014) all integrate Trojans as massless test
+particles. A massive run would not be a more correct version of this one — it would be a
+different experiment whose escape fractions could not be set beside theirs.
+
+Masslessness also makes the run cheap and perfectly parallel. That is a convenience the
+physics allows, not the reason for the choice.
+
+### 3.5 Test-particle treatment
 
 ```
 sim.N_active          = 5      # Sun + four giants
@@ -107,7 +131,7 @@ splitting 16,445 of them across 8 independent processes is bookkeeping, not phys
 `RUN_mass_ladder.md` §6 and `docs/MASS_THRESHOLD.md`. It holds with ~9 orders of margin
 for single-body dynamics.)*
 
-### 3.5 Sampling, diagnostics and removal
+### 3.6 Sampling, diagnostics and removal
 
 Every **8 steps** (≈ 0.949 yr) the runner reads all states and records, per Trojan:
 
@@ -132,7 +156,7 @@ circular mean, and a libration class. Classification is by which separatrix was 
 1,000 windows over the run. State is checkpointed every 10 windows (100 kyr); restart is
 **bit-for-bit identical** to an uninterrupted run, which is asserted in the test suite.
 
-### 3.6 Achieved accuracy and cost
+### 3.7 Achieved accuracy and cost
 
 | | |
 |---|---|
