@@ -194,7 +194,55 @@ almost always go on to be removed).
 
 ---
 
-## 5. Status and what it does not say
+## 5. Do collisional families change this?
+
+Families are not independent trials — a family is a set of fragments from one parent, so
+*N* members are closer to one correlated unit than to *N* draws — and the two swarms carry
+them in very different proportion. Checked on the same V24 + U ≤ 4 sample, using V24's own
+family assignments.
+
+| swarm | group | n | escapers | fraction |
+|---|---|---|---|---|
+| L4 | **family members** | 1,485 | **0** | 0 |
+| L4 | background | 7,330 | 20 | 0.002729 ± 0.000609 |
+| L5 | **family members** | 392 | **0** | 0 |
+| L5 | background | 5,136 | 21 | 0.004089 ± 0.000890 |
+
+**Not one family member escaped** — 1,877 objects across 13 families, zero removals, against
+**5.65 expected** at each swarm's own background rate. Poisson P(0 | 5.65) = 0.0035; Fisher
+exact p = 0.0047.
+
+| variant | n L4 | n L5 | escapers | escape ratio L5/L4 | amplifier S4/S5 |
+|---|---|---|---|---|---|
+| with families (as §4.2) | 8,815 | 5,528 | 20 / 21 | 1.674 ± 0.522 | 1.0015 ± 0.0010 |
+| **families removed** | 7,330 | 5,136 | 20 / 21 | 1.499 ± 0.467 | 1.0014 ± 0.0011 |
+
+**The conclusion is unchanged.** The amplifier moves 1.0015 ± 0.0010 → 1.0014 ± 0.0011,
+consistent with unity either way; the L5/L4 ratio stays consistent with unity either way.
+
+**But families are not neutral.** L4 is 16.8% family members, L5 only 7.1%. Since no family
+member escapes, including them dilutes L4's escape fraction more than L5's, inflating the
+apparent L5 excess from 1.50 to 1.67. This bias runs **opposite** to §4.1's — short-arc
+orbits inflate L4's escapes, families suppress them. The raw comparison is sensitive to
+sample composition in at least two independent ways.
+
+**Caveat — partly true by construction.** V24 identify families as clusters in
+proper-element space, which requires proper elements stable enough to cluster. An object
+whose elements diffuse cannot be assigned to a family at all, so family membership is
+stability-selected *before* any integration. The 0/1,877 is real for this sample but is not
+purely a dynamical result.
+
+**Effective sample size.** Counting each family as one correlated unit: L4 8,815 → 7,339
+(−16.7%), L5 5,528 → 5,140 (−7.0%). The binomial errors in §4.2 are therefore mildly
+optimistic, and asymmetrically so — not enough to change a result already consistent with
+unity.
+
+Source: `campaign/reports/pilot_10myr/explore_families.csv` (sample `clean`), produced by
+`campaign/scripts/s3_explore.py`.
+
+---
+
+## 6. Status and what it does not say
 
 - **Timespan.** 10 Myr, not 4.5 Gyr. The unstable population empties first, so these
   fractions are not a rate.
