@@ -108,10 +108,33 @@ co-orbital region failing only between 1 and 3 M_Jup. Hektor is 1.4 × 10⁻⁹ 
 catalogue summed is 1.8 × 10⁻⁸ M_Jup. Giving the 200 largest their real masses with full
 mutual gravity changed no libration class and left all 200 alive.
 
-**3. It is what the comparison literature does.** Levison+ (1997), Tsiganis+ (2005),
-Robutel & Gabern (2006) and Di Sisto+ (2014) all integrate Trojans as massless test
-particles. A massive run would not be a more correct version of this one — it would be a
-different experiment whose escape fractions could not be set beside theirs.
+**3. It is what the comparison literature does — including this catalogue's own authors.**
+Levison+ (1997), Tsiganis+ (2005), Robutel & Gabern (2006) and Di Sisto+ (2014) all
+integrate Trojans as massless test particles. So does **V24**, the source of this run's
+catalogue and proper elements (their §4):
+
+> "we performed the barycentric correction to state vectors of all integrated bodies
+> (massive planets and massless Trojans). This means (i) we added masses of all terrestrial
+> planets to the center (the Sun), and (ii) shifted the Sun to the barycenter of the inner
+> Solar system. We used ... swift (specifically swift_rmvs4) ... and used a short timestep
+> of 0.25 years."
+
+| | V24 | this run |
+|---|---|---|
+| Trojans | massless | massless |
+| terrestrial planets | folded into the Sun | folded into the Sun |
+| planet set | Sun + 4 giants | Sun + 4 giants |
+| code | swift_rmvs4 | REBOUND 4.6.0, WHFast |
+| timestep | 0.25 yr (2.1% P_J) | **0.1186 yr (1% P_J)** |
+| span | 100 Myr | 10 Myr (pilot) |
+
+The two modelling choices most open to challenge — massless Trojans and a folded Sun —
+match the catalogue paper exactly, and the timestep here is 2.1× finer. Note their
+integration maps the stability *zone* with synthetic (A, B, C) grid orbits, not the real
+catalogue, so it is a companion to this run rather than the same experiment.
+
+A massive run would not be a more correct version of this one — it would be a different
+experiment whose escape fractions could not be set beside theirs.
 
 Masslessness also makes the run cheap and perfectly parallel. That is a convenience the
 physics allows, not the reason for the choice.
@@ -346,7 +369,10 @@ Reproduce: `python campaign/scripts/s3_escaper_profile.py --run-id pilot_10myr`
 ## 7. Status and what it does not say
 
 - **Timespan.** 10 Myr, not 4.5 Gyr. The unstable population empties first, so these
-  fractions are not a rate.
+  fractions are not a rate. V24 call their own *100 Myr* stability integration "rather
+  short", noting that "extending it to Gyr would lead to additional collapse of the
+  stability zone" (citing Levison+ 1997, Robutel & Gabern 2006). This run is an order of
+  magnitude shorter again — it is a pilot, and Stage 4 is what answers Q1.
 - **The clean sample is small.** 41 escapers carry the headline number. The 4.5 Gyr run
   is what makes it a measurement.
 - **The orbit-quality cut is now a required step**, not an option — it changes the sign of
