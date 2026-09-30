@@ -165,3 +165,26 @@ selection, MPC and our label disagree for two objects (`label_comparison.csv`).
 3. **The complete sample (H ≤ 13.6) is where to run the KS tests on e, I and D**
    (Step 3). There U is irrelevant (every orbit is good) and discovery bias is
    smallest.
+
+## 5. What the U ladder shows (Step 2, `campaign/scripts/s3_uladder.py`)
+
+Figures: `campaign/reports/pilot_10myr/fig_grand.png` and `fig_uladder.png`; numbers in
+`uladder.csv`.
+
+- **The asymmetry doesn't depend on where we cut, up to U ≤ 7.** The escape ratio L5/L4
+  for the cut U ≤ k is 1.6–2.1 for every k from 0 to 7 (1.67 ± 0.52 at k = 4). It
+  falls to 1.25 at k = 8 and inverts to 0.39 at k = 9. So U ≤ 4 is a conservative,
+  safe cut; U ≤ 5, 6 or 7 would report the same asymmetry.
+- **Orbit error only takes over at U ≥ 8.** Taking each U on its own, U = 1–7 escape
+  at ≈ 1% in 10 Myr, U = 8 at ≈ 3.5% and U = 9 at ≈ 20%. At fixed size
+  (14 < H < 15.5) U = 9 still escapes at 23%, so this is the orbit fit, not size. It
+  matches §2.2, where σ_a reaches the whole tadpole at U = 8.
+- **Unexpected: U = 1–4 escape ≈ 5× more often than U = 0**, at fixed H as well
+  (0.39% vs 0.11%). Yet their σ_a is < 0.3% of the tadpole, so orbit error can't be
+  the reason. What differs is *which* orbits they are. At 14 < H < 15.5 the U = 1–4
+  objects have median I = 17° against 11° for U = 0, and three times as many sit in
+  the unstable edge (C > 2: 0.26% vs 0.08%). The likely reading is discovery order:
+  surveys found the cold, stable Trojans first, and the hotter, marginal ones later,
+  so they still have short arcs. This is a hypothesis; it hasn't been tested.
+- **Consequence for Step 3.** Inclination distributions below completeness are shaped
+  by discovery order. The KS tests should be quoted on the complete sample.
