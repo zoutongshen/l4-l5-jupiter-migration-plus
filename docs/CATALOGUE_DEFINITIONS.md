@@ -188,3 +188,9 @@ Figures: `campaign/reports/pilot_10myr/fig_grand.png` and `fig_uladder.png`; num
   so they still have short arcs. This is a hypothesis; it hasn't been tested.
 - **Consequence for Step 3.** Inclination distributions below completeness are shaped
   by discovery order. The KS tests should be quoted on the complete sample.
+
+**Correction (Step 3, same day).** The 1.6–2.1 ratios above include 12 L4 and 16 L5
+comet-like interlopers. V24's element box admits them, but JPL and MPC don't call them
+Trojans, and all of them escape within a few kyr. For objects that V24 and JPL/MPC both
+call Trojans, the ratio is 1.00 ± 0.57. The conclusion about where to cut U stands; see
+`docs/INITIAL_CONDITIONS_KS.md` §3.

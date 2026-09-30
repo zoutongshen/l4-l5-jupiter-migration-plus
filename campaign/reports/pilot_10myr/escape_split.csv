@@ -1,0 +1,5 @@
+group,swarm,n,k,f,lo,hi,median_e,per_10k_of_swarm
+Trojan by V24 and JPL/MPC,L4,8803,8,0.00090878,0.00063937,0.0012916,0.06838,9.0754
+Trojan by V24 and JPL/MPC,L5,5512,5,0.00090711,0.00058221,0.0014131,0.069387,9.0449
+V24 box only (interloper),L4,12,12,1,0.92308,1,0.40819,13.613
+V24 box only (interloper),L5,16,16,1,0.94118,1,0.46536,28.944
