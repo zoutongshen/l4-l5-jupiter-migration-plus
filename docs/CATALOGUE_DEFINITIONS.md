@@ -168,29 +168,46 @@ selection, MPC and our label disagree for two objects (`label_comparison.csv`).
 
 ## 5. What the U ladder shows (Step 2, `campaign/scripts/s3_uladder.py`)
 
-Figures: `campaign/reports/pilot_10myr/fig_grand.png` and `fig_uladder.png`; numbers in
-`uladder.csv`.
+- Figures: `campaign/reports/pilot_10myr/fig_grand.png` and `fig_uladder.png`.
+- Numbers: `uladder.csv`.
+- Base sample: V24-selected objects that JPL or MPC also call Trojans. The 28
+  comet-like objects that only V24's element box admits are removed; see
+  `docs/INITIAL_CONDITIONS_KS.md` §3. A first version of this ladder included them
+  and showed L5/L4 ratios of 1.6–2.1. That ratio came entirely from those objects.
 
-- **The asymmetry doesn't depend on where we cut, up to U ≤ 7.** The escape ratio L5/L4
-  for the cut U ≤ k is 1.6–2.1 for every k from 0 to 7 (1.67 ± 0.52 at k = 4). It
-  falls to 1.25 at k = 8 and inverts to 0.39 at k = 9. So U ≤ 4 is a conservative,
-  safe cut; U ≤ 5, 6 or 7 would report the same asymmetry.
-- **Orbit error only takes over at U ≥ 8.** Taking each U on its own, U = 1–7 escape
-  at ≈ 1% in 10 Myr, U = 8 at ≈ 3.5% and U = 9 at ≈ 20%. At fixed size
-  (14 < H < 15.5) U = 9 still escapes at 23%, so this is the orbit fit, not size. It
-  matches §2.2, where σ_a reaches the whole tadpole at U = 8.
-- **Unexpected: U = 1–4 escape ≈ 5× more often than U = 0**, at fixed H as well
-  (0.39% vs 0.11%). Yet their σ_a is < 0.3% of the tadpole, so orbit error can't be
-  the reason. What differs is *which* orbits they are. At 14 < H < 15.5 the U = 1–4
-  objects have median I = 17° against 11° for U = 0, and three times as many sit in
-  the unstable edge (C > 2: 0.26% vs 0.08%). The likely reading is discovery order:
-  surveys found the cold, stable Trojans first, and the hotter, marginal ones later,
-  so they still have short arcs. This is a hypothesis; it hasn't been tested.
-- **Consequence for Step 3.** Inclination distributions below completeness are shaped
-  by discovery order. The KS tests should be quoted on the complete sample.
+**Orbit error takes over at U = 8.**
+- Per U value, with L4 and L5 pooled, the escape fraction in 10 Myr is:
+  - 0.06% at U = 0;
+  - 0.2–0.8% at U = 1–4;
+  - about 1% at U = 6–7;
+  - 3% at U = 8;
+  - 19% at U = 9.
+- At fixed size (14 < H < 15.5) U = 9 still escapes at 23%, so this is the orbit fit,
+  not size. It matches §2.2: at U = 8, σ_a is about the whole tadpole width.
 
-**Correction (Step 3, same day).** The 1.6–2.1 ratios above include 12 L4 and 16 L5
-comet-like interlopers. V24's element box admits them, but JPL and MPC don't call them
-Trojans, and all of them escape within a few kyr. For objects that V24 and JPL/MPC both
-call Trojans, the ratio is 1.00 ± 0.57. The conclusion about where to cut U stands; see
-`docs/INITIAL_CONDITIONS_KS.md` §3.
+**No cut up to U ≤ 7 shows an asymmetry.** The escape ratio L5/L4 for each cut U ≤ k:
+
+| Cut | Ratio L5/L4 | L4:L5 escapers |
+|---|---|---|
+| U ≤ 0 | 1.22 ± 0.93 | 4 : 3 |
+| U ≤ 4 | 1.00 ± 0.57 | 8 : 5 |
+| U ≤ 5 | 0.99 ± 0.57 | |
+| U ≤ 7 | 0.80 ± 0.40 | |
+| U ≤ 8 | 0.59 ± 0.24 | |
+| U ≤ 9 | 0.25 ± 0.05 | |
+
+- Adding U = 8 fakes an L4 excess. L4 holds 3× more U = 8 objects than L5 (recent
+  short-arc discoveries), and they escape because their orbits are unknown.
+- **Keep U ≤ 4 (or U ≤ 5).**
+- **Per-U L5/L4 ratios are not shown.** Each U value holds 0–4 escapers per swarm, so
+  a ladder for each U can test orbit quality (panel a) but not the asymmetry.
+
+**U = 1–4 escape several times more often than U = 0, although their σ_a is < 0.3% of
+the tadpole.**
+- At 14 < H < 15.5, U = 1–4 objects have median I = 17° against 11° for U = 0.
+- Three times as many of them sit in the unstable edge.
+- The likely reading is discovery order: surveys found the cold, stable Trojans first.
+- This is untested.
+
+**Consequence.** Inclination distributions below completeness are shaped by discovery
+order. The KS tests are quoted on the complete sample (Step 3).

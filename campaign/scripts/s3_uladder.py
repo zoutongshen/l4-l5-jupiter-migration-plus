@@ -2,11 +2,18 @@
 
 Reads a merged run and writes to campaign/reports/<run_id>/:
   fig_grand.png     cumulative % of each swarm escaped vs log time, with the running
-                    escape ratio L5/L4 underneath (V24-selected, U <= 4)
-  fig_uladder.png   escape fraction per U value (all H, and 14 < H < 15.5 to hold size
-                    fixed), per cumulative cut U <= k, the ratio L5/L4 per cut, and the
-                    number of objects per U
+                    escape ratio L5/L4 underneath (U <= 4)
+  fig_uladder.png   (a) escape fraction per U value, L4 and L5 pooled (all H, and
+                    14 < H < 15.5 to hold size fixed): where orbit error takes over;
+                    (b) the ratio L5/L4 for each cumulative cut U <= k: whether the cut
+                    drives the result; (c) the number of objects per U
   uladder.csv       the numbers behind fig_uladder
+
+Base sample: V24-selected objects that JPL (class TJN) or the MPC also call Trojans.
+Objects only V24's element box admits are comet-like interlopers (e 0.31-0.60, T_J
+2.25-2.82) that all leave within a few kyr, and would otherwise dominate the ratio
+(docs/INITIAL_CONDITIONS_KS.md). Per-U L5/L4 ratios are not drawn: each U value holds
+0-4 escapers per swarm, so they would be noise.
 
 U is the JPL orbit condition code (the MPC uncertainty parameter), see
 docs/CATALOGUE_DEFINITIONS.md. Escape is the first entry within 2.1 Hill radii of a
@@ -69,7 +76,7 @@ def ratio(k4, n4, k5, n5):
 
 def load(run_id):
     ev = pd.read_parquet(paths.merged_dir(run_id) / "events.parquet")
-    ev = ev[ev["v24_selected"]].copy()
+    ev = ev[ev["v24_selected"] & (ev["label_region"] != "V24")].copy()
     ev["U"] = pd.to_numeric(ev["condition_code"], errors="coerce").astype(int)
     ev["esc"] = ev["t_hill_record"].notna()
     t_end = json.loads((paths.run_dir(run_id) / "settings.json").read_text())["t_end_yr"]
@@ -81,6 +88,10 @@ def ladder(ev) -> pd.DataFrame:
     rows = []
     for u in U_VALUES:
         row = {"U": u}
+        for tag, mask in [("pool_", ev["U"] == u), ("pool_Hfix_", fixed_h & (ev["U"] == u))]:
+            n, k = int(mask.sum()), int(ev.loc[mask, "esc"].sum())
+            f, lo, hi = wilson(k, n)
+            row.update({f"{tag}n": n, f"{tag}k": k, f"{tag}f": f, f"{tag}lo": lo, f"{tag}hi": hi})
         for s in SWARMS:
             sw = ev["swarm"] == s
             for tag, mask in [("", sw & (ev["U"] == u)), ("Hfix_", sw & fixed_h & (ev["U"] == u)),
@@ -109,10 +120,14 @@ def fig_grand(ev, t_end, out):
         top.fill_between(grid, 100 * band[:, 1], 100 * band[:, 2], step="post", color=SWARM_COLOR[s], alpha=0.15, lw=0)
         top.step(grid, 100 * k / n, where="post", color=SWARM_COLOR[s], lw=2,
                  label=f"{s}: {k[-1]} of {n:,} escaped ({100 * k[-1] / n:.2f}%)")
-        top.annotate(s, (grid[-1], 100 * k[-1] / n), xytext=(5, 0), textcoords="offset points",
-                     va="center", color=TEXT_2, fontsize=9)
+    y4, y5 = (100 * curves[s][0][-1] / curves[s][1] for s in SWARMS)
+    close = abs(y4 - y5) < 0.05 * max(y4, y5, 1e-9)
+    for s, y, dy in [("L4", y4, -6 if close and y4 <= y5 else 6 if close else 0),
+                     ("L5", y5, -6 if close and y5 < y4 else 6 if close else 0)]:
+        top.annotate(s, (grid[-1], y), xytext=(5, dy), textcoords="offset points", va="center", color=TEXT_2,
+                     fontsize=9)
     top.set_ylabel("escaped so far [% of swarm]")
-    top.set_title("V24-selected Trojans with well-determined orbits (U ≤ 4): cumulative escapes", loc="left")
+    top.set_title("Trojans by V24 and JPL/MPC, well-determined orbits (U ≤ 4): cumulative escapes", loc="left")
     top.legend(loc="upper left")
     top.set_ylim(bottom=0)
 
@@ -126,7 +141,7 @@ def fig_grand(ev, t_end, out):
     bot.step(grid, r, where="post", color=TEXT_2, lw=2)
     bot.axhline(1, color=BASELINE, lw=1.2, ls="--")
     bot.annotate("no asymmetry", (grid[1], 1), xytext=(2, 3), textcoords="offset points", color=MUTED, fontsize=8)
-    bot.annotate(f"{r[-1]:.2f} ± {e[-1]:.2f} at {t_end / 1e6:.0f} Myr", (grid[-1], r[-1]), xytext=(-4, 8),
+    bot.annotate(f"{r[-1]:.2f} ± {e[-1]:.2f} at {t_end / 1e6:.0f} Myr", (grid[-1], r[-1] + e[-1]), xytext=(-4, 6),
                  textcoords="offset points", ha="right", color=TEXT_2, fontsize=8)
     bot.set_ylabel("escape ratio L5 / L4\n(fraction escaped)")
     bot.set_ylim(0, max(4, np.nanmax(r + e) * 1.05))
@@ -140,49 +155,49 @@ def fig_grand(ev, t_end, out):
     return {"L4": (int(k4[-1]), n4), "L5": (int(k5[-1]), n5), "ratio": (float(r[-1]), float(e[-1]))}
 
 
-def _rate_panel(ax, lad, tag, title):
-    offset = {"L4": -0.12, "L5": 0.12}
+def fig_uladder(lad, out):
+    fig, axes = plt.subplots(3, 1, figsize=(7.2, 8.2), sharex=True, height_ratios=[3, 2.4, 2],
+                             constrained_layout=True)
     floor = 3e-5
-    for s in SWARMS:
-        x = lad["U"] + offset[s]
-        f, lo, hi = lad[f"{tag}f_{s}"], lad[f"{tag}lo_{s}"], lad[f"{tag}hi_{s}"]
-        some = lad[f"{tag}k_{s}"] > 0
+    ax = axes[0]
+    for tag, dx, label, face in [("pool_", -0.1, "all H", TEXT_2), ("pool_Hfix_", 0.1, f"{H_FIXED[0]} < H < {H_FIXED[1]}", SURFACE)]:
+        x = lad["U"] + dx
+        f, lo, hi, k = lad[f"{tag}f"], lad[f"{tag}lo"], lad[f"{tag}hi"], lad[f"{tag}k"]
+        some = k > 0
         ax.errorbar(x[some], f[some], yerr=[f[some] - np.maximum(lo[some], floor), hi[some] - f[some]], fmt="o",
-                    ms=6, color=SWARM_COLOR[s], mec=SURFACE, mew=1, elinewidth=1.2, capsize=0, label=s)
-        none = (~some) & (lad[f"{tag}n_{s}"] > 0)
-        ax.errorbar(x[none], np.full(none.sum(), floor), yerr=[np.zeros(none.sum()), hi[none] - floor], fmt="o",
-                    ms=6, mfc=SURFACE, color=SWARM_COLOR[s], elinewidth=1.2, capsize=0)
+                    ms=7, color=TEXT_2, mfc=face, mew=1.4, elinewidth=1.2, capsize=0, label=label)
+        none = ~some
+        ax.errorbar(x[none], np.full(none.sum(), floor), yerr=[np.zeros(none.sum()), hi[none] - floor], fmt="v",
+                    ms=6, color=MUTED, mfc=face, elinewidth=1, capsize=0)
     ax.set_yscale("log")
     ax.set_ylim(floor * 0.7, 1)
     ax.set_ylabel("fraction escaped\nin 10 Myr")
-    ax.set_title(title, loc="left")
+    ax.set_title("(a) escape per U value, L4 + L5 pooled: where orbit error takes over", loc="left")
+    ax.legend(loc="upper left")
+    ax.annotate("▼ = no escaper; bar = 1σ upper limit", (0.99, 0.04), xycoords="axes fraction", ha="right",
+                color=MUTED, fontsize=8)
 
-
-def fig_uladder(lad, out):
-    fig, axes = plt.subplots(5, 1, figsize=(7.2, 11.5), sharex=True, height_ratios=[3, 3, 3, 2.2, 2],
-                             constrained_layout=True)
-    _rate_panel(axes[0], lad, "", "(a) each U value on its own, all H  (open = no escaper; bar = 1σ upper limit)")
-    axes[0].legend(loc="upper left")
-    _rate_panel(axes[1], lad, "Hfix_", f"(b) same, only {H_FIXED[0]} < H < {H_FIXED[1]}: size held fixed")
-    _rate_panel(axes[2], lad, "cum_", "(c) cumulative cut: everything with U ≤ k")
-
-    ax = axes[3]
+    ax = axes[1]
     ok = lad["cum_ratio"].notna()
-    ax.errorbar(lad["U"][ok], lad["cum_ratio"][ok], yerr=lad["cum_ratio_err"][ok], fmt="o", ms=6, color=TEXT_2,
+    ax.errorbar(lad["U"][ok], lad["cum_ratio"][ok], yerr=lad["cum_ratio_err"][ok], fmt="o", ms=7, color=TEXT_2,
                 mec=SURFACE, mew=1, elinewidth=1.2, capsize=0)
+    for u, r, n4, n5 in zip(lad["U"][ok], lad["cum_ratio"][ok], lad["cum_k_L4"][ok], lad["cum_k_L5"][ok]):
+        ax.annotate(f"{n4}:{n5}", (u, r), xytext=(8, 0), textcoords="offset points", va="center",
+                    color=MUTED, fontsize=7)
     ax.axhline(1, color=BASELINE, lw=1.2, ls="--")
     ax.set_ylabel("escape ratio L5 / L4\nfor U ≤ k")
-    ax.set_title("(d) the asymmetry each cut would report", loc="left")
+    ax.set_title("(b) the asymmetry each cut U ≤ k would report (labels: L4:L5 escapers)", loc="left")
 
-    ax = axes[4]
+    ax = axes[2]
     w = 0.36
-    for s, dx in zip(SWARMS, (-w / 2, w / 2)):
-        ax.bar(lad["U"] + dx, lad[f"n_{s}"], width=w - 0.04, color=SWARM_COLOR[s], label=s)
+    for sw, dx in zip(SWARMS, (-w / 2, w / 2)):
+        ax.bar(lad["U"] + dx, lad[f"n_{sw}"], width=w - 0.04, color=SWARM_COLOR[sw], label=sw)
     ax.set_yscale("log")
     ax.set_ylabel("objects")
-    ax.set_title("(e) how many objects have each U", loc="left")
+    ax.set_title("(c) how many objects have each U", loc="left")
+    ax.legend(loc="upper right", ncol=2)
     ax.set_xticks(U_VALUES)
-    ax.set_xlabel("U (orbit uncertainty, 0 = best, 9 = worst)   ·   (c), (d): the cut U ≤ k")
+    ax.set_xlabel("U (orbit uncertainty, 0 = best, 9 = worst)   ·   (b): the cut U ≤ k")
     for a in axes:
         a.axvspan(4.5, 9.6, color=GRID, alpha=0.35, lw=0, zorder=0)
     axes[0].annotate("excluded by the current cut", (4.6, 0.5), color=MUTED, fontsize=8, va="top")
@@ -203,8 +218,8 @@ def main() -> None:
     fig_uladder(lad, out)
 
     print(f"grand (U <= 4): {grand}")
-    cols = ["U", "n_L4", "k_L4", "n_L5", "k_L5", "Hfix_n_L4", "Hfix_k_L4", "Hfix_n_L5", "Hfix_k_L5",
-            "cum_f_L4", "cum_f_L5", "cum_ratio", "cum_ratio_err"]
+    cols = ["U", "n_L4", "k_L4", "n_L5", "k_L5", "pool_f", "pool_Hfix_n", "pool_Hfix_k",
+            "cum_k_L4", "cum_k_L5", "cum_ratio", "cum_ratio_err"]
     print(lad[cols].to_string(index=False, float_format=lambda v: f"{v:.4g}"))
 
 

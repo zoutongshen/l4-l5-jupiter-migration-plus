@@ -108,9 +108,17 @@ Removing them gives **1.00 ± 0.57**. Applying V24's cleaning (dropping objects 
 within 1 Myr) gives 1.20 ± 0.91.
 
 **Correction to earlier numbers.** The pilot report's headline escape ratio (1.67 ± 0.52;
-`reports/pilot_10myr/report.md`) and the Step 2 ladder ratios (1.6–2.1) both include
-these interlopers. The U ladder's conclusion about the U cut still stands. The
-asymmetry it protected does not.
+`reports/pilot_10myr/report.md`) includes these interlopers. The U ladder
+(`CATALOGUE_DEFINITIONS.md` §5) has been redrawn without them. Every cut up to U ≤ 7
+now gives a ratio consistent with 1.
+
+**What "interloper" means here.** It is an operational definition, based on the
+catalogue labels, not on dynamics. An interloper is an object that passes V24's
+element box at the epoch but is neither JPL class TJN nor on the MPC Trojan list
+(`label_region == "V24"`). In this sample all 28 have e = 0.31–0.60 and
+T_J = 2.25–2.82. 18 of them have U = 0, so this is not an orbit-quality problem, and
+no U cut removes them. V24's dynamical definition (a 1 Myr libration check) removes
+the same objects and gives 1.20 ± 0.91.
 
 ## 4. What this means for the capture question
 
