@@ -135,3 +135,9 @@ the same objects and gives 1.20 ± 0.91.
 included? Or should it be the V24 ∩ JPL/MPC intersection? Either removes the
 interlopers. I'd suggest the intersection, because it is catalogue-based and doesn't
 depend on our own integration.
+
+**Added 2026-10-02.** Split by inclination, the complete sample's number excess sits
+entirely below I ≈ 15–20°. The ratio N4/N5 is 2.01 ± 0.10 below 15° and 0.98 ± 0.06
+above it (families removed; `ratio_by_inclination.csv`). The inclination difference and
+the number asymmetry are therefore one feature: an extra cold L4 component. See
+`docs/TIME_SYMMETRY_HYPOTHESIS.md` §6.

@@ -107,3 +107,76 @@ break the symmetry.
   needs a time-dependent past" is old (Morbidelli et al. 2005; Nesvorný et al. 2013).
   What might be new is reading the *L4/L5 difference* as the measure of how strongly
   the symmetry was broken.
+
+## 6. Revisions after the literature review (2026-10-02)
+
+Source: `docs/CAPTURE_ASYMMETRY_LITERATURE.md`. The quotes from Sicardy & Dubois
+(2003, §6, p. 335), Lhotka & Celletti (2015, §4) and Horner & Evans (2006, §3) were
+checked against the PDFs.
+
+**1. Breaking time symmetry is necessary but not sufficient.**
+- Sicardy & Dubois's co-orbital Hamiltonian (Eqs. 15–17) stays symmetric under
+  (φ, J) → (−φ, −J) without reversing time, *even while the masses change*.
+- So a time-dependent epoch alone (for example, Jupiter growing) leaves L4 and L5
+  equal. Their §9 (p. 346) puts it as: the asymmetry "is caused by an explicit
+  variation of J_s (i.e. by a torque applied to the satellite), and not by a variation
+  of a_s per se".
+- The epoch must also supply a forcing that is odd under the mirror map: a migration
+  or drag torque, or a perturber on one side.
+- Lhotka & Celletti (2015, §4) make the same point for Poynting–Robertson drag: the
+  conservative L4 and L5 are "mirror symmetric", and the dissipative terms don't change
+  sign under the mirror map.
+
+**2. The pieces are known; the synthesis appears to be new.**
+- Already published:
+  - inward migration enlarges the L4 region (Sicardy & Dubois §6);
+  - reversing the migration reverses the sign (Pirani et al. 2019a §4.2, outward gives
+    N4/N5 ≈ 0.6);
+  - "Newton's equations are time-reversible, so some form of dissipation is required
+    for permanent capture" (Horner & Evans 2006 §3).
+- Not found anywhere:
+  - the Roy–Ovenden map used for Trojans;
+  - pairing capture into L4 with escape from L5;
+  - the steady-state argument;
+  - the observation that Pirani's capture-dominated run and Li's loss-dominated run
+    are mirror images.
+- Open risk: Hou, Scheeres & Liu (2016, CeMDA 125, 451) "studies the symmetry problem".
+  It is closed access and not yet read. **Get it from Leiden before claiming novelty.**
+
+**3. The asymmetry is an extra cold L4 component (new measurement).**
+In the complete sample, binned by proper inclination:
+
+| Proper I | N4 | N5 | N4/N5 (families removed) |
+|---|---|---|---|
+| < 15° | 1,121 | 559 | 2.01 ± 0.10 |
+| ≥ 15° | 559 | 570 | 0.98 ± 0.06 |
+| 0–10° | 739 | 343 | 2.15 ± 0.14 |
+| 10–20° | 613 | 445 | 1.38 ± 0.09 |
+| 20–30° | 270 | 289 | 0.93 ± 0.08 |
+| > 30° | 58 | 52 | 1.12 ± 0.21 |
+
+Source: `campaign/reports/pilot_10myr/ratio_by_inclination.csv`; the same holds with
+families included and with osculating I.
+
+- **The hot halves of the two swarms are equal.** The whole number excess, about 550
+  objects, is cold L4 objects.
+- **So "L5 is hotter" and "N4 > N5" are one fact, not two.** This also dissolves the
+  tension noted from Pirani et al. 2019b and Li et al. 2023a, that the asymmetry
+  weakens as inclination rises: that is exactly what an extra cold L4 component looks
+  like.
+- **Survey bias doesn't explain it.** H ≤ 13.6 is the complete range, and V24's
+  debiased model has the same KS distance (0.221).
+
+**4. The target for a capture mechanism, sharpened.** Explain an extra cold
+(I ≲ 15–20°) population in L4, about the size of L5's cold population, on top of two
+swarms that are otherwise equal. No published mechanism reports inclinations swarm by
+swarm:
+- Li et al. 2023a's Table 5 has the right sign but is far too weak (estimated KS D of
+  0.01–0.03 against the observed 0.21).
+- Li 2023a also predicts that L4 survivors have smaller libration amplitudes. The data
+  show no difference (V24 p = 0.17; ours p = 0.11–0.33), which is a discriminant
+  against it.
+
+**5. A lead for P2.** Greenstreet et al. 2023 (Table 1) list 12 L4 and 4 L5 recently
+captured, short-lived Jupiter co-orbitals. Their inclinations are a direct observational
+test of whether present-day captures are symmetric.

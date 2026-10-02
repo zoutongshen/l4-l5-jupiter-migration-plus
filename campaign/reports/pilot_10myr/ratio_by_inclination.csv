@@ -1,0 +1,13 @@
+sample,I_lo,I_hi,n_L4,n_L5,ratio,err
+complete,0,15,1231,559,2.202,0.1123
+complete,15,90,605,652,0.9279,0.05238
+complete,0,10,842,343,2.455,0.1572
+complete,10,20,637,449,1.419,0.08742
+complete,20,30,283,348,0.8132,0.06509
+complete,30,90,74,71,1.042,0.1731
+"complete, families removed",0,15,1121,559,2.005,0.1038
+"complete, families removed",15,90,559,570,0.9807,0.05838
+"complete, families removed",0,10,739,343,2.155,0.1408
+"complete, families removed",10,20,613,445,1.378,0.08579
+"complete, families removed",20,30,270,289,0.9343,0.07908
+"complete, families removed",30,90,58,52,1.115,0.213

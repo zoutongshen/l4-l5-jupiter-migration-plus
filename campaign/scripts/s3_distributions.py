@@ -10,6 +10,8 @@ campaign/reports/<run_id>/:
   fig_composition.png    the L5/L4 escape ratio observed, and the ratio expected if each
                          swarm escaped at the pooled rate for its own mix of (e, D, I)
   ic_reweighting.csv     the numbers behind fig_composition (left panel)
+  ratio_by_inclination.csv  N4/N5 in bins of proper inclination, complete sample with and
+                         without families: where in inclination the number excess sits
   escape_split.csv       escapes split into objects every label calls a Trojan and objects
                          only V24's element box admits (not JPL TJN, not on the MPC list;
                          comet-like, T_J 2.3-2.8, e > 0.3) (fig_composition, right panel)
@@ -247,6 +249,20 @@ def escape_split(t) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def ratio_by_inclination(t) -> pd.DataFrame:
+    """N4/N5 per proper-inclination bin in the complete sample (Poisson errors)."""
+    rows = []
+    for name, mask in [("complete", t["complete"]), ("complete, families removed", t["complete"] & ~t["family"])]:
+        s = t[mask & ~t["v24_only"] & t["I_p"].notna()]
+        for lo, hi in [(0, 15), (15, 90), (0, 10), (10, 20), (20, 30), (30, 90)]:
+            g = s[(s["I_p"] >= lo) & (s["I_p"] < hi)]
+            n4, n5 = int((g["swarm"] == "L4").sum()), int((g["swarm"] == "L5").sum())
+            r = n4 / n5
+            rows.append({"sample": name, "I_lo": lo, "I_hi": hi, "n_L4": n4, "n_L5": n5,
+                         "ratio": r, "err": r * np.sqrt(1 / n4 + 1 / n5)})
+    return pd.DataFrame(rows)
+
+
 def fig_composition(comp, split, out):
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11, 3.2), width_ratios=[1.25, 1], constrained_layout=True)
     labels = ["observed"] + [f"expected from {s}" for s in comp["strata"]]
@@ -306,6 +322,9 @@ def main() -> None:
 
     comp = composition_table(t, rng)
     comp.to_csv(out / "ic_reweighting.csv", index=False, float_format="%.5g")
+    by_inc = ratio_by_inclination(t)
+    by_inc.to_csv(out / "ratio_by_inclination.csv", index=False, float_format="%.4g")
+    print(by_inc.to_string(index=False, float_format=lambda v: f"{v:.3g}"))
     split = escape_split(t)
     split.to_csv(out / "escape_split.csv", index=False, float_format="%.5g")
     fig_composition(comp, split, out)
