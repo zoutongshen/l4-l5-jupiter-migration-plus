@@ -121,23 +121,34 @@ def _jupiter_lam(sim):
     return o.l, o.a
 
 
-def follow(args) -> dict:
-    spkid, group, swarm, h, dt_yr, t_max_yr, out_dir = args
+def fate_simulation(h: dict, dt_yr: float) -> rebound.Simulation:
+    """The phase-2 simulation from a hand-off state: Sun, giants, escaper (index 5), TRACE.
+
+    Deterministic: stepping it in blocks of CHECK_EVERY_STEPS reproduces follow() exactly,
+    which is how s5_fates_gif.py redraws an escaper without storing its whole trajectory.
+    """
     sim = rebound.Simulation()
     sim.G = constants.G
     sim.integrator = "trace"
     sim.dt = dt_yr
-    names = ["sun", *constants.GIANTS]
     radii = [R_SUN_AU] + [RADIUS_AU[p] for p in constants.GIANTS]
     for (p, v), m, r in zip(h["massive"], h["masses"], radii):
         sim.add(m=m, r=r, x=p[0], y=p[1], z=p[2], vx=v[0], vy=v[1], vz=v[2])
     p, v = h["particle"]
     sim.add(m=0.0, r=0.0, x=p[0], y=p[1], z=p[2], vx=v[0], vy=v[1], vz=v[2])
-    sim.N_active = len(names)
+    sim.N_active = 1 + len(constants.GIANTS)
     sim.testparticle_type = 0
     sim.collision = "direct"
     sim.collision_resolve = "halt"
     sim.t = h["t_yr"]
+    return sim
+
+
+def follow(args) -> dict:
+    spkid, group, swarm, h, dt_yr, t_max_yr, out_dir = args
+    sim = fate_simulation(h, dt_yr)
+    names = ["sun", *constants.GIANTS]
+    radii = [R_SUN_AU] + [RADIUS_AU[p] for p in constants.GIANTS]
 
     a_n = sim.particles[4].orbit(primary=sim.particles[0]).a
     hill_a = np.array([sim.particles[i].orbit(primary=sim.particles[0]).a for i in range(1, 5)])
