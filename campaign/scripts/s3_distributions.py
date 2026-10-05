@@ -10,6 +10,8 @@ campaign/reports/<run_id>/:
   fig_composition.png    the L5/L4 escape ratio observed, and the ratio expected if each
                          swarm escaped at the pooled rate for its own mix of (e, D, I)
   ic_reweighting.csv     the numbers behind fig_composition (left panel)
+  fig_cold_l4.png        L4 and L5 counts per proper-inclination bin and their ratio
+                         (complete sample, families removed)
   ratio_by_inclination.csv  N4/N5 in bins of proper inclination, complete sample with and
                          without families: where in inclination the number excess sits
   escape_split.csv       escapes split into objects every label calls a Trojan and objects
@@ -263,6 +265,43 @@ def ratio_by_inclination(t) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def fig_cold_l4(t, out):
+    s = t[t["complete"] & ~t["family"] & ~t["v24_only"] & t["I_p"].notna()]
+    fine = np.arange(0, 47.5, 2.5)
+    coarse = np.array([0, 5, 10, 15, 20, 25, 30, 47.5])
+    fig, (top, bot) = plt.subplots(2, 1, figsize=(7.2, 5.4), sharex=True, height_ratios=[3, 2],
+                                   constrained_layout=True)
+    h = {sw: np.histogram(s.loc[s["swarm"] == sw, "I_p"], fine)[0] for sw in SWARMS}
+    top.fill_between(fine[:-1], h["L5"], np.maximum(h["L4"], h["L5"]), step="post", color=SWARM_COLOR["L4"],
+                     alpha=0.18, lw=0, label="L4 excess")
+    for sw in SWARMS:
+        top.step(fine[:-1], h[sw], where="post", color=SWARM_COLOR[sw], lw=2,
+                 label=f"{sw} (n = {int((s['swarm'] == sw).sum()):,})")
+    top.set_ylabel("objects per 2.5°")
+    top.set_title("Complete sample (H ≤ 13.6), families removed: where the extra L4 Trojans are", loc="left")
+    top.legend(loc="upper right")
+    top.set_ylim(bottom=0)
+
+    c4 = np.histogram(s.loc[s["swarm"] == "L4", "I_p"], coarse)[0]
+    c5 = np.histogram(s.loc[s["swarm"] == "L5", "I_p"], coarse)[0]
+    r = c4 / c5
+    err = r * np.sqrt(1 / c4 + 1 / c5)
+    mid = (coarse[:-1] + coarse[1:]) / 2
+    bot.errorbar(mid, r, yerr=err, xerr=np.diff(coarse) / 2, fmt="o", ms=6, color=TEXT_2, elinewidth=1.2, capsize=0)
+    bot.axhline(1, color=BASELINE, lw=1.2, ls="--")
+    overall = (s["swarm"] == "L4").sum() / (s["swarm"] == "L5").sum()
+    bot.axhline(overall, color=SWARM_COLOR["L4"], lw=1, ls=":")
+    bot.annotate(f"all inclinations: {overall:.2f}", (46, overall), xytext=(0, 4), textcoords="offset points",
+                 ha="right", color=TEXT_2, fontsize=8)
+    bot.annotate("equal", (46, 1), xytext=(0, -11), textcoords="offset points", ha="right", color=MUTED, fontsize=8)
+    bot.set_ylabel("N4 / N5")
+    bot.set_xlabel("proper inclination I_p [deg] (V24)")
+    bot.set_xlim(0, 47.5)
+    bot.set_ylim(0, max(r + err) * 1.1)
+    fig.savefig(out / "fig_cold_l4.png", dpi=200)
+    plt.close(fig)
+
+
 def fig_composition(comp, split, out):
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11, 3.2), width_ratios=[1.25, 1], constrained_layout=True)
     labels = ["observed"] + [f"expected from {s}" for s in comp["strata"]]
@@ -322,6 +361,7 @@ def main() -> None:
 
     comp = composition_table(t, rng)
     comp.to_csv(out / "ic_reweighting.csv", index=False, float_format="%.5g")
+    fig_cold_l4(t, out)
     by_inc = ratio_by_inclination(t)
     by_inc.to_csv(out / "ratio_by_inclination.csv", index=False, float_format="%.4g")
     print(by_inc.to_string(index=False, float_format=lambda v: f"{v:.3g}"))
