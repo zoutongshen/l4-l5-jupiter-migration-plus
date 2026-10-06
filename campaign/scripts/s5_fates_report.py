@@ -38,7 +38,7 @@ GROUPS = [("trojan", "L4"), ("trojan", "L5"), ("interloper", "L4"), ("interloper
 plt.rcParams.update({
     "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
     "axes.edgecolor": GRID, "axes.labelcolor": TEXT_2, "text.color": TEXT,
-    "xtick.color": MUTED, "ytick.color": MUTED, "font.size": 9, "legend.frameon": False,
+    "xtick.color": MUTED, "ytick.color": MUTED, "font.size": 11, "legend.frameon": False,
 })
 
 
@@ -56,7 +56,7 @@ def main() -> None:
         rows.append(("header", group, swarm, len(sel)))
         rows += [("object", f) for f in sel]
 
-    fig, ax = plt.subplots(figsize=(8.6, 0.17 * len(rows) + 1.6), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(11, 0.24 * len(rows) + 1.8), constrained_layout=True)
     y = 0
     yticks, ylabels = [], []
     for row in rows[::-1]:
@@ -64,7 +64,7 @@ def main() -> None:
             _, group, swarm, n = row
             label = f"{'Trojans' if group == 'trojan' else 'Interlopers'} escaped from {swarm} ({n})"
             ax.annotate(label, (X_MIN, y), xytext=(2, 0), textcoords="offset points", va="center",
-                        fontsize=8.5, color=SWARM_COLOR[swarm], fontweight="bold")
+                        fontsize=10, color=SWARM_COLOR[swarm], fontweight="bold")
             y += 1.6
             continue
         f = row[1]
@@ -86,7 +86,7 @@ def main() -> None:
     ax.set_xscale("log")
     ax.set_xlim(X_MIN, X_MAX)
     ax.set_ylim(-1, y - 1.0)
-    ax.set_yticks(yticks, ylabels, fontsize=6.5)
+    ax.set_yticks(yticks, ylabels, fontsize=8.5)
     ax.grid(axis="x", color=GRID, lw=0.6)
     ax.set_axisbelow(True)
     for side in ("top", "right", "left"):
@@ -100,7 +100,7 @@ def main() -> None:
                Patch(color=TEXT, label="co-orbital with Jupiter (recapture)"),
                Line2D([], [], marker="x", ls="none", color=TEXT_2, label="ejected (hyperbolic)"),
                Line2D([], [], marker="o", ls="none", color=TEXT_2, mfc="none", label="bound, past 1000 au")]
-    ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=4, fontsize=7.5,
+    ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=4, fontsize=9,
               handlelength=1.4, columnspacing=1.2)
     out = paths.report_dir(args.out_id)
     fig.savefig(out / "fig_fates.png", dpi=200)

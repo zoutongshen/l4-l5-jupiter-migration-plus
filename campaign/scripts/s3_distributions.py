@@ -82,7 +82,7 @@ plt.rcParams.update({
     "xtick.color": MUTED, "ytick.color": MUTED, "text.color": TEXT,
     "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6,
     "axes.spines.top": False, "axes.spines.right": False,
-    "font.size": 9, "axes.titlesize": 10, "legend.frameon": False,
+    "font.size": 11, "axes.titlesize": 12, "legend.frameon": False,
 })
 
 
@@ -148,7 +148,7 @@ def _p_text(p, floor=None):
 
 def fig_ecdf(t, ks, out):
     masks = sample_masks(t)
-    fig, axes = plt.subplots(len(masks), len(PANELS), figsize=(10.5, 8.4), constrained_layout=True)
+    fig, axes = plt.subplots(len(masks), len(PANELS), figsize=(12.5, 9.8), constrained_layout=True)
     for r, (name, mask) in enumerate(masks.items()):
         s = t[mask]
         for c, (var, label, xlim) in enumerate(PANELS):
@@ -166,15 +166,15 @@ def fig_ecdf(t, ks, out):
             ax.plot([at, at], [y4, y5], color=TEXT, lw=2.4, solid_capstyle="butt")
             ax.annotate(f"KS D = {row['ks_D']:.3f}\np(KS) = {_p_text(row['ks_p'])}\n"
                         f"p(AD) = {_p_text(row['ad_p'], floor=1 / (N_PERMUTATIONS + 1))}",
-                        (0.97, 0.05), xycoords="axes fraction", ha="right", va="bottom", fontsize=8, color=TEXT_2)
+                        (0.97, 0.05), xycoords="axes fraction", ha="right", va="bottom", fontsize=9.5, color=TEXT_2)
             ax.set_xlim(*xlim)
             ax.set_ylim(0, 1.02)
             if r == len(masks) - 1:
                 ax.set_xlabel(label)
             if c == 0:
                 ax.set_ylabel(f"{name}\ncumulative fraction")
-            ax.legend(loc="upper left", fontsize=8)
-    fig.suptitle("L4 vs L5 starting distributions: empirical CDFs; the black bar is the KS distance",
+            ax.legend(loc="upper left", fontsize=9.5)
+    fig.suptitle("Empirical CDFs of L4 (blue) and L5 (orange) at t0; black bar: KS distance",
                  x=0.01, ha="left", fontsize=11)
     fig.savefig(out / "fig_ecdf.png", dpi=200)
     plt.close(fig)
@@ -269,7 +269,7 @@ def fig_cold_l4(t, out):
     s = t[t["complete"] & ~t["family"] & ~t["v24_only"] & t["I_p"].notna()]
     fine = np.arange(0, 47.5, 2.5)
     coarse = np.array([0, 5, 10, 15, 20, 25, 30, 47.5])
-    fig, (top, bot) = plt.subplots(2, 1, figsize=(7.2, 5.4), sharex=True, height_ratios=[3, 2],
+    fig, (top, bot) = plt.subplots(2, 1, figsize=(9.6, 6.4), sharex=True, height_ratios=[3, 2],
                                    constrained_layout=True)
     h = {sw: np.histogram(s.loc[s["swarm"] == sw, "I_p"], fine)[0] for sw in SWARMS}
     top.fill_between(fine[:-1], h["L5"], np.maximum(h["L4"], h["L5"]), step="post", color=SWARM_COLOR["L4"],
@@ -278,7 +278,7 @@ def fig_cold_l4(t, out):
         top.step(fine[:-1], h[sw], where="post", color=SWARM_COLOR[sw], lw=2,
                  label=f"{sw} (n = {int((s['swarm'] == sw).sum()):,})")
     top.set_ylabel("objects per 2.5°")
-    top.set_title("Complete sample (H ≤ 13.6), families removed: where the extra L4 Trojans are", loc="left")
+    top.set_title("Proper inclination, complete sample (H ≤ 13.6), families removed", loc="left")
     top.legend(loc="upper right")
     top.set_ylim(bottom=0)
 
@@ -292,8 +292,8 @@ def fig_cold_l4(t, out):
     overall = (s["swarm"] == "L4").sum() / (s["swarm"] == "L5").sum()
     bot.axhline(overall, color=SWARM_COLOR["L4"], lw=1, ls=":")
     bot.annotate(f"all inclinations: {overall:.2f}", (46, overall), xytext=(0, 4), textcoords="offset points",
-                 ha="right", color=TEXT_2, fontsize=8)
-    bot.annotate("equal", (46, 1), xytext=(0, -11), textcoords="offset points", ha="right", color=MUTED, fontsize=8)
+                 ha="right", color=TEXT_2, fontsize=9.5)
+    bot.annotate("equal", (46, 1), xytext=(0, -11), textcoords="offset points", ha="right", color=MUTED, fontsize=9.5)
     bot.set_ylabel("N4 / N5")
     bot.set_xlabel("proper inclination I_p [deg] (V24)")
     bot.set_xlim(0, 47.5)
@@ -303,7 +303,7 @@ def fig_cold_l4(t, out):
 
 
 def fig_composition(comp, split, out):
-    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(11, 3.2), width_ratios=[1.25, 1], constrained_layout=True)
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(13, 4.4), width_ratios=[1.25, 1], constrained_layout=True)
     labels = ["observed"] + [f"expected from {s}" for s in comp["strata"]]
     y = np.arange(len(labels))[::-1]
     obs = comp.iloc[0]
@@ -315,11 +315,11 @@ def fig_composition(comp, split, out):
         ax.plot([l, h], [yi, yi], color=color, lw=1.6)
         ax.plot(v, yi, "o", ms=8, color=color, mfc=color if lab == "observed" else SURFACE, mew=1.6)
         ax.annotate(f"{v:.2f}", (h, yi), xytext=(6, 0), textcoords="offset points", va="center",
-                    color=TEXT_2, fontsize=8)
+                    color=TEXT_2, fontsize=9.5)
     ax.axvline(1, color=BASELINE, lw=1.2, ls="--")
     ax.set_yticks(y, labels)
-    ax.set_xlabel("escape ratio L5 / L4 over 10 Myr (well-determined sample; bar = 68% bootstrap interval)")
-    ax.set_title("How much of L5's extra escape is explained by where its members start?", loc="left")
+    ax.set_xlabel("escape ratio L5/L4 in 10 Myr (U ≤ 4; bar: 68% bootstrap interval)")
+    ax.set_title("(a) L5/L4 escape ratio, observed and expected", loc="left")
     ax.grid(axis="y", visible=False)
     ax.set_xlim(0, max(hi) * 1.15)
 
@@ -332,16 +332,16 @@ def fig_composition(comp, split, out):
             w = r["per_10k_of_swarm"]
             ax2.barh(yi, w, left=left, height=0.55, color=SWARM_COLOR[sw], alpha=alpha,
                      edgecolor=SURFACE, linewidth=2)
-            ax2.annotate(f"{r['k']} of {r['n']:,}", (left + w / 2, yi - 0.3), ha="center", va="top", fontsize=8,
+            ax2.annotate(f"{r['k']} of {r['n']:,}", (left + w / 2, yi - 0.3), ha="center", va="top", fontsize=9.5,
                          color=TEXT_2)
             left += w
         ax2.annotate(f"{left:.0f}", (left, yi), xytext=(5, 0), textcoords="offset points", va="center",
-                     color=TEXT_2, fontsize=8)
+                     color=TEXT_2, fontsize=9.5)
     ax2.set_yticks([1, 0], SWARMS)
     ax2.set_ylim(-0.75, 1.4)
     ax2.grid(axis="y", visible=False)
     ax2.set_xlabel("escapers per 10,000 members in 10 Myr")
-    ax2.set_title("dark = Trojan by all labels · light = V24 box only", loc="left")
+    ax2.set_title("(b) escapers per 10⁴ members", loc="left")
     fig.savefig(out / "fig_composition.png", dpi=200)
     plt.close(fig)
 

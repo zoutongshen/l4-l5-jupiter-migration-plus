@@ -50,7 +50,7 @@ plt.rcParams.update({
     "xtick.color": MUTED, "ytick.color": MUTED, "text.color": TEXT,
     "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6,
     "axes.spines.top": False, "axes.spines.right": False,
-    "font.size": 9, "axes.titlesize": 10, "legend.frameon": False,
+    "font.size": 11, "axes.titlesize": 12, "legend.frameon": False,
 })
 
 
@@ -107,7 +107,7 @@ def ladder(ev) -> pd.DataFrame:
 def fig_grand(ev, t_end, out):
     sel = ev[ev["U"] <= 4]
     grid = np.logspace(0, np.log10(t_end), 600)
-    fig, (top, bot) = plt.subplots(2, 1, figsize=(7.2, 5.6), sharex=True, height_ratios=[3, 2],
+    fig, (top, bot) = plt.subplots(2, 1, figsize=(9.6, 6.4), sharex=True, height_ratios=[3, 2],
                                    constrained_layout=True)
     curves = {}
     for s in SWARMS:
@@ -127,7 +127,7 @@ def fig_grand(ev, t_end, out):
         top.annotate(s, (grid[-1], y), xytext=(5, dy), textcoords="offset points", va="center", color=TEXT_2,
                      fontsize=9)
     top.set_ylabel("escaped so far [% of swarm]")
-    top.set_title("Trojans by V24 and JPL/MPC, well-determined orbits (U ≤ 4): cumulative escapes", loc="left")
+    top.set_title("Trojans (V24 ∩ JPL or MPC), U ≤ 4: cumulative fraction escaped", loc="left")
     top.legend(loc="upper left")
     top.set_ylim(bottom=0)
 
@@ -140,23 +140,23 @@ def fig_grand(ev, t_end, out):
     bot.fill_between(grid, r - e, r + e, step="post", color=MUTED, alpha=0.2, lw=0)
     bot.step(grid, r, where="post", color=TEXT_2, lw=2)
     bot.axhline(1, color=BASELINE, lw=1.2, ls="--")
-    bot.annotate("no asymmetry", (grid[1], 1), xytext=(2, 3), textcoords="offset points", color=MUTED, fontsize=8)
+    bot.annotate("no asymmetry", (grid[1], 1), xytext=(2, 3), textcoords="offset points", color=MUTED, fontsize=9.5)
     bot.annotate(f"{r[-1]:.2f} ± {e[-1]:.2f} at {t_end / 1e6:.0f} Myr", (grid[-1], r[-1] + e[-1]), xytext=(-4, 6),
-                 textcoords="offset points", ha="right", color=TEXT_2, fontsize=8)
+                 textcoords="offset points", ha="right", color=TEXT_2, fontsize=9.5)
     bot.set_ylabel("escape ratio L5 / L4\n(fraction escaped)")
     bot.set_ylim(0, max(4, np.nanmax(r + e) * 1.05))
     bot.set_xscale("log")
     bot.set_xlim(grid[0], grid[-1])
-    bot.set_xlabel("time since today's orbits [yr]")
+    bot.set_xlabel("time since epoch t0 [yr]")
     bot.set_title(f"shown once both swarms have ≥ {MIN_ESCAPERS_FOR_RATIO} escapers; band = 1σ", loc="left",
-                  color=TEXT_2, fontsize=8)
+                  color=TEXT_2, fontsize=9.5)
     fig.savefig(out / "fig_grand.png", dpi=200)
     plt.close(fig)
     return {"L4": (int(k4[-1]), n4), "L5": (int(k5[-1]), n5), "ratio": (float(r[-1]), float(e[-1]))}
 
 
 def fig_uladder(lad, out):
-    fig, axes = plt.subplots(3, 1, figsize=(7.2, 8.2), sharex=True, height_ratios=[3, 2.4, 2],
+    fig, axes = plt.subplots(3, 1, figsize=(9.6, 9.8), sharex=True, height_ratios=[3, 2.4, 2],
                              constrained_layout=True)
     floor = 3e-5
     ax = axes[0]
@@ -172,10 +172,10 @@ def fig_uladder(lad, out):
     ax.set_yscale("log")
     ax.set_ylim(floor * 0.7, 1)
     ax.set_ylabel("fraction escaped\nin 10 Myr")
-    ax.set_title("(a) escape per U value, L4 + L5 pooled: where orbit error takes over", loc="left")
+    ax.set_title("(a) escape fraction per U value, L4 and L5 pooled", loc="left")
     ax.legend(loc="upper left")
     ax.annotate("▼ = no escaper; bar = 1σ upper limit", (0.99, 0.04), xycoords="axes fraction", ha="right",
-                color=MUTED, fontsize=8)
+                color=MUTED, fontsize=9.5)
 
     ax = axes[1]
     ok = lad["cum_ratio"].notna()
@@ -183,10 +183,10 @@ def fig_uladder(lad, out):
                 mec=SURFACE, mew=1, elinewidth=1.2, capsize=0)
     for u, r, n4, n5 in zip(lad["U"][ok], lad["cum_ratio"][ok], lad["cum_k_L4"][ok], lad["cum_k_L5"][ok]):
         ax.annotate(f"{n4}:{n5}", (u, r), xytext=(8, 0), textcoords="offset points", va="center",
-                    color=MUTED, fontsize=7)
+                    color=MUTED, fontsize=9)
     ax.axhline(1, color=BASELINE, lw=1.2, ls="--")
     ax.set_ylabel("escape ratio L5 / L4\nfor U ≤ k")
-    ax.set_title("(b) the asymmetry each cut U ≤ k would report (labels: L4:L5 escapers)", loc="left")
+    ax.set_title("(b) L5/L4 escape ratio for the cumulative cut U ≤ k (labels: escapers L4:L5)", loc="left")
 
     ax = axes[2]
     w = 0.36
@@ -194,13 +194,13 @@ def fig_uladder(lad, out):
         ax.bar(lad["U"] + dx, lad[f"n_{sw}"], width=w - 0.04, color=SWARM_COLOR[sw], label=sw)
     ax.set_yscale("log")
     ax.set_ylabel("objects")
-    ax.set_title("(c) how many objects have each U", loc="left")
+    ax.set_title("(c) number of objects per U value", loc="left")
     ax.legend(loc="upper right", ncol=2)
     ax.set_xticks(U_VALUES)
-    ax.set_xlabel("U (orbit uncertainty, 0 = best, 9 = worst)   ·   (b): the cut U ≤ k")
+    ax.set_xlabel("U (orbit-uncertainty parameter; 0 = best, 9 = worst); in (b), k")
     for a in axes:
         a.axvspan(4.5, 9.6, color=GRID, alpha=0.35, lw=0, zorder=0)
-    axes[0].annotate("excluded by the current cut", (4.6, 0.5), color=MUTED, fontsize=8, va="top")
+    axes[0].annotate("U > 4: excluded", (4.6, 0.5), color=MUTED, fontsize=9.5, va="top")
     fig.savefig(out / "fig_uladder.png", dpi=200)
     plt.close(fig)
 
