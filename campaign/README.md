@@ -19,7 +19,7 @@ The first run is a 10 Myr pilot:
 | `slurm/` | ALICE job templates wrapping the same scripts | |
 | `reports/<run_id>/` | Small tracked outputs: figures, summary CSVs, notes | Nothing heavy |
 
-Heavy outputs go under the data root, `data/` → `/Volumes/Crucial-X10-Pro/trojans`, or
+Heavy outputs go under the data root, `data/` → `/Volumes/X10-Pro-4T/trojans`, or
 `$TROJAN_DATA` on ALICE:
 - `raw/<source>/<date>/`
 - `catalogue/<id>/`
@@ -59,6 +59,10 @@ for example `2026-09-15`.
 | 4 mass ladder | `python campaign/scripts/s4_run_ladder.py --workers 8` | `data/runs/mass_ladder/` |
 | 4 ladder report | `python campaign/scripts/s4_ladder_report.py --run-id mass_ladder` | `reports/mass_ladder/` |
 | 4 swarm | `python campaign/scripts/s4_run_swarm.py --n-per-swarm 100` (then `--massless`) | `data/runs/swarm_{selfgrav,massless}/` |
+| 7 map | `python campaign/scripts/s7_run_map.py --source grid --n 40000 --run-id map_grid` | `data/runs/map_grid/` |
+| 7 real negatives | `python campaign/scripts/s7_run_map.py --source catalogue --catalogue-id D --run-id map_catalogue` | `data/runs/map_catalogue/` |
+| 7 dataset | `python campaign/scripts/s7_dataset.py --out-id definition_v1 --grid-runs map_grid --catalogue-id D --catalogue-run map_catalogue` | `data/runs/definition_v1/` |
+| 7 train | `python campaign/scripts/s7_train.py --out-id definition_v1 --k 5` | `reports/definition_v1/` |
 
 Stage 4 is a side experiment, not part of the 4.5 Gyr campaign: it asks where the
 massless-test-particle assumption breaks (`docs/MASS_THRESHOLD.md`). It does not use

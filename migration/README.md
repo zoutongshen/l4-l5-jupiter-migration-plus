@@ -15,7 +15,7 @@ real catalogue (`campaign/`). **This code is kept for reference and is not edite
 | `tests/test_physics.py` | 8 tests; they passed on 2026-09-15 before the move |
 | `results/png/`, `results/gif/` | Figures from the migration runs |
 | `results/batch_results.json`, `batch_summary.txt` | Timings and summaries of the June 2026 batch |
-| `results/pkl` | **Symlink** to `/Volumes/Crucial-X10-Pro/trojans/migration_era/pkl`. That directory has its own README listing which pickles are AMUSE-era and unloadable |
+| `results/pkl` | **Symlink** to `/Volumes/X10-Pro-4T/trojans/migration_era/pkl`. That directory has its own README listing which pickles are AMUSE-era and unloadable |
 | `slopes.md` | Retired. Its numbers and labels are unreliable; kept for provenance |
 | `_archive/` | The original notebooks |
 

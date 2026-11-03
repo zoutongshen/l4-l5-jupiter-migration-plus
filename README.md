@@ -13,7 +13,7 @@ between Jupiter's leading (L4) and trailing (L5) Trojan swarms.
 ├── literature/        papers by topic, plus READING_LIST.md
 ├── migration/         parked Jupiter-migration code and results; frozen, see migration/README.md
 ├── campaign/          present-day integrations of the real Trojan catalogue (in progress)
-└── data -> /Volumes/Crucial-X10-Pro/trojans    all heavy data, on the external SSD (not in git)
+└── data -> /Volumes/X10-Pro-4T/trojans    all heavy data, on the external SSD (not in git)
 ```
 
 | Directory | Contents |

@@ -1,0 +1,28 @@
+{
+  "rule": "boosted \u00b7 minimal",
+  "t0_jd_tdb": 2461200.5,
+  "population": 1581789,
+  "near_jupiter_a": 18028,
+  "in_domain": 16730,
+  "rule_trojans": 16156,
+  "labelled": 16473,
+  "rule_yes_unlabelled": 0,
+  "borderline_unlabelled": 0,
+  "labelled_rule_no": 317,
+  "outside_domain_near_aJ": 111,
+  "rule_yes_unlabelled_new_since_sept": 0,
+  "git_commit": "3d6bc646ea27eb1d5f0e097dd77bc44904e4320a",
+  "git_dirty": true,
+  "rebound": "4.6.0",
+  "numpy": "2.4.6",
+  "python": "3.12.13",
+  "host": "Zoutongs-MacBook-Air.local",
+  "command": [
+    "campaign/scripts/s7_screen.py",
+    "--out-id",
+    "definition_v1",
+    "--population-date",
+    "2026-10-27"
+  ],
+  "started_utc": "2026-10-27T15:06:07Z"
+}

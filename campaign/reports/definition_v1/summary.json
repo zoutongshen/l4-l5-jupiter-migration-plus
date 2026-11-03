@@ -1,0 +1,24 @@
+{
+  "target": "label_k5",
+  "n_train": 30000,
+  "n_test": 10000,
+  "label_counts_grid": {
+    "none": 38212,
+    "L5": 895,
+    "L4": 893
+  },
+  "git_commit": "3d6bc646ea27eb1d5f0e097dd77bc44904e4320a",
+  "git_dirty": true,
+  "rebound": "4.6.0",
+  "numpy": "2.4.6",
+  "python": "3.12.13",
+  "host": "Zoutongs-MacBook-Air.local",
+  "command": [
+    "campaign/scripts/s7_train.py",
+    "--out-id",
+    "definition_v1",
+    "--k",
+    "5"
+  ],
+  "started_utc": "2026-10-27T15:05:29Z"
+}

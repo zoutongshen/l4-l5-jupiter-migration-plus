@@ -72,9 +72,10 @@ def download(url: str, params: dict | None = None) -> Download:
     return Download(url=url, params=params or {}, content=response.content, fetched_utc=_utc_now())
 
 
-def sbdb_query(constraints: dict | None = None, sb_class: str | None = None) -> Download:
-    """Asteroids matching element constraints and/or an SBDB orbit class."""
-    params = {"fields": ",".join(SBDB_FIELDS), "sb-kind": "a", "full-prec": "1"}
+def sbdb_query(constraints: dict | None = None, sb_class: str | None = None, kind: str = "a",
+               fields=SBDB_FIELDS) -> Download:
+    """Small bodies of one kind ("a" asteroids, "c" comets) matching element constraints and/or an SBDB orbit class."""
+    params = {"fields": ",".join(fields), "sb-kind": kind, "full-prec": "1"}
     if constraints is not None:
         params["sb-cdata"] = json.dumps(constraints, separators=(",", ":"))
     if sb_class is not None:

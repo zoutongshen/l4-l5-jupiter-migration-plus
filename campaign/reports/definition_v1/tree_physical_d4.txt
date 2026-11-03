@@ -1,0 +1,43 @@
+|--- e <= 0.156
+|   |--- sin_sigma <= -0.703
+|   |   |--- da <= -0.212
+|   |   |   |--- class: none
+|   |   |--- da >  -0.212
+|   |   |   |--- da <= 0.168
+|   |   |   |   |--- class: L5
+|   |   |   |--- da >  0.168
+|   |   |   |   |--- class: none
+|   |--- sin_sigma >  -0.703
+|   |   |--- sin_sigma <= 0.548
+|   |   |   |--- sin_sigma <= -0.490
+|   |   |   |   |--- class: none
+|   |   |   |--- sin_sigma >  -0.490
+|   |   |   |   |--- class: none
+|   |   |--- sin_sigma >  0.548
+|   |   |   |--- da <= -0.186
+|   |   |   |   |--- class: none
+|   |   |   |--- da >  -0.186
+|   |   |   |   |--- class: none
+|--- e >  0.156
+|   |--- sin_sigma <= 0.817
+|   |   |--- sin_sigma <= -0.720
+|   |   |   |--- e <= 0.263
+|   |   |   |   |--- class: none
+|   |   |   |--- e >  0.263
+|   |   |   |   |--- class: none
+|   |   |--- sin_sigma >  -0.720
+|   |   |   |--- e <= 0.251
+|   |   |   |   |--- class: none
+|   |   |   |--- e >  0.251
+|   |   |   |   |--- class: none
+|   |--- sin_sigma >  0.817
+|   |   |--- inc <= 27.259
+|   |   |   |--- da <= -0.136
+|   |   |   |   |--- class: none
+|   |   |   |--- da >  -0.136
+|   |   |   |   |--- class: none
+|   |   |--- inc >  27.259
+|   |   |   |--- cos_sigma <= 0.575
+|   |   |   |   |--- class: none
+|   |   |   |--- cos_sigma >  0.575
+|   |   |   |   |--- class: L4

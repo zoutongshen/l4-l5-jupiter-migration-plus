@@ -15,7 +15,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CAMPAIGN_ROOT = REPO_ROOT / "campaign"
 DATA_LINK = REPO_ROOT / "data"
-SSD_MOUNT = Path("/Volumes/Crucial-X10-Pro")
+SSD_MOUNT = Path("/Volumes/X10-Pro-4T")
 
 _ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
