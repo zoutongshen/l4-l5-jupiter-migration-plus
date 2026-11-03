@@ -1,0 +1,29 @@
+# Stage 8, Phase 1, V1: regression. No migration, growth only: the disc_grow arm
+# (docs/RUN_disc_capture_control.md) rerun through the stage-8 code. Same disc
+# (seed, size, box), same growth law, same dt and t_end = 1.2 Myr, so it should
+# reproduce disc_grow (N4/N5 = 1.009 +/- 0.034) particle by particle or nearly so.
+[run]
+run_id = "mig_v1_insitu"
+t_classify_yr = 1.1e6          # + 0.1 Myr growth = 1.2 Myr, as disc_grow
+
+[jupiter]
+a_start_au = 5.2026
+a_end_au = 5.2026
+m0_earth = 10.0
+t_grow_yr = 1.0e5
+growth_law = "exponential"
+
+[disc]
+n_pairs = 10000
+a_min_au = 4.9
+a_max_au = 5.5
+e_max = 0.3
+inc_max_deg = 40.0
+seed = 20261023
+
+[snapshots]
+fine_every_yr = 1000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

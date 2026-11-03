@@ -1,0 +1,34 @@
+# Stage 8, Phase 1, V2: a Pirani+2019a-like inward track (the "x0.25" case of her
+# Table 1: Jupiter 8.8 -> 5.4 au over the 0.69 Myr between 2.31 and 3 Myr), on her
+# flat disc (e < 0.01, I < 0.01 deg). She reports N4/N5 = 1.60 +/- 0.44 at 5 Myr,
+# counting everything within +/- 2.5 R_H. Her growth track is only a figure; here
+# Jupiter grows exponentially from 0.1 M_E across the whole migration (a midpoint
+# mass of ~6 M_E), which approximates a slow pebble phase and late runaway.
+# Not an exact reproduction: the test is the sign and rough size of the ratio.
+[run]
+run_id = "mig_v2_pirani"
+t_classify_yr = 1.2e6
+
+[jupiter]
+a_start_au = 8.8
+a_end_au = 5.4
+t_mig_yr = 6.9e5
+migration_law = "const_nu"
+m0_earth = 0.1
+t_grow_yr = 6.9e5
+growth_law = "exponential"
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.0
+a_max_au = 9.4
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 20261103
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

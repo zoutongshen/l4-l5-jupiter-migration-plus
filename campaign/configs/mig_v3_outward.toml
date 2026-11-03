@@ -1,0 +1,30 @@
+# Stage 8, Phase 1, V3: V2 with the direction reversed (Jupiter 5.4 -> 8.8 au while
+# growing; same disc, same growth). Pirani+2019a (p. 11, Fig. 12) finds the sign
+# flips for outward migration (N4/N5 ~ 0.6). Expect N4/N5 < 1.
+[run]
+run_id = "mig_v3_outward"
+t_classify_yr = 1.2e6
+
+[jupiter]
+a_start_au = 5.4
+a_end_au = 8.8
+t_mig_yr = 6.9e5
+migration_law = "const_nu"
+m0_earth = 0.1
+t_grow_yr = 6.9e5
+growth_law = "exponential"
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.0
+a_max_au = 9.4
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 20261103
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

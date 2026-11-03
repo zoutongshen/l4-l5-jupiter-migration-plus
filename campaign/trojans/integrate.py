@@ -8,8 +8,16 @@ Every ``check_every_steps`` WHFast steps the runner reads all states and
   - adds the sample to per-window accumulators.
 
 At the end of each window it stores, per Trojan: mean a, e, I, A, B, C; the
-sigma range and circular mean; the libration class; the sample count.
-Windows, events and a REBOUND snapshot are written together every
+sigma range and circular mean; the libration class; the sample count; and
+Jupiter's osculating a and mass at the window's end.
+
+Optionally (``snapshot_every_yr`` > 0) it also stores instantaneous snapshots of
+every particle (a, e, I, sigma, heliocentric x, y, z; NaN once removed) in
+``snapshots.h5``: at t = 0, every ``snapshot_fine_every_yr`` up to
+``snapshot_fine_until_yr``, and every ``snapshot_every_yr`` after. With
+``snapshot_every_yr = window_yr`` the last check is always a snapshot.
+
+Windows, snapshots, events and a REBOUND snapshot are written together every
 ``checkpoint_every_windows`` windows, and ``latest.json`` is switched to them in
 one rename, so the files on disk always describe one consistent moment.
 
@@ -38,6 +46,9 @@ ALIVE, REMOVED_HILL, REMOVED_R_MAX, REMOVED_NON_FINITE = range(4)
 REMOVAL_NAMES = ["alive", "hill", "r_max", "non_finite"]
 
 WINDOW_FIELDS = ["a", "e", "inc", "A", "B", "C", "sigma_min", "sigma_max", "sigma_cmean"]
+JUPITER_FIELDS = ["jupiter_a", "jupiter_m"]          # per window; absent in files from before stage 8
+SNAPSHOT_FIELDS = ["a", "e", "inc", "sigma", "x", "y", "z"]
+SNAPSHOT_SCALARS = ["t", "jupiter_a", "jupiter_m", "jupiter_lam"]   # lam in deg, for the rotating frame
 
 
 @dataclass(frozen=True)
@@ -54,6 +65,9 @@ class Settings:
     corrector: int = 0
     trojan_mass_msun: float = 0.0
     self_gravity: bool = False
+    snapshot_every_yr: float = 0.0
+    snapshot_fine_every_yr: float = 0.0
+    snapshot_fine_until_yr: float = 0.0
 
     @property
     def check_interval_yr(self) -> float:
@@ -66,6 +80,26 @@ class Settings:
     @property
     def n_windows(self) -> int:
         return int(np.ceil(self.t_end_yr / (self.checks_per_window * self.check_interval_yr)))
+
+    @property
+    def total_checks(self) -> int:
+        return self.n_windows * self.checks_per_window
+
+    @property
+    def snapshots_enabled(self) -> bool:
+        return self.snapshot_every_yr > 0.0 or self.snapshot_fine_every_yr > 0.0
+
+    def snapshot_due(self, check_index: int, t_yr: float) -> bool:
+        """Whether the sample at this check is also stored as a snapshot."""
+        if not self.snapshots_enabled:
+            return False
+        if check_index == 0:
+            return True
+        fine = self.snapshot_fine_every_yr > 0.0 and t_yr <= self.snapshot_fine_until_yr
+        every = self.snapshot_fine_every_yr if fine else self.snapshot_every_yr
+        if every <= 0.0:
+            return False
+        return check_index % max(1, round(every / self.check_interval_yr)) == 0
 
 
 def classify_windows(n, crossed0, crossed180, sigma_cmean):
@@ -125,6 +159,9 @@ class ChunkRunner:
         self.sigma_prev = np.full(self.n, np.nan)
         self._reset_window()
         self._window_buffer = []
+        self.snapshot_index = 0
+        self._snapshot_buffer = []
+        self._jupiter_now = (np.nan, np.nan)
 
         sim.ri_whfast.safe_mode = settings.safe_mode
         sim.ri_whfast.corrector = settings.corrector
@@ -143,6 +180,8 @@ class ChunkRunner:
         if forcing is not None:
             forcing(sim, runner)
         runner._init_windows_file()
+        if settings.snapshots_enabled:
+            runner._init_snapshots_file()
         runner._sample(accumulate=False)
         return runner
 
@@ -161,14 +200,20 @@ class ChunkRunner:
         for key in runner.events:
             runner.events[key] = state[key]
         with h5py.File(out_dir / "windows.h5", "a") as f:
-            for name in ["t_end", "class", "n_samples", *WINDOW_FIELDS]:
-                f[name].resize(runner.window_index, axis=0)
+            for name in ["t_end", "class", "n_samples", *WINDOW_FIELDS, *JUPITER_FIELDS]:
+                if name in f:
+                    f[name].resize(runner.window_index, axis=0)
+        if settings.snapshots_enabled:
+            runner.snapshot_index = int(state["snapshot_index"]) if "snapshot_index" in state else 0
+            with h5py.File(out_dir / "snapshots.h5", "a") as f:
+                for name in [*SNAPSHOT_SCALARS, *SNAPSHOT_FIELDS]:
+                    f[name].resize(runner.snapshot_index, axis=0)
         return runner
 
     # --- main loop ------------------------------------------------------------
 
     def run(self, log=print) -> None:
-        total_checks = self.s.n_windows * self.s.checks_per_window
+        total_checks = self.s.total_checks
         started = time.time()
         while self.check_index < total_checks:
             self.sim.steps(self.s.check_every_steps)
@@ -234,6 +279,7 @@ class ChunkRunner:
         el = diagnostics.elements(pos[keep], vel[keep], mu)
         jup = diagnostics.elements(jup_x[None], jup_v[None], constants.G * (constants.CENTRAL_MASS + self.m_jupiter))
         jup = {k: float(v[0]) for k, v in jup.items()}
+        self._jupiter_now = (jup["a"], self.m_jupiter)
         sigma = diagnostics.resonant_angle(el["lam"], jup["lam"])
 
         crossed180, crossed0 = sigma_crossings(self.sigma_prev[k_slots], sigma)
@@ -256,6 +302,17 @@ class ChunkRunner:
             w["sigma_max"][k_slots] = np.maximum(w["sigma_max"][k_slots], sigma)
             w["crossed0"][k_slots] |= crossed0
             w["crossed180"][k_slots] |= crossed180
+
+        if self.s.snapshot_due(self.check_index, t):
+            snap = {"t": t, "jupiter_a": jup["a"], "jupiter_m": self.m_jupiter, "jupiter_lam": jup["lam"]}
+            columns = (("a", el["a"]), ("e", el["e"]), ("inc", el["inc"]), ("sigma", sigma),
+                       ("x", pos[keep, 0]), ("y", pos[keep, 1]), ("z", pos[keep, 2]))
+            for name, values in columns:
+                row = np.full(self.n, np.nan, dtype=np.float32)
+                row[k_slots] = values
+                snap[name] = row
+            self._snapshot_buffer.append(snap)
+            self.snapshot_index += 1
 
         for h in hashes[n_active:][gone]:
             self.sim.remove(hash=int(h))
@@ -287,6 +344,7 @@ class ChunkRunner:
             "sigma_min": np.where(n > 0, w["sigma_min"], np.nan).astype(np.float32),
             "sigma_max": np.where(n > 0, w["sigma_max"], np.nan).astype(np.float32),
             "sigma_cmean": np.where(n > 0, cmean, np.nan).astype(np.float32),
+            "jupiter_a": self._jupiter_now[0], "jupiter_m": self._jupiter_now[1],
         }
         self._window_buffer.append(record)
         self.window_index += 1
@@ -298,13 +356,44 @@ class ChunkRunner:
             f.attrs["settings"] = json.dumps(asdict(self.s))
             f.attrs["class_names"] = json.dumps(CLASS_NAMES)
             f.create_dataset("spkid", data=self.spkids)
-            f.create_dataset("t_end", shape=(0,), maxshape=(None,), dtype="f8", chunks=(1024,))
+            for name in ["t_end", *JUPITER_FIELDS]:
+                f.create_dataset(name, shape=(0,), maxshape=(None,), dtype="f8", chunks=(1024,))
             for name, dtype in [("class", "i1"), ("n_samples", "i4")] + [(k, "f4") for k in WINDOW_FIELDS]:
                 f.create_dataset(name, shape=(0, self.n), maxshape=(None, self.n), dtype=dtype,
                                  chunks=(1, self.n), compression="lzf")
 
+    def _init_snapshots_file(self) -> None:
+        self.out_dir.mkdir(parents=True, exist_ok=True)
+        with h5py.File(self.out_dir / "snapshots.h5", "w") as f:
+            f.attrs["settings"] = json.dumps(asdict(self.s))
+            f.create_dataset("spkid", data=self.spkids)
+            for name in SNAPSHOT_SCALARS:
+                f.create_dataset(name, shape=(0,), maxshape=(None,), dtype="f8", chunks=(1024,))
+            for name in SNAPSHOT_FIELDS:
+                f.create_dataset(name, shape=(0, self.n), maxshape=(None, self.n), dtype="f4",
+                                 chunks=(1, self.n), compression="lzf")
+
+    def _flush_snapshots(self) -> None:
+        """Append buffered snapshots, then read the last one back (the SSD has corrupted files silently)."""
+        if not self._snapshot_buffer:
+            return
+        with h5py.File(self.out_dir / "snapshots.h5", "a") as f:
+            for snap in self._snapshot_buffer:
+                i = f["t"].shape[0]
+                for name in [*SNAPSHOT_SCALARS, *SNAPSHOT_FIELDS]:
+                    f[name].resize(i + 1, axis=0)
+                    f[name][i] = snap[name]
+            n_rows = f["t"].shape[0]
+            last = self._snapshot_buffer[-1]
+            ok = n_rows == self.snapshot_index and f["t"][-1] == last["t"] and all(
+                np.array_equal(f[name][-1], last[name], equal_nan=True) for name in SNAPSHOT_FIELDS)
+        if not ok:
+            raise IOError(f"snapshots.h5 read-back failed in {self.out_dir}")
+        self._snapshot_buffer = []
+
     def _checkpoint(self) -> None:
         with h5py.File(self.out_dir / "windows.h5", "a") as f:
+            has_jupiter = all(name in f for name in JUPITER_FIELDS)
             for record in self._window_buffer:
                 i = f["t_end"].shape[0]
                 f["t_end"].resize(i + 1, axis=0)
@@ -312,13 +401,18 @@ class ChunkRunner:
                 for name in ["class", "n_samples", *WINDOW_FIELDS]:
                     f[name].resize(i + 1, axis=0)
                     f[name][i] = record[name]
+                if has_jupiter:
+                    for name in JUPITER_FIELDS:
+                        f[name].resize(i + 1, axis=0)
+                        f[name][i] = record[name]
         self._window_buffer = []
+        self._flush_snapshots()
 
         tag = f"w{self.window_index:06d}"
         snapshot, state = f"checkpoint_{tag}.bin", f"state_{tag}.npz"
         self.sim.save_to_file(str(self.out_dir / snapshot), delete_file=True)
         np.savez(self.out_dir / state, check_index=self.check_index, window_index=self.window_index,
-                 sigma_prev=self.sigma_prev, **self.events)
+                 snapshot_index=self.snapshot_index, sigma_prev=self.sigma_prev, **self.events)
         self.events_frame().to_parquet(self.out_dir / "events.parquet", index=False)
 
         previous = self.out_dir / "latest.json"
