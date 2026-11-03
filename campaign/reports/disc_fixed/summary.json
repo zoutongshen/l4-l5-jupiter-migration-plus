@@ -1,0 +1,27 @@
+{
+  "run_id": "disc_fixed",
+  "arm": "fixed",
+  "n_disc": 20000,
+  "N4": 2293,
+  "N5": 2287,
+  "N4/N5": 1.0026235242675994,
+  "err": 0.02963026389619408,
+  "capture_fraction": 0.229,
+  "classify_windows": 100,
+  "twin_fates": {
+    "none+none": 7671,
+    "L4+L5": 2251,
+    "L4+none": 42,
+    "L5+none": 36
+  },
+  "physical_disc": {
+    "source": "Pirani+2019b pre-stirred (asteroid belt)",
+    "mu_e": 0.15,
+    "sigma_e": 0.07,
+    "mu_i_deg": 8.5,
+    "sigma_i_deg": 7.0,
+    "N4/N5": 1.0027435782659637,
+    "capture_fraction": 0.22702081297870436,
+    "n_eff_trojans": 1846.0454730574859
+  }
+}

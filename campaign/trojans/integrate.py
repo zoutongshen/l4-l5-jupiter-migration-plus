@@ -89,19 +89,30 @@ def sigma_crossings(sigma_prev, sigma_now):
 
 
 class ChunkRunner:
-    def __init__(self, sim: rebound.Simulation, spkids, settings: Settings, giants: dict, out_dir: Path):
+    """``planets`` names the massive bodies after the Sun, in simulation order; Jupiter first.
+
+    ``forcing``, if given, is called as ``forcing(sim, runner)`` after every block of
+    steps, before sampling. It may change the planets (e.g. Jupiter's mass) and must
+    then update ``runner.hill`` and ``runner.m_jupiter`` to match. It must be a pure
+    function of ``sim.t`` so that a resumed run continues it exactly.
+    """
+
+    def __init__(self, sim: rebound.Simulation, spkids, settings: Settings, giants: dict, out_dir: Path,
+                 planets=constants.GIANTS, forcing=None):
         self.sim = sim
         self.s = settings
         self.out_dir = Path(out_dir)
         self.spkids = np.asarray(spkids, dtype=np.int64)
         self._order = np.argsort(self.spkids)
         self.n = len(self.spkids)
-        self.hill = np.array([giants[p]["hill_radius"] for p in constants.GIANTS])
+        self.planets = tuple(planets)
+        self.forcing = forcing
+        self.hill = np.array([giants[p]["hill_radius"] for p in self.planets])
         # Where the Trojans start. Not sim.N_active: with a self-gravitating swarm
         # every particle is active, while the massive bodies are still the first
         # five and are never removed.
-        self.n_planets = 1 + len(constants.GIANTS)
-        self.mass_ratio = constants.GIANT_MASS["jupiter"] / (constants.CENTRAL_MASS + constants.GIANT_MASS["jupiter"])
+        self.n_planets = 1 + len(self.planets)
+        self.m_jupiter = constants.GIANT_MASS["jupiter"]
 
         self.check_index = 0
         self.window_index = 0
@@ -122,19 +133,27 @@ class ChunkRunner:
 
     # --- construction -------------------------------------------------------
 
+    @property
+    def mass_ratio(self) -> float:
+        return self.m_jupiter / (constants.CENTRAL_MASS + self.m_jupiter)
+
     @classmethod
-    def start(cls, sim, spkids, settings, giants, out_dir):
-        runner = cls(sim, spkids, settings, giants, out_dir)
+    def start(cls, sim, spkids, settings, giants, out_dir, planets=constants.GIANTS, forcing=None):
+        runner = cls(sim, spkids, settings, giants, out_dir, planets, forcing)
+        if forcing is not None:
+            forcing(sim, runner)
         runner._init_windows_file()
         runner._sample(accumulate=False)
         return runner
 
     @classmethod
-    def resume(cls, spkids, settings, giants, out_dir):
+    def resume(cls, spkids, settings, giants, out_dir, planets=constants.GIANTS, forcing=None):
         out_dir = Path(out_dir)
         latest = json.loads((out_dir / "latest.json").read_text())
         sim = rebound.Simulation(str(out_dir / latest["snapshot"]))
-        runner = cls(sim, spkids, settings, giants, out_dir)
+        runner = cls(sim, spkids, settings, giants, out_dir, planets, forcing)
+        if forcing is not None:
+            forcing(sim, runner)
         state = np.load(out_dir / latest["state"], allow_pickle=False)
         runner.check_index = int(state["check_index"])
         runner.window_index = int(state["window_index"])
@@ -155,6 +174,8 @@ class ChunkRunner:
             self.sim.steps(self.s.check_every_steps)
             if self.s.safe_mode == 0:
                 self.sim.synchronize()
+            if self.forcing is not None:
+                self.forcing(self.sim, self)
             self.check_index += 1
             self._sample(accumulate=True)
             if self.check_index % self.s.checks_per_window == 0:
@@ -211,7 +232,7 @@ class ChunkRunner:
         k_slots = slots[keep]
         mu = constants.G * constants.CENTRAL_MASS
         el = diagnostics.elements(pos[keep], vel[keep], mu)
-        jup = diagnostics.elements(jup_x[None], jup_v[None], constants.G * (constants.CENTRAL_MASS + constants.GIANT_MASS["jupiter"]))
+        jup = diagnostics.elements(jup_x[None], jup_v[None], constants.G * (constants.CENTRAL_MASS + self.m_jupiter))
         jup = {k: float(v[0]) for k, v in jup.items()}
         sigma = diagnostics.resonant_angle(el["lam"], jup["lam"])
 
@@ -312,7 +333,7 @@ class ChunkRunner:
         frame = pd.DataFrame({"spkid": self.spkids, **self.events})
         frame["removal_reason"] = pd.Categorical.from_codes(frame["removal_reason"], REMOVAL_NAMES)
         for col in ["planet_hill_record", "planet_hill_remove"]:
-            frame[col] = [constants.GIANTS[i] if i >= 0 else None for i in frame[col]]
+            frame[col] = [self.planets[i] if i >= 0 else None for i in frame[col]]
         return frame
 
 
