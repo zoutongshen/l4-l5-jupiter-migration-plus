@@ -106,4 +106,43 @@ Any interrupted arm continues with `--resume`.
 
 ## 6. Results
 
-(to be filled in)
+### Phase 1 (finished 2026-11-04 00:31)
+
+| Arm | N4/N5 (tadpole classifier) | Pirani ±2.5 R_H count | Trojans / disc | CPU-h |
+|---|---|---|---|---|
+| V1 in situ | 1796/1780 = 1.009 ± 0.034 | — | 18% | 4.70 |
+| V2 inward 8.8 → 5.4 | 205/182 = **1.13 ± 0.11** | 1.13 (same set) | 1.9% | 14.6 |
+| V3 outward 5.4 → 8.8 | 95/124 = **0.77 ± 0.10** | 0.77 | 1.1% | 13.0 |
+
+- **V1** reproduces disc_grow particle by particle (20000/20000 fates identical).
+- **V2 and V3 have the sign Pirani predicts**: L4 for inward, L5 for outward.
+  The V2 − V3 difference is 0.36 ± 0.16 (2.3σ). The amplitudes are weaker than
+  Pirani's ×0.25 run (≈ 1.6 and ≈ 0.6).
+- **When the asymmetry forms** (co-orbital σ > 0 : σ < 0, `coorbital.csv`):
+  it is set in the first ~100–200 kyr, while Jupiter is 0.1–1 M⊕ and ν = 7 → 0.7.
+  - V2: 1.40 at 50 kyr, then 1.14 from 200 kyr on.
+  - V3: 0.68 from 100 kyr on.
+
+  After Jupiter passes ~1 M⊕, ν < 0.17, nothing new forms, and the ratio is
+  only frozen in.
+- **Where the Trojans come from:** all of them start in Jupiter's *initial*
+  co-orbital zone.
+  - V2: 204 + 182 from a0 = 8.6–9.0 au, and 1 from 8.2–8.6.
+  - V3: 217 of 219 from 5.0–5.8 au.
+
+  Nothing is picked up along the 3.4 au path. So with this growth law the
+  migration does not sweep material into the swarms: it carries the seed's
+  starting co-orbitals and biases their sides early.
+- Both swarms end cold (I < 0.1°, e < 0.02). The flat disc has nothing to say
+  about I, as planned.
+
+**Interpretation.** The code passes the sign test, and the migration
+asymmetry is real but weak here. That is because the exponential growth law
+puts the in-window ν phase at a sub-Earth-mass seed. A larger effect needs ν
+in the window while Jupiter is massive enough to hold tadpoles. This argues
+for Phase 2's design: ν₀ is defined at 10 M⊕ and the seed starts as a 10 M⊕
+core, so the asymmetry is made where it can be kept. Pirani's exact
+amplitude depends on her figure-only growth track and is not pursued further.
+
+Minor: `summary.json` `max_coorbital_side_ratio` only tracks the maximum, so it
+reads 1.0 for V3. Read `coorbital.csv` instead.

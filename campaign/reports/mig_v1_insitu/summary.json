@@ -1,0 +1,80 @@
+{
+  "run_id": "mig_v1_insitu",
+  "history": {
+    "a_start_au": 5.2026,
+    "a_end_au": 5.2026,
+    "t_mig_yr": 0.0,
+    "t_mig_start_yr": 0.0,
+    "migration_law": "const_nu",
+    "m0_msun": 3.0034896152653906e-05,
+    "m_final_msun": 0.0009547919099414248,
+    "t_grow_start_yr": 0.0,
+    "t_grow_yr": 100000.0,
+    "growth_law": "exponential",
+    "direction": "in_situ",
+    "m0_earth": 10.0,
+    "m_final_earth": 317.8941938366112,
+    "t_forcing_end_yr": 100000.0,
+    "mean_rate_au_per_myr": 0.0,
+    "nu_start": 0.0,
+    "nu_mid": 0.0,
+    "nu_end": 0.0
+  },
+  "disc": {
+    "n_pairs": 10000,
+    "a_min": 4.9,
+    "a_max": 5.5,
+    "e_max": 0.3,
+    "inc_max_deg": 40.0,
+    "seed": 20261023
+  },
+  "n_disc": 20000,
+  "N4": 1796,
+  "N5": 1780,
+  "N4/N5": 1.0089887640449438,
+  "err": 0.03374597012989553,
+  "capture_fraction": 0.1788,
+  "inc_split": {
+    "[0, 15)": {
+      "L4": 834.0,
+      "L5": 816.0,
+      "N4/N5": 1.0220588235294117,
+      "err": 0.05032569245848633
+    },
+    "[15, 90)": {
+      "L4": 962.0,
+      "L5": 964.0,
+      "N4/N5": 0.9979253112033195,
+      "err": 0.04547787111719547
+    }
+  },
+  "pirani_count": {
+    "t_yr": 1200054.4910510825,
+    "N4": 1144,
+    "N5": 1146,
+    "N4/N5": 0.9982547993019197,
+    "err": 0.04172091522925311
+  },
+  "twin_fates": {
+    "none+none": 7973,
+    "L4+L5": 1059,
+    "L4+none": 247,
+    "L5+L5": 245,
+    "L4+L4": 245,
+    "L5+none": 231
+  },
+  "classify_windows": 100,
+  "physical_disc": {
+    "source": "Pirani+2019b pre-stirred (asteroid belt)",
+    "mu_e": 0.15,
+    "sigma_e": 0.07,
+    "mu_i_deg": 8.5,
+    "sigma_i_deg": 7.0,
+    "N4/N5": 1.0213976130376323,
+    "n_eff_trojans": 1650.9754776454004
+  },
+  "max_coorbital_side_ratio": {
+    "pos/neg": 1.0457546445570398,
+    "at_t_yr": 14001.964188487362
+  }
+}
