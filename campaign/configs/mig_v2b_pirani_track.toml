@@ -1,0 +1,26 @@
+# Stage 8, Phase 1b: V2/V3 rerun on Pirani+2019a's own x0.25 track (inward, as Pirani's x0.25 run).
+# V2 used an exponential m(t) with const-nu drift, so nu fell 7 -> 0.06 and sat in
+# her window only at < 1 M_E. Her track (digitized from Figs. 3 and 13, built by
+# scripts/s8_pirani_track.py) keeps nu ~ 0.35 -> 0.17 while the core grows to 20 M_E.
+# Same flat disc and seed as V2.
+[run]
+run_id = "mig_v2b_pirani_track"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/pirani_x025.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.0
+a_max_au = 9.4
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 20261103
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

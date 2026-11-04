@@ -18,6 +18,9 @@ Migration laws, for s = (t - t_mig_start) / t_mig clipped to [0, 1]:
   const_nu     a^(3/2) linear in s: constant nu at a fixed mass (the default)
   linear       a linear in s: constant da/dt
   exponential  ln a linear in s: constant (da/dt)/a
+  table        a(t) and m(t) both interpolated from a table (``from_table``; e.g. a
+               track digitized from Pirani+2019a): a linear in t, ln m linear in t.
+               The growth fields then only mirror the table's ends.
 
 Growth laws, for u = (t - t_grow_start) / t_grow clipped to [0, 1]:
   exponential  ln m linear in u (dm/dt proportional to m, runaway-like)
@@ -34,7 +37,7 @@ import rebound
 from trojans import constants
 from trojans.disc import M_EARTH, hill_radius
 
-MIGRATION_LAWS = ("const_nu", "linear", "exponential")
+MIGRATION_LAWS = ("const_nu", "linear", "exponential", "table")
 GROWTH_LAWS = ("exponential", "linear")
 GM_SUN = constants.G * constants.CENTRAL_MASS
 
@@ -60,8 +63,24 @@ class JupiterHistory:
     t_grow_start_yr: float = 0.0
     t_grow_yr: float = 0.0
     growth_law: str = "exponential"
+    table_t_yr: tuple = ()
+    table_a_au: tuple = ()
+    table_m_msun: tuple = ()
 
     def __post_init__(self):
+        for name in ("table_t_yr", "table_a_au", "table_m_msun"):     # lists from JSON
+            object.__setattr__(self, name, tuple(float(x) for x in getattr(self, name)))
+        if self.migration_law == "table":
+            t, a, m = self.table_t_yr, self.table_a_au, self.table_m_msun
+            if not (len(t) == len(a) == len(m) >= 2) or t[0] != 0.0 or not np.all(np.diff(t) > 0):
+                raise ValueError("table needs equal-length t, a, m with t[0] = 0 and t increasing")
+            expect = {"a_start_au": a[0], "a_end_au": a[-1], "t_mig_yr": t[-1], "t_mig_start_yr": 0.0,
+                      "m0_msun": m[0], "m_final_msun": m[-1], "t_grow_start_yr": 0.0, "t_grow_yr": t[-1]}
+            for k, v in expect.items():
+                if getattr(self, k) != v:
+                    raise ValueError(f"table history: {k} must be {v} (use from_table)")
+        elif self.table_t_yr:
+            raise ValueError("table_* fields need migration_law='table'")
         if self.migration_law not in MIGRATION_LAWS:
             raise ValueError(f"migration_law must be one of {MIGRATION_LAWS}")
         if self.growth_law not in GROWTH_LAWS:
@@ -87,6 +106,14 @@ class JupiterHistory:
         t_mig = abs(a_end_au**1.5 - a_start_au**1.5) / rate
         return cls(a_start_au=a_start_au, a_end_au=a_end_au, t_mig_yr=t_mig,
                    migration_law="const_nu", **kwargs)
+
+    @classmethod
+    def from_table(cls, t_yr, a_au, m_msun) -> "JupiterHistory":
+        """A history interpolated from a table of (t, a, m), starting at t = 0."""
+        t, a, m = (tuple(float(x) for x in v) for v in (t_yr, a_au, m_msun))
+        return cls(a_start_au=a[0], a_end_au=a[-1], t_mig_yr=t[-1], migration_law="table",
+                   m0_msun=m[0], m_final_msun=m[-1], t_grow_yr=t[-1],
+                   table_t_yr=t, table_a_au=a, table_m_msun=m)
 
     # --- the history ----------------------------------------------------------
 
@@ -121,6 +148,8 @@ class JupiterHistory:
         return _clip((t - self.t_mig_start_yr) / self.t_mig_yr) if self.migrates else 1.0
 
     def a(self, t: float) -> float:
+        if self.migration_law == "table":
+            return float(np.interp(t, self.table_t_yr, self.table_a_au))
         if not self.migrates:
             return self.a_end_au
         s, a0, a1 = self._s(t), self.a_start_au, self.a_end_au
@@ -139,6 +168,10 @@ class JupiterHistory:
         if not self.migrates or not (self.t_mig_start_yr <= t < self.t_mig_end_yr):
             return 0.0
         a0, a1, T = self.a_start_au, self.a_end_au, self.t_mig_yr
+        if self.migration_law == "table":
+            tt, aa = self.table_t_yr, self.table_a_au
+            i = min(int(np.searchsorted(tt, t, side="right")) - 1, len(tt) - 2)
+            return (aa[i + 1] - aa[i]) / (tt[i + 1] - tt[i])
         if self.migration_law == "linear":
             return (a1 - a0) / T
         if self.migration_law == "exponential":
@@ -148,6 +181,10 @@ class JupiterHistory:
     def mass(self, t: float) -> float:
         """Jupiter's mass in M_sun at time t (named like ``disc.Growth.mass``)."""
         m0, m1 = self.m0_msun, self.m_final_msun
+        if self.migration_law == "table":
+            if t >= self.table_t_yr[-1]:
+                return m1
+            return float(np.exp(np.interp(t, self.table_t_yr, np.log(self.table_m_msun))))
         if self.t_grow_yr <= 0.0:
             return m1 if t >= self.t_grow_start_yr else m0
         u = _clip((t - self.t_grow_start_yr) / self.t_grow_yr)
@@ -166,7 +203,10 @@ class JupiterHistory:
     def summary(self) -> dict:
         """The history plus derived numbers, for settings.json."""
         mid = self.t_mig_start_yr + 0.5 * self.t_mig_yr
-        return {**asdict(self), "direction": self.direction,
+        record = asdict(self)
+        if self.migration_law == "table":
+            record["table_rows"] = len(self.table_t_yr)
+        return {**record, "direction": self.direction,
                 "m0_earth": self.m0_msun / M_EARTH, "m_final_earth": self.m_final_msun / M_EARTH,
                 "t_forcing_end_yr": self.t_forcing_end_yr,
                 "mean_rate_au_per_myr": (self.a_end_au - self.a_start_au) / self.t_mig_yr * 1e6

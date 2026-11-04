@@ -172,3 +172,47 @@ def test_restart_with_migration_and_snapshots_is_bitwise_identical(tmp_path):
     assert np.allclose(snaps["jupiter_m"], [h.mass(x) for x in t], rtol=1e-15)
     with h5py.File(tmp_path / "straight" / "windows.h5") as f:
         assert np.allclose(f["jupiter_a"][:], [h.a(x) for x in f["t_end"][:]], rtol=1e-9)
+
+
+# --- tabulated tracks ---------------------------------------------------------
+
+def _table_from(h, n=4001):
+    t = np.linspace(0.0, h.t_forcing_end_yr, n)
+    return JupiterHistory.from_table(t, [h.a(x) for x in t], [h.mass(x) for x in t])
+
+
+def test_table_reproduces_an_analytic_history():
+    h = JupiterHistory.from_nu(0.5, 8.2, 5.2, t_grow_yr=8e4, m0_msun=0.5 * disc.M_EARTH)
+    tab = _table_from(h)
+    assert tab.migration_law == "table" and tab.direction == "inward" and tab.a_min_au == 5.2
+    assert tab.t_forcing_end_yr == h.t_forcing_end_yr
+    for t in np.linspace(0.0, 1.2 * h.t_forcing_end_yr, 37):
+        assert tab.a(t) == pytest.approx(h.a(t), rel=1e-6)
+        assert tab.mass(t) == pytest.approx(h.mass(t), rel=1e-6)
+    for t in np.linspace(0.05, 0.95, 7) * h.t_mig_yr:
+        assert tab.adot(t) == pytest.approx(h.adot(t), rel=1e-3)
+        assert tab.nu(t) == pytest.approx(h.nu(t), rel=1e-3)
+    assert tab.adot(2 * h.t_forcing_end_yr) == 0.0
+    assert tab.mass(2 * h.t_forcing_end_yr) == tab.m_final_msun
+
+
+def test_table_round_trips_through_json_and_validates():
+    import json
+    from dataclasses import asdict
+    tab = _table_from(JupiterHistory(a_start_au=6.0, a_end_au=5.2, t_mig_yr=800.0, t_grow_yr=600.0), n=50)
+    back = JupiterHistory(**json.loads(json.dumps(asdict(tab))))
+    assert back == tab
+    with pytest.raises(ValueError):
+        JupiterHistory(a_start_au=6.0, a_end_au=5.0, t_mig_yr=1.0, migration_law="table",
+                       table_t_yr=(0.0, 1.0), table_a_au=(6.0, 5.2), table_m_msun=(1e-5, 1e-3))
+
+
+def test_restart_with_a_table_is_bitwise_identical(tmp_path):
+    h = _table_from(JupiterHistory(a_start_au=6.0, a_end_au=5.2, t_mig_yr=800.0, t_grow_yr=600.0), n=300)
+    straight = _runner(tmp_path / "straight", h, 1600.0)
+    straight.run(log=lambda *_: None)
+    first = _runner(tmp_path / "split", h, 800.0)
+    first.run(log=lambda *_: None)
+    resumed = _runner(tmp_path / "split", h, 1600.0, resume=True)
+    resumed.run(log=lambda *_: None)
+    assert np.array_equal(straight._states()[0], resumed._states()[0])

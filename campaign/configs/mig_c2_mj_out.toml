@@ -1,0 +1,29 @@
+# Stage 8 check 2: migration alone, at a FIXED mass (317.83 M_E), constant nu = 0.5
+# (inside Pirani's 0.17-1.45 window the whole way), flat disc. No growth, so any
+# L4/L5 difference comes from the migration acting on the starting co-orbitals.
+# Outward: expect L5 > L4. (Inward: L4 > L5, L5 > L4 for outward, if the code is right.
+[run]
+run_id = "mig_c2_mj_out"
+t_classify_yr = 1.1e6
+
+[jupiter]
+a_start_au = 5.2
+a_end_au = 7.2
+nu0 = 0.5
+m0_earth = 317.83
+m_final_earth = 317.83
+
+[disc]
+n_pairs = 5000
+a_min_au = 4.8
+a_max_au = 7.8
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 20261104
+
+[snapshots]
+fine_every_yr = 50.0
+
+[parallel]
+n_chunks = 8
+workers = 8

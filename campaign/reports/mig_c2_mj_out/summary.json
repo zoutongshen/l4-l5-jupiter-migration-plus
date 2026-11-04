@@ -1,0 +1,74 @@
+{
+  "run_id": "mig_c2_mj_out",
+  "history": {
+    "a_start_au": 5.2,
+    "a_end_au": 7.2,
+    "t_mig_yr": 1657.9977269101473,
+    "t_mig_start_yr": 0.0,
+    "migration_law": "const_nu",
+    "m0_msun": 0.000954599104419799,
+    "m_final_msun": 0.000954599104419799,
+    "t_grow_start_yr": 0.0,
+    "t_grow_yr": 0.0,
+    "growth_law": "exponential",
+    "table_t_yr": [],
+    "table_a_au": [],
+    "table_m_msun": [],
+    "direction": "outward",
+    "m0_earth": 317.83,
+    "m_final_earth": 317.83,
+    "t_forcing_end_yr": 1657.9977269101473,
+    "mean_rate_au_per_myr": 1206.2742713931277,
+    "nu_start": 0.49999999999999994,
+    "nu_mid": 0.4999999999999999,
+    "nu_end": 0.49999999999999983
+  },
+  "disc": {
+    "n_pairs": 5000,
+    "a_min": 4.8,
+    "a_max": 7.8,
+    "e_max": 0.01,
+    "inc_max_deg": 0.01,
+    "seed": 20261104
+  },
+  "n_disc": 10000,
+  "N4": 345,
+  "N5": 416,
+  "N4/N5": 0.8293269230769231,
+  "err": 0.060389562036215046,
+  "capture_fraction": 0.0761,
+  "inc_split": {
+    "[0, 15)": {
+      "L4": 345.0,
+      "L5": 416.0,
+      "N4/N5": 0.8293269230769231,
+      "err": 0.060389562036215046
+    },
+    "[15, 90)": {
+      "L4": 0.0,
+      "L5": 0.0,
+      "N4/N5": NaN,
+      "err": NaN
+    }
+  },
+  "pirani_count": {
+    "t_yr": 1109955.1285797376,
+    "N4": 345,
+    "N5": 417,
+    "N4/N5": 0.8273381294964028,
+    "err": 0.06021198582878716
+  },
+  "twin_fates": {
+    "none+none": 4502,
+    "L4+L5": 262,
+    "L5+none": 154,
+    "L4+none": 81,
+    "L4+L4": 1
+  },
+  "classify_windows": 101,
+  "physical_disc": null,
+  "max_coorbital_side_ratio": {
+    "pos/neg": 1.3062997827661116,
+    "at_t_yr": 50.253989669954926
+  }
+}

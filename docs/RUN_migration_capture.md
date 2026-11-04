@@ -146,3 +146,43 @@ amplitude depends on her figure-only growth track and is not pursued further.
 
 Minor: `summary.json` `max_coorbital_side_ratio` only tracks the maximum, so it
 reads 1.0 for V3. Read `coorbital.csv` instead.
+
+### Phase 1b: code checks and Pirani's own track (2026-11-04/05)
+
+**Check 1: tadpole count = Pirani count in V2/V3.** Physical, not a bug. In
+a flat disc after 1.2 Myr, the particles with their whole orbit inside ±2.5 R_H
+are exactly the tadpoles; the 265 others with |a − a_J| < 2.5 R_H are too eccentric.
+
+**Check 2: migration at a fixed mass** (ν = 0.5 the whole way, 7.2 ↔ 5.2 au, flat
+disc, 10k particles; `mig_c2_*`):
+
+| Mass | Inward | Outward | Twins one-sided: L4+none vs L5+none (in / out) |
+|---|---|---|---|
+| 10 M⊕ | 0.99 ± 0.13 | 0.98 ± 0.14 | 39/36, 24/28 |
+| 1 M_J | **1.17 ± 0.08** | **0.83 ± 0.06** | **146/80**, **81/154** |
+
+- At 1 M_J, migration alone gives the right sign. The mirror-twin pairs make
+  this a paired test: inward kills the L5 twin about twice as often as the L4 twin,
+  and outward does the reverse.
+- At 10 M⊕ nothing survives as an asymmetry. Not yet checked why; the likely
+  reason is that tadpoles at 10 M⊕ re-mix over the following Myr.
+
+**Check 3: Pirani's ×0.25 track itself**, digitized from her Figs. 3 and 13
+(`scripts/s8_pirani_track.py` → `configs/tracks/pirani_x025*.csv`, new
+`migration_law = "table"`; 3 new tests, 66 pass). ν stays at 0.35 → 0.17 while
+the core grows to 20 M⊕, against 7 → 0.06 in V2.
+
+| Arm | N4/N5 | Pirani |
+|---|---|---|
+| V2b inward (`mig_v2b_pirani_track`) | **1.27 ± 0.14** (179/141) | 1.60 ± 0.44 |
+| V3b outward, same clock, drift reversed | **0.82 ± 0.13** (78/95) | ≈ 0.6 (different set-up: 5 → 18 au) |
+
+- The asymmetry now grows steadily while ν is in the window. Co-orbital side
+  ratio: 1.07 at 20 kyr, 1.20 at 50 kyr, 1.27–1.29 at 100–200 kyr. It is then
+  frozen in as ν drops below 0.17.
+- All Trojans again come from Jupiter's starting zone, as in her Fig. 10.
+- **Conclusion.** The code is right, and the shortfall against Pirani in V2
+  was mostly the growth law. On her track we agree within her error
+  (0.7σ). Her ×0.25 run sits at the edge of the window (her ×0.15 gives 1.23),
+  so the exact value is sensitive to the details. Still flat Trojans:
+  inclination needs Phase 2.

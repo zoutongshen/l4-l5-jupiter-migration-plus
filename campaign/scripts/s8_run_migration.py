@@ -10,7 +10,8 @@ Config sections:
   [run]        run_id, t_classify_yr
   [jupiter]    a_start_au, a_end_au, and either t_mig_yr or nu0 (sets t_mig from the
                speed at the core mass, const_nu law); migration_law, t_mig_start_yr,
-               m0_earth, t_grow_start_yr, t_grow_yr, growth_law
+               m0_earth, t_grow_start_yr, t_grow_yr, growth_law.
+               Or only track_csv = "tracks/<file>.csv" (columns t_yr, a_au, m_earth).
   [disc]       n_pairs, a_min_au, a_max_au, e_max, inc_max_deg, seed
   [snapshots]  fine_every_yr (until the forcing ends), every_yr (after; default one window)
   [parallel]   n_chunks, workers
@@ -26,6 +27,7 @@ import json
 import multiprocessing as mp
 import time
 from dataclasses import asdict
+from pathlib import Path
 
 import numpy as np
 
@@ -44,6 +46,12 @@ def _init_worker():
 
 def history_from_config(section: dict) -> JupiterHistory:
     j = dict(section)
+    if "track_csv" in j:            # a tabulated track (t_yr, a_au, m_earth), path relative to configs/
+        if set(j) != {"track_csv"}:
+            raise ValueError("track_csv takes no other [jupiter] keys")
+        path = Path(__file__).resolve().parents[1] / "configs" / j["track_csv"]
+        t, a, m = np.loadtxt(path, delimiter=",", skiprows=1, unpack=True)
+        return JupiterHistory.from_table(t, a, m * disc.M_EARTH)
     m0 = float(j.pop("m0_earth", 10.0)) * disc.M_EARTH
     if "m_final_earth" in j:
         j["m_final_msun"] = float(j.pop("m_final_earth")) * disc.M_EARTH
