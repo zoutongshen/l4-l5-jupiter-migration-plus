@@ -243,3 +243,26 @@ reshapes it is a stage-2 question (`PIRANI_MODEL_STAGES.md`: s4, s5, C).
 - **Next (C0b):** concentrate the disc where Trojans come from (a0 8.2–9.0 au) and on
   cold starts (e0 ≤ 0.1, i0 ≤ 15°) to resolve the i0 dependence: ~10× the particles per
   cold bin at the same cost.
+
+### C0b: cold starts in Jupiter's starting zone (2026-11-06 00:11)
+
+`mig_c0b_cold_zone`: C0 with a0 8.2–9.0 au, e0 ≤ 0.1, i0 ≤ 15°; 3312 Trojans.
+
+| i0 (°) | 0–2.5 | 2.5–5 | 5–7.5 | 7.5–10 | 10–12.5 | 12.5–15 |
+|---|---|---|---|---|---|---|
+| N4/N5 | 1.09 ± 0.10 | 1.06 ± 0.09 | 1.01 ± 0.08 | 1.02 ± 0.09 | 1.21 ± 0.10 | 1.14 ± 0.10 |
+
+| e0 | 0–0.025 | 0.025–0.05 | 0.05–0.075 | 0.075–0.1 |
+|---|---|---|---|---|
+| N4/N5 | **1.25 ± 0.10** | 1.15 ± 0.08 | 0.97 ± 0.07 | 1.05 ± 0.07 |
+
+- **Overall 1.08 ± 0.04.** The migration asymmetry depends on e0, not on i0: it needs
+  near-circular starts (e0 ≲ 0.05) and is flat in i0 up to 15°. C0's cold lean was noise.
+- Trojans keep their inclination (median final I 8.1° vs i0 7.4°).
+- Side ratio among co-orbitals builds 1.0 → 1.14 between 140 and 240 kyr (Jupiter
+  8 → 15 M⊕... 36 M⊕), then settles at 1.07–1.09.
+- **Implication for the cold-L4 excess:** with these tracks, gas-era migration makes
+  an e-dependent, I-independent excess of ≤ 1.25, not the observed I-dependent 2.0.
+  An I-dependence would have to come from a later stage (e.g. a symmetric, hotter
+  captured component diluting the primordial one) or from a disc whose e and I
+  are correlated (cold and circular together).

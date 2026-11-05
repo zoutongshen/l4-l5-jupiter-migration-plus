@@ -1,0 +1,44 @@
+# C0b: C0 with the disc concentrated where Trojans come from (a0 8.2-9.0 au) and on
+# cold starts (e0 <= 0.1, i0 <= 15 deg), to resolve the cold-L4 lean seen in C0.
+
+# Block C0: the science nominal. Every giant on a generated physical track
+# (scripts/s8_tracks.py): pebble core (dM/dt ~ M^(2/3)) to 20 M_E, slow envelope
+# phase to 40 M_E, then disc-limited gas accretion; migration nu = nu_I/(1+(m/M_gap)^p)
+# with nu_I = 0.225, M_gap = 25 M_E, p = 3 (reproduces Pirani's x0.25 track, rms 0.1 au).
+# Jupiter 8.65 -> 5.4 au over 0.69 Myr.
+# End configuration = today's orbits scaled to Jupiter at 5.4 au (as B1c), because:
+#   B2: Saturn crossing the J-S 2:1 destroys every Trojan;
+#   B1 (near 2:1) and B1b (compact 3:2 chain) keep 2% and 0.5% of them;
+#   B1c (wide) keeps 91-103% in every i0 bin, symmetric (1.02 +- 0.03).
+# Saturn forms with Jupiter (t_start 0): P_S/P_J >= 2.02 throughout and >= 2.3 once
+# Saturn exceeds 20 M_E, so it never crosses the 2:1. C0 thus isolates the gas-era
+# formation asymmetry; survival in a compact configuration is a stage-2 question.
+# WARM twin disc (e <= 0.3, I <= 40 deg): N4/N5 against I0 and e0.
+[run]
+run_id = "mig_c0b_cold_zone"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/gen_jupiter_x025.csv"
+
+[giants.saturn]
+track_csv = "tracks/c0_saturn.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 8.2
+a_max_au = 9.0
+e_max = 0.1
+inc_max_deg = 15.0
+seed = 20261106
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8
