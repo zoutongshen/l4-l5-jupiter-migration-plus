@@ -1,0 +1,31 @@
+# Block B1b: as B1, but the giants in the 3:2 chain favoured at gas dispersal
+# (Roig & Nesvorny 2015 Table 1: J 5.47, S 7.45, ice giants 10.11, 16.08 au; scaled
+# to Jupiter at 5.4 au). Measures how many cold Trojans survive the 3:2 configuration.
+[run]
+run_id = "mig_g1b_insitu_32"
+t_classify_yr = 1.1e6
+
+[jupiter]
+a_start_au = 5.4
+a_end_au = 5.4
+m0_earth = 10.0
+t_grow_yr = 1.0e5
+
+[giants.saturn]
+fixed_a_au = 7.355
+[giants.uranus]
+fixed_a_au = 9.981
+[giants.neptune]
+fixed_a_au = 15.874
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.1
+a_max_au = 5.7
+e_max = 0.3
+inc_max_deg = 40.0
+seed = 20261023
+
+[parallel]
+n_chunks = 8
+workers = 8

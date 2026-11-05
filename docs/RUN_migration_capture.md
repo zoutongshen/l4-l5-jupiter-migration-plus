@@ -186,3 +186,29 @@ the core grows to 20 M⊕, against 7 → 0.06 in V2.
   (0.7σ). Her ×0.25 run sits at the edge of the window (her ×0.15 gives 1.23),
   so the exact value is sensitive to the details. Still flat Trojans:
   inclination needs Phase 2.
+
+### Block B: all four giants (2026-11-05)
+
+Giants on physical tracks (`scripts/s8_tracks.py`; ν = ν_I/(1+(m/M_gap)^p),
+calibrated on Pirani's ×0.25 track: ν_I = 0.225, M_gap = 25 M⊕, p = 3), forced
+circular while their history runs, then free N-body.
+
+| Arm | Set-up | N4/N5 | Note |
+|---|---|---|---|
+| B1 `mig_g1_insitu` | J grows in situ at 5.4; S/U/N fixed at 8.6/16/18.5 (P_S/P_J = 2.03); warm disc | 614/644 = **0.95 ± 0.05** | symmetric in every D/I/e bin; but cold Trojans destroyed: survival relative to V1 is 0.02 at i0 < 10°, 0.37 at 15–20°, 0.78 at 30–40° |
+| B2 `mig_g2_pirani` | Pirani ×0.25 track for J (ends 5.59); generated S/U/N (S ends 8.6); flat disc | **0/0** | asymmetry forms exactly as in V2b (co-orbital side ratio 1.25 from 100 to 600 kyr), then every co-orbital is lost between 600 and 700 kyr |
+| B3 `mig_g3_pirani_out` | B2 reversed: J 5.59 → 8.76 (outward), S/U/N reversed and scaled (S 13.95 → 18.36; P_S/P_J 3.9 → 3.0, never crosses the 2:1); flat disc | 80/96 = **0.83 ± 0.13** | as V3b (0.82 ± 0.13): side ratio set to 0.83 by ~110 kyr, then frozen; 177 co-orbitals, no loss after the forcing ends |
+
+- **B2 diagnosis.** Saturn's track crosses P_S/P_J = 2.00 at 600 kyr (S at 8.87 au,
+  78 M⊕), converging on Jupiter. The co-orbital count drops 315 → 56 by 620 kyr and
+  → 0 by 940 kyr. This is the known destabilisation of Trojans by the J–S 1:2
+  (Morbidelli+2005; Marzari & Scholl 2007; Robutel & Bodossian 2009). Before the
+  crossing, the giants change nothing: formation matches V2b (1.27).
+- **Consequence.** The end configuration and the *path* of the J–S period ratio
+  decide survival. The C0 config as first written (S ending at 8.6, starting
+  250 kyr later) would cross the 2:1 too, so it was stopped before it started.
+  Co-eval tracks (S starting with J) ending in the 3:2 region never cross it:
+  S_end 7.355 peaks at P_S/P_J = 1.98 (≈ 300 kyr, M_S ≈ 45 M⊕), S_end 7.0 at 1.88.
+- Real convergent migration with gas damping would *capture* Saturn into the 2:1
+  rather than let it pass (Masset & Snellgrove 2001; Pierens & Nelson 2008); the
+  forced circular tracks cannot represent that.

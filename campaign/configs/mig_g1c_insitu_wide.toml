@@ -1,0 +1,31 @@
+# Block B1c: as B1, but the giants on today's (non-resonant) orbits scaled to Jupiter
+# at 5.4 au (S/J period ratio 2.48). Reference for cold-Trojan survival away from
+# J-S resonances.
+[run]
+run_id = "mig_g1c_insitu_wide"
+t_classify_yr = 1.1e6
+
+[jupiter]
+a_start_au = 5.4
+a_end_au = 5.4
+m0_earth = 10.0
+t_grow_yr = 1.0e5
+
+[giants.saturn]
+fixed_a_au = 9.899
+[giants.uranus]
+fixed_a_au = 19.918
+[giants.neptune]
+fixed_a_au = 31.211
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.1
+a_max_au = 5.7
+e_max = 0.3
+inc_max_deg = 40.0
+seed = 20261023
+
+[parallel]
+n_chunks = 8
+workers = 8
