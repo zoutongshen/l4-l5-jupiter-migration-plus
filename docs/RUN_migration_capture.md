@@ -198,7 +198,7 @@ circular while their history runs, then free N-body.
 | B1 `mig_g1_insitu` | J grows in situ at 5.4; S/U/N fixed at 8.6/16/18.5 (P_S/P_J = 2.03); warm disc | 614/644 = **0.95 ± 0.05** | symmetric in every D/I/e bin; but cold Trojans destroyed: survival relative to V1 is 0.02 at i0 < 10°, 0.37 at 15–20°, 0.78 at 30–40° |
 | B2 `mig_g2_pirani` | Pirani ×0.25 track for J (ends 5.59); generated S/U/N (S ends 8.6); flat disc | **0/0** | asymmetry forms exactly as in V2b (co-orbital side ratio 1.25 from 100 to 600 kyr), then every co-orbital is lost between 600 and 700 kyr |
 | B3 `mig_g3_pirani_out` | B2 reversed: J 5.59 → 8.76 (outward), S/U/N reversed and scaled (S 13.95 → 18.36; P_S/P_J 3.9 → 3.0, never crosses the 2:1); flat disc | 80/96 = **0.83 ± 0.13** | as V3b (0.82 ± 0.13): side ratio set to 0.83 by ~110 kyr, then frozen; 177 co-orbitals, no loss after the forcing ends |
-| B1b `mig_g1b_insitu_32` | as B1, giants in the compact 3:2 chain (Roig & Nesvorný 2015, scaled: S 7.355, U 9.981, N 15.874) | 9/8 | **0.5% of V1's Trojans survive** (17 of 3576), at all i0: as RN15 (10000 → 44) |
+| B1b `mig_g1b_insitu_32` | as B1, giants in a compact chain (Roig & Nesvorný 2015 positions, scaled: S 7.355, U 9.981, N 15.874; NB P_S/P_J = 1.59, near 8:5, free and non-resonant, so not a true 3:2 lock) | 9/8 | **0.5% of V1's Trojans survive** (17 of 3576), at all i0: as RN15 (10000 → 44) |
 | B1c `mig_g1c_insitu_wide` | as B1, today's orbits scaled to J at 5.4 (S 9.899, U 19.918, N 31.211) | 1744/1705 = **1.02 ± 0.03** | survival relative to V1 0.91/0.91/0.97/1.03/0.95/1.02 for i0 0–5/5–10/10–15/15–20/20–30/30–40°; symmetric in every bin |
 
 - **B2 diagnosis.** Saturn's track crosses P_S/P_J = 2.00 at 600 kyr (S at 8.87 au,
@@ -224,3 +224,22 @@ configuration, with Saturn forming together with Jupiter (`tracks/c0_saturn.csv`
 measures the formation asymmetry against I0 and e0 without a configuration-
 dependent loss on top. How a compact or resonant phase (and the instability)
 reshapes it is a stage-2 question (`PIRANI_MODEL_STAGES.md`: s4, s5, C).
+
+### C0: warm twin disc, all giants, wide end configuration (2026-11-05 22:28)
+
+`mig_c0_nominal`: generated tracks (J 8.64 → 5.40, co-eval S 13.80 → 9.90), warm disc
+(e0 ≤ 0.3, i0 ≤ 40°, 5.0–9.25 au), 20k particles, 12.9 CPU-h.
+
+- **Overall N4/N5 = 194/202 = 0.96 ± 0.10.** 396 Trojans (2.0% of the disc); 309 of
+  them start at a0 = 8.48–8.86 au, i.e. Jupiter's starting zone again.
+- By i0: 1.18 ± 0.34 (0–5°), 1.24 ± 0.31 (5–10°), 0.93 ± 0.21 (10–15°), 1.00 ± 0.27,
+  0.69 ± 0.14 (20–30°), 1.14 ± 0.34 (30–40°). By e0: no trend.
+- Cold *and* circular starts lean to L4: e0 < 0.1 & i0 < 10°: 27/16 = 1.69 ± 0.53;
+  e0 < 0.1 & i0 < 5°: 18/8. Everything else ≈ 1. Suggestive (≈ 1.3σ), too few particles.
+- The co-orbital side ratio stays at 1.00 ± 0.06 throughout (V2b, flat: 1.27): in a
+  warm disc most "co-orbitals" are eccentric passers, and the mechanism acts only on
+  the cold, near-circular minority. Consistent with Pirani 2019b (pre-stirred discs
+  weaker: 1.15).
+- **Next (C0b):** concentrate the disc where Trojans come from (a0 8.2–9.0 au) and on
+  cold starts (e0 ≤ 0.1, i0 ≤ 15°) to resolve the i0 dependence: ~10× the particles per
+  cold bin at the same cost.
