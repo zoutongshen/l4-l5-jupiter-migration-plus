@@ -1,0 +1,34 @@
+# Block B3: the sign check of B2. Every giant's drift is reversed (same clocks and
+# masses); Saturn, Uranus and Neptune are scaled out by 8.76/5.4 so they stay
+# outside Jupiter's reach (Jupiter ends at 8.76 au). Expect N4/N5 < 1 (V3b: 0.82).
+[run]
+run_id = "mig_g3_pirani_out"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/pirani_x025_outward.csv"
+
+[giants.saturn]
+track_csv = "tracks/gen_saturn_x025_reversed.csv"
+a_scale = 1.6224
+[giants.uranus]
+track_csv = "tracks/gen_uranus_x025_reversed.csv"
+a_scale = 1.6224
+[giants.neptune]
+track_csv = "tracks/gen_neptune_x025_reversed.csv"
+a_scale = 1.6224
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.0
+a_max_au = 9.4
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 20261103
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

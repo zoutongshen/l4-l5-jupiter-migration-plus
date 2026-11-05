@@ -216,3 +216,155 @@ def test_restart_with_a_table_is_bitwise_identical(tmp_path):
     resumed = _runner(tmp_path / "split", h, 1600.0, resume=True)
     resumed.run(log=lambda *_: None)
     assert np.array_equal(straight._states()[0], resumed._states()[0])
+
+
+# --- several giants -------------------------------------------------------------
+
+from trojans.history import SystemForcing, SystemHistory  # noqa: E402
+
+
+def _system(jupiter, others=()):
+    names = ("jupiter", *(n for n, _ in others))
+    return SystemHistory(planets=names, histories=(jupiter, *(h for _, h in others)))
+
+
+def _fixed(name, a):
+    m = constants.GIANT_MASS[name]
+    return JupiterHistory(a_start_au=a, a_end_au=a, m0_msun=m, m_final_msun=m)
+
+
+def _system_sim(system, n_pairs=10, a_min=5.0, a_max=6.5, seed=11):
+    pos, vel = disc.disc_states(disc.Disc(n_pairs=n_pairs, a_min=a_min, a_max=a_max, seed=seed))
+    a0 = [h.a(0.0) for h in system.histories]
+    m0 = [h.mass(0.0) for h in system.histories]
+    return disc.build_system(pos, vel, disc.particle_ids(n_pairs), system.planets, a0, m0,
+                             constants.timestep(system.jupiter.a_min_au))
+
+
+def test_one_giant_system_reproduces_history_forcing_exactly():
+    h = JupiterHistory(a_start_au=6.0, a_end_au=5.2, t_mig_yr=300.0, t_grow_yr=200.0,
+                       m0_msun=0.5 * disc.M_EARTH)
+    pos, vel = disc.disc_states(disc.Disc(n_pairs=10, a_min=5.0, a_max=6.5, seed=11))
+    ids = disc.particle_ids(10)
+    dt = constants.timestep(h.a_min_au)
+    runs = []
+    for kind in ("history", "system"):
+        if kind == "history":
+            sim, forcing = disc.build_simulation(pos, vel, ids, h, h.a(0.0), dt), HistoryForcing(h)
+        else:
+            sys_h = _system(h)
+            sim, forcing = disc.build_system(pos, vel, ids, ("jupiter",), [h.a(0.0)], [h.mass(0.0)], dt), \
+                SystemForcing(sys_h)
+        runner = _stub()
+        forcing(sim, runner)
+        for _ in range(60):                    # past the end of the history (~500 yr)
+            sim.steps(8)
+            forcing(sim, runner)
+        runs.append((_states(sim), runner.hill[0], runner.m_jupiter))
+    assert np.array_equal(runs[0][0], runs[1][0])
+    assert runs[0][1:] == runs[1][1:]
+
+
+def test_giants_follow_their_tracks_then_move_freely():
+    jup = JupiterHistory(a_start_au=6.0, a_end_au=5.2, t_mig_yr=400.0, t_grow_yr=300.0, m0_msun=1 * disc.M_EARTH)
+    sat = JupiterHistory(a_start_au=9.0, a_end_au=8.6, t_mig_yr=300.0, t_mig_start_yr=100.0,
+                         m0_msun=1 * disc.M_EARTH, m_final_msun=constants.GIANT_MASS["saturn"],
+                         t_grow_start_yr=100.0, t_grow_yr=300.0)
+    system = _system(jup, [("saturn", sat), ("uranus", _fixed("uranus", 16.0)), ("neptune", _fixed("neptune", 18.5))])
+    sim = _system_sim(system)
+    # mirror-symmetric start: giants on the x axis, velocities along y
+    for p in sim.particles[1:5]:
+        assert abs(p.y) < 1e-12 and abs(p.vx) < 1e-12
+    forcing, runner = SystemForcing(system), _stub()
+    forcing(sim, runner)
+    for _ in range(80):
+        sim.steps(8)
+        forcing(sim, runner)
+        sun = sim.particles[0]
+        if sim.t < 400.0:
+            for k, h in ((1, jup), (2, sat)):
+                r = np.linalg.norm(np.array(sim.particles[k].xyz) - np.array(sun.xyz))
+                assert r == pytest.approx(h.a(sim.t), rel=1e-9)
+                assert sim.particles[k].m == h.mass(sim.t)
+        assert len(runner.hill) == 4 and runner.m_jupiter == jup.mass(sim.t)
+    # after the histories end nobody is forced: a call changes nothing, and the
+    # giants feel each other (Jupiter's distance is no longer exactly a_end)
+    before = _states(sim)
+    forcing(sim, runner)
+    assert np.array_equal(before, _states(sim))
+    for _ in range(200):
+        sim.steps(8)
+        forcing(sim, runner)
+    sun, j = sim.particles[0], sim.particles[1]
+    assert abs(np.linalg.norm(np.array(j.xyz) - np.array(sun.xyz)) - 5.2) > 1e-9
+    assert sim.particles[3].m == constants.GIANT_MASS["uranus"]
+
+
+def test_restart_with_four_giants_is_bitwise_identical(tmp_path):
+    jup = JupiterHistory(a_start_au=6.0, a_end_au=5.2, t_mig_yr=800.0, t_grow_yr=600.0)
+    sat = JupiterHistory(a_start_au=9.0, a_end_au=8.6, t_mig_yr=500.0, t_mig_start_yr=200.0,
+                         m0_msun=1 * disc.M_EARTH, m_final_msun=constants.GIANT_MASS["saturn"],
+                         t_grow_start_yr=200.0, t_grow_yr=500.0)
+    system = _system(jup, [("saturn", sat), ("uranus", _fixed("uranus", 16.0)), ("neptune", _fixed("neptune", 18.5))])
+
+    def runner_for(path, t_end, resume=False):
+        settings = integrate.Settings(t_end_yr=t_end, dt_yr=constants.timestep(5.2), check_every_steps=8,
+                                      window_yr=200.0, checkpoint_every_windows=2, snapshot_every_yr=200.0,
+                                      snapshot_fine_every_yr=20.0, snapshot_fine_until_yr=800.0)
+        ids = disc.particle_ids(10)
+        giants = {p: {"a": h.a(0.0), "hill_radius": disc.hill_radius(h.a(0.0), h.mass(0.0))}
+                  for p, h in zip(system.planets, system.histories)}
+        forcing = SystemForcing(system)
+        if resume:
+            return integrate.ChunkRunner.resume(ids, settings, giants, path, system.planets, forcing)
+        return integrate.ChunkRunner.start(_system_sim(system), ids, settings, giants, path, system.planets, forcing)
+
+    straight = runner_for(tmp_path / "straight", 1600.0)
+    straight.run(log=lambda *_: None)
+    runner_for(tmp_path / "split", 800.0).run(log=lambda *_: None)
+    resumed = runner_for(tmp_path / "split", 1600.0, resume=True)
+    resumed.run(log=lambda *_: None)
+    assert np.array_equal(straight._states()[0], resumed._states()[0])
+    for name in ("straight", "split"):
+        with h5py.File(tmp_path / name / "snapshots.h5") as f:
+            assert len(f["t"]) > 0
+
+
+def test_system_history_round_trips_through_json():
+    import json
+    from dataclasses import asdict
+    system = _system(JupiterHistory(a_start_au=6.0, a_end_au=5.2, t_mig_yr=800.0),
+                     [("saturn", _fixed("saturn", 8.6))])
+    assert SystemHistory(**json.loads(json.dumps(asdict(system)))) == system
+    with pytest.raises(ValueError):
+        SystemHistory(planets=("saturn",), histories=(_fixed("saturn", 8.6),))
+
+
+# --- the physical track generator ---------------------------------------------------
+
+def _tracks_module():
+    import importlib.util
+    from pathlib import Path
+    path = Path(__file__).resolve().parents[1] / "scripts" / "s8_tracks.py"
+    spec = importlib.util.spec_from_file_location("s8_tracks", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_generated_track_has_type_I_nu_and_hits_its_end():
+    tr_mod = _tracks_module()
+    tr = tr_mod.Track(a_end_au=5.4, m_final_earth=317.8, nu_I=0.3, m_gap_earth=30.0, gap_power=2.0,
+                      t_start_yr=1e4)
+    t, a, m = tr.build()
+    assert a[-1] == 5.4 and m[-1] == pytest.approx(317.8) and m[0] == pytest.approx(0.017)
+    assert np.all(np.diff(a) <= 0) and np.all(np.diff(t) > 0)
+    nu = tr_mod.nu_along(t, a, m)
+    light = (m > 0.5) & (m < 3.0)
+    assert np.allclose(nu[light], 0.3 / (1 + (m[light] / 30.0) ** 2), rtol=0.02)
+    assert a[0] == a[np.searchsorted(t, 1e4) - 1]          # the seed waits in place before t_start
+    out = tr_mod.Track(a_end_au=8.0, m_final_earth=95.0, direction="outward", nu_I=0.225, m_gap_earth=25.0,
+                       gap_power=3.0).build()
+    assert out[1][-1] == 8.0 and out[1][0] < 8.0
+    ice = tr_mod.Track(a_end_au=16.0, m_final_earth=14.5).build()
+    assert ice[2][-1] == pytest.approx(14.5) and np.all(np.diff(ice[2]) >= 0)

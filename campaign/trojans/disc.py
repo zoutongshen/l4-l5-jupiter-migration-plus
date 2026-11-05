@@ -127,3 +127,31 @@ class GrowthForcing:
             sim.ri_whfast.recalculate_coordinates_this_timestep = 1
         runner.m_jupiter = m
         runner.hill = np.array([hill_radius(self.a_jupiter, m)])
+
+
+# Giants after Jupiter get hashes 6, 7, 8 (Jupiter is 5, the Sun 10).
+GIANT_HASH = {"jupiter": JUPITER_HASH, "saturn": 6, "uranus": 7, "neptune": 8}
+
+
+def build_system(pos, vel, ids, planets, a0, m0, dt_yr: float) -> rebound.Simulation:
+    """Sun, then the giants on circular planar orbits, then the disc particles.
+
+    ``planets`` are names (Jupiter first), ``a0`` and ``m0`` their starting a and mass.
+    The giants alternate between longitude 0 and 180 deg (Jupiter on +x), so the
+    starting system is still sent to itself by the mirror map and the twin disc stays
+    exactly symmetric. With Jupiter alone this is ``build_simulation``.
+    """
+    sim = rebound.Simulation()
+    sim.G = constants.G
+    sim.integrator = "whfast"
+    sim.dt = dt_yr
+    sim.add(m=constants.CENTRAL_MASS, hash=SUN_HASH)
+    for k, (name, a, m) in enumerate(zip(planets, a0, m0)):
+        sim.add(m=m, a=a, e=0.0, inc=0.0, Omega=0.0, omega=0.0, M=0.0 if k % 2 == 0 else np.pi,
+                primary=sim.particles[0], hash=GIANT_HASH[name])
+    sim.N_active = 1 + len(planets)
+    sim.testparticle_type = 0
+    for i, (p, v) in zip(ids, zip(pos, vel)):
+        sim.add(m=0.0, x=p[0], y=p[1], z=p[2], vx=v[0], vy=v[1], vz=v[2], hash=int(i))
+    sim.move_to_com()
+    return sim

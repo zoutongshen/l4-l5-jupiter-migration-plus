@@ -132,7 +132,7 @@ def main() -> None:
 
     cold = tables[(tables["variable"] == "inc_split")].set_index("bin")
     summary = {
-        "run_id": args.run_id, "history": settings["history"], "disc": the_disc,
+        "run_id": args.run_id, "history": settings["history"], "giants": settings.get("giants", {}), "disc": the_disc,
         "n_disc": len(particles), "N4": n4, "N5": n5, "N4/N5": n4 / n5 if n5 else None,
         "err": n4 / n5 * np.sqrt(1 / n4 + 1 / n5) if n4 and n5 else None,
         "capture_fraction": (n4 + n5) / len(particles),
@@ -148,7 +148,7 @@ def main() -> None:
     }
     write_json(out / "summary.json", summary)
 
-    print(json.dumps({k: v for k, v in summary.items() if k not in ("history", "disc")}, indent=1, default=str))
+    print(json.dumps({k: v for k, v in summary.items() if k not in ("history", "giants", "disc")}, indent=1, default=str))
     with pd.option_context("display.width", 160, "display.max_rows", 200):
         print(tables.round(3).to_string(index=False))
         if warm:

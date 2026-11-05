@@ -1,0 +1,33 @@
+# Block B1: the symmetric control with all four giants. Jupiter grows in place
+# (10 M_E -> 1 M_J over 0.1 Myr, as V1); Saturn, Uranus and Neptune sit at full mass
+# at their end-of-gas positions and move freely from t = 0. Warm disc as V1,
+# shifted to Jupiter's 5.4 au. With giants the twins no longer match one by one;
+# the test is statistical: N4/N5 within 2 sigma of 1 in every I bin.
+[run]
+run_id = "mig_g1_insitu"
+t_classify_yr = 1.1e6
+
+[jupiter]
+a_start_au = 5.4
+a_end_au = 5.4
+m0_earth = 10.0
+t_grow_yr = 1.0e5
+
+[giants.saturn]
+fixed_a_au = 8.6
+[giants.uranus]
+fixed_a_au = 16.0
+[giants.neptune]
+fixed_a_au = 18.5
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.1
+a_max_au = 5.7
+e_max = 0.3
+inc_max_deg = 40.0
+seed = 20261023
+
+[parallel]
+n_chunks = 8
+workers = 8

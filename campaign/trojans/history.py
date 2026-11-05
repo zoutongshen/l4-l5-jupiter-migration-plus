@@ -248,3 +248,85 @@ class HistoryForcing:
             sim.ri_whfast.recalculate_coordinates_this_timestep = 1
         runner.m_jupiter = m
         runner.hill = np.array([hill_radius(a, m)])
+
+
+# --- several giants ------------------------------------------------------------
+
+@dataclass(frozen=True)
+class SystemHistory:
+    """One history per giant, Jupiter first, in simulation order.
+
+    Each giant is forced onto its circular orbit of a(t), m(t) only while its own
+    history runs (t < its t_forcing_end_yr). After that it moves freely under the
+    N-body forces, so the giants can perturb each other once the gas disc is gone.
+    A giant whose history never forces it (a_start = a_end, t_grow_yr = 0, m0 = m_final)
+    is free from t = 0.
+    """
+    planets: tuple
+    histories: tuple
+
+    def __post_init__(self):
+        object.__setattr__(self, "planets", tuple(self.planets))
+        hs = tuple(h if isinstance(h, JupiterHistory) else JupiterHistory(**h) for h in self.histories)
+        object.__setattr__(self, "histories", hs)
+        if len(self.planets) != len(hs) or not self.planets or self.planets[0] != "jupiter":
+            raise ValueError("SystemHistory needs one history per planet, Jupiter first")
+
+    @property
+    def jupiter(self) -> JupiterHistory:
+        return self.histories[0]
+
+    @property
+    def t_forcing_end_yr(self) -> float:
+        return max(h.t_forcing_end_yr for h in self.histories)
+
+    @staticmethod
+    def forced_until(h: JupiterHistory) -> float:
+        """Time after which this giant is left alone (0 for a giant that is fixed from the start)."""
+        static = not h.migrates and h.t_grow_yr <= 0.0 and h.m0_msun == h.m_final_msun
+        return 0.0 if static else h.t_forcing_end_yr
+
+
+class SystemForcing:
+    """``ChunkRunner`` forcing for several giants (particles 1..n after the Sun).
+
+    While a giant's history runs, it is put on the circular orbit of its a(t), m(t),
+    keeping its direction from the Sun (as ``HistoryForcing``). After its history
+    ends, at t >= ``SystemHistory.forced_until``, it is not touched again.
+    ``runner.hill`` follows each giant's history (its final values once free) and
+    ``runner.m_jupiter`` Jupiter's mass. Everything depends on t only, so resumes
+    are exact. With Jupiter alone this is ``HistoryForcing`` (bitwise; tested).
+    """
+
+    def __init__(self, system: SystemHistory):
+        self.system = system
+        self.until = [SystemHistory.forced_until(h) for h in system.histories]
+
+    def __call__(self, sim: rebound.Simulation, runner) -> None:
+        t = sim.t
+        sun = sim.particles[0]
+        changed = False
+        hill = np.empty(len(self.system.histories))
+        for k, h in enumerate(self.system.histories):
+            a, m = h.a(t), h.mass(t)
+            hill[k] = hill_radius(a, m)
+            if t >= self.until[k]:
+                continue                     # its history is over: it moves freely
+            p = sim.particles[k + 1]
+            rel_x = np.array(p.xyz) - np.array(sun.xyz)
+            r = float(np.linalg.norm(rel_x))
+            move = abs(r - a) > RADIUS_TOLERANCE * a
+            if m != p.m or move:
+                radius = a if move else r
+                speed = np.sqrt(constants.G * (constants.CENTRAL_MASS + m) / radius)
+                tangent = np.array([-rel_x[1], rel_x[0], 0.0]) / np.hypot(rel_x[0], rel_x[1])
+                p.m = m
+                if move:
+                    p.xyz = tuple(np.array(sun.xyz) + a * rel_x / r)
+                p.vxyz = tuple(np.array(sun.vxyz) + speed * tangent)
+                changed = True
+        if changed:
+            sim.move_to_com()
+            sim.ri_whfast.recalculate_coordinates_this_timestep = 1
+        runner.m_jupiter = self.system.jupiter.mass(t)
+        runner.hill = hill

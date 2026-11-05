@@ -1,0 +1,34 @@
+# Block C0: the science nominal. Every giant on a generated physical track
+# (scripts/s8_tracks.py): pebble core (dM/dt ~ M^(2/3)) to 20 M_E, slow envelope
+# phase to 40 M_E, then disc-limited gas accretion; migration nu = nu_I/(1+(m/M_gap)^p)
+# with nu_I = 0.225, M_gap = 25 M_E, p = 3 (the values that reproduce Pirani's x0.25
+# track, rms 0.1 au). Jupiter 8.65 -> 5.4 au over 0.69 Myr. WARM twin disc
+# (e <= 0.3, I <= 40 deg) over a_end - 0.4 .. a_start + 0.6: N4/N5 against I0 and e0.
+[run]
+run_id = "mig_c0_nominal"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/gen_jupiter_x025.csv"
+
+[giants.saturn]
+track_csv = "tracks/gen_saturn_x025.csv"
+[giants.uranus]
+track_csv = "tracks/gen_uranus_x025.csv"
+[giants.neptune]
+track_csv = "tracks/gen_neptune_x025.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.0
+a_max_au = 9.25
+e_max = 0.3
+inc_max_deg = 40.0
+seed = 20261105
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

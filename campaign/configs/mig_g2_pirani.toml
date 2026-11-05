@@ -1,0 +1,33 @@
+# Block B2: Pirani's x0.25 Jupiter track (digitized, as V2b) with Saturn, Uranus and
+# Neptune on generated tracks (scripts/s8_tracks.py, same disc: nu_I = 0.225,
+# M_gap = 25 M_E, p = 3, calibrated on her Jupiter track). Saturn 11.3 -> 8.6 au from
+# 0.25 Myr; Uranus 17.2 -> 16.0 and Neptune 19.8 -> 18.5 au from 0.39 Myr (ends from
+# her Fig. 1). Flat disc and seed as V2b. Compare with V2b's 1.27 +/- 0.14.
+[run]
+run_id = "mig_g2_pirani"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/pirani_x025.csv"
+
+[giants.saturn]
+track_csv = "tracks/gen_saturn_x025.csv"
+[giants.uranus]
+track_csv = "tracks/gen_uranus_x025.csv"
+[giants.neptune]
+track_csv = "tracks/gen_neptune_x025.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 5.0
+a_max_au = 9.4
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 20261103
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8
