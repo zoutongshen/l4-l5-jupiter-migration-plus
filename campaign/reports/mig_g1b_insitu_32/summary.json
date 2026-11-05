@@ -1,0 +1,151 @@
+{
+  "run_id": "mig_g1b_insitu_32",
+  "history": {
+    "a_start_au": 5.4,
+    "a_end_au": 5.4,
+    "t_mig_yr": 0.0,
+    "t_mig_start_yr": 0.0,
+    "migration_law": "const_nu",
+    "m0_msun": 3.0034896152653906e-05,
+    "m_final_msun": 0.0009547919099414248,
+    "t_grow_start_yr": 0.0,
+    "t_grow_yr": 100000.0,
+    "growth_law": "exponential",
+    "table_t_yr": [],
+    "table_a_au": [],
+    "table_m_msun": [],
+    "direction": "in_situ",
+    "m0_earth": 10.0,
+    "m_final_earth": 317.8941938366112,
+    "t_forcing_end_yr": 100000.0,
+    "mean_rate_au_per_myr": 0.0,
+    "nu_start": 0.0,
+    "nu_mid": 0.0,
+    "nu_end": 0.0
+  },
+  "giants": {
+    "saturn": {
+      "a_start_au": 7.355,
+      "a_end_au": 7.355,
+      "t_mig_yr": 0.0,
+      "t_mig_start_yr": 0.0,
+      "migration_law": "const_nu",
+      "m0_msun": 0.00028588567002459455,
+      "m_final_msun": 0.00028588567002459455,
+      "t_grow_start_yr": 0.0,
+      "t_grow_yr": 0.0,
+      "growth_law": "exponential",
+      "table_t_yr": [],
+      "table_a_au": [],
+      "table_m_msun": [],
+      "direction": "in_situ",
+      "m0_earth": 95.18450424185451,
+      "m_final_earth": 95.18450424185451,
+      "t_forcing_end_yr": 0.0,
+      "mean_rate_au_per_myr": 0.0,
+      "nu_start": 0.0,
+      "nu_mid": 0.0,
+      "nu_end": 0.0
+    },
+    "uranus": {
+      "a_start_au": 9.981,
+      "a_end_au": 9.981,
+      "t_mig_yr": 0.0,
+      "t_mig_start_yr": 0.0,
+      "migration_law": "const_nu",
+      "m0_msun": 4.36624961322212e-05,
+      "m_final_msun": 4.36624961322212e-05,
+      "t_grow_start_yr": 0.0,
+      "t_grow_yr": 0.0,
+      "growth_law": "exponential",
+      "table_t_yr": [],
+      "table_a_au": [],
+      "table_m_msun": [],
+      "direction": "in_situ",
+      "m0_earth": 14.537255567758356,
+      "m_final_earth": 14.537255567758356,
+      "t_forcing_end_yr": 0.0,
+      "mean_rate_au_per_myr": 0.0,
+      "nu_start": 0.0,
+      "nu_mid": 0.0,
+      "nu_end": 0.0
+    },
+    "neptune": {
+      "a_start_au": 15.874,
+      "a_end_au": 15.874,
+      "t_mig_yr": 0.0,
+      "t_mig_start_yr": 0.0,
+      "migration_law": "const_nu",
+      "m0_msun": 5.151383772654274e-05,
+      "m_final_msun": 5.151383772654274e-05,
+      "t_grow_start_yr": 0.0,
+      "t_grow_yr": 0.0,
+      "growth_law": "exponential",
+      "table_t_yr": [],
+      "table_a_au": [],
+      "table_m_msun": [],
+      "direction": "in_situ",
+      "m0_earth": 17.151328729329048,
+      "m_final_earth": 17.151328729329048,
+      "t_forcing_end_yr": 0.0,
+      "mean_rate_au_per_myr": 0.0,
+      "nu_start": 0.0,
+      "nu_mid": 0.0,
+      "nu_end": 0.0
+    }
+  },
+  "disc": {
+    "n_pairs": 10000,
+    "a_min": 5.1,
+    "a_max": 5.7,
+    "e_max": 0.3,
+    "inc_max_deg": 40.0,
+    "seed": 20261023
+  },
+  "n_disc": 20000,
+  "N4": 9,
+  "N5": 8,
+  "N4/N5": 1.125,
+  "err": 0.5466517401417469,
+  "capture_fraction": 0.00085,
+  "inc_split": {
+    "[0, 15)": {
+      "L4": 0.0,
+      "L5": 0.0,
+      "N4/N5": NaN,
+      "err": NaN
+    },
+    "[15, 90)": {
+      "L4": 9.0,
+      "L5": 8.0,
+      "N4/N5": 1.125,
+      "err": 0.5466517401417469
+    }
+  },
+  "pirani_count": {
+    "t_yr": 1200003.270541989,
+    "N4": 9,
+    "N5": 9,
+    "N4/N5": 1.0,
+    "err": 0.4714045207910317
+  },
+  "twin_fates": {
+    "none+none": 9983,
+    "L4+none": 9,
+    "L5+none": 8
+  },
+  "classify_windows": 100,
+  "physical_disc": {
+    "source": "Pirani+2019b pre-stirred (asteroid belt)",
+    "mu_e": 0.15,
+    "sigma_e": 0.07,
+    "mu_i_deg": 8.5,
+    "sigma_i_deg": 7.0,
+    "N4/N5": 0.2894223397638151,
+    "n_eff_trojans": 2.026066908870318
+  },
+  "max_coorbital_side_ratio": {
+    "pos/neg": 1.1111111111111112,
+    "at_t_yr": 1200003.270541989
+  }
+}

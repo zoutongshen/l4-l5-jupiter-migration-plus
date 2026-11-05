@@ -198,6 +198,8 @@ circular while their history runs, then free N-body.
 | B1 `mig_g1_insitu` | J grows in situ at 5.4; S/U/N fixed at 8.6/16/18.5 (P_S/P_J = 2.03); warm disc | 614/644 = **0.95 ± 0.05** | symmetric in every D/I/e bin; but cold Trojans destroyed: survival relative to V1 is 0.02 at i0 < 10°, 0.37 at 15–20°, 0.78 at 30–40° |
 | B2 `mig_g2_pirani` | Pirani ×0.25 track for J (ends 5.59); generated S/U/N (S ends 8.6); flat disc | **0/0** | asymmetry forms exactly as in V2b (co-orbital side ratio 1.25 from 100 to 600 kyr), then every co-orbital is lost between 600 and 700 kyr |
 | B3 `mig_g3_pirani_out` | B2 reversed: J 5.59 → 8.76 (outward), S/U/N reversed and scaled (S 13.95 → 18.36; P_S/P_J 3.9 → 3.0, never crosses the 2:1); flat disc | 80/96 = **0.83 ± 0.13** | as V3b (0.82 ± 0.13): side ratio set to 0.83 by ~110 kyr, then frozen; 177 co-orbitals, no loss after the forcing ends |
+| B1b `mig_g1b_insitu_32` | as B1, giants in the compact 3:2 chain (Roig & Nesvorný 2015, scaled: S 7.355, U 9.981, N 15.874) | 9/8 | **0.5% of V1's Trojans survive** (17 of 3576), at all i0: as RN15 (10000 → 44) |
+| B1c `mig_g1c_insitu_wide` | as B1, today's orbits scaled to J at 5.4 (S 9.899, U 19.918, N 31.211) | 1744/1705 = **1.02 ± 0.03** | survival relative to V1 0.91/0.91/0.97/1.03/0.95/1.02 for i0 0–5/5–10/10–15/15–20/20–30/30–40°; symmetric in every bin |
 
 - **B2 diagnosis.** Saturn's track crosses P_S/P_J = 2.00 at 600 kyr (S at 8.87 au,
   78 M⊕), converging on Jupiter. The co-orbital count drops 315 → 56 by 620 kyr and
@@ -212,3 +214,13 @@ circular while their history runs, then free N-body.
 - Real convergent migration with gas damping would *capture* Saturn into the 2:1
   rather than let it pass (Masset & Snellgrove 2001; Pierens & Nelson 2008); the
   forced circular tracks cannot represent that.
+
+**Choice of C0's end configuration (2026-11-05 20:55).** Survival of the
+gas-era Trojans depends entirely on where Saturn is: near or across the 2:1
+(B1, B2) or in the compact 3:2 chain (B1b) almost nothing survives; in the wide
+configuration (B1c) survival is flat in i0 and symmetric. So C0 ends in the wide
+configuration, with Saturn forming together with Jupiter (`tracks/c0_saturn.csv`,
+13.80 → 9.90 au; P_S/P_J ≥ 2.02 throughout, ≥ 2.3 once M_S > 20 M⊕). C0 then
+measures the formation asymmetry against I0 and e0 without a configuration-
+dependent loss on top. How a compact or resonant phase (and the instability)
+reshapes it is a stage-2 question (`PIRANI_MODEL_STAGES.md`: s4, s5, C).
