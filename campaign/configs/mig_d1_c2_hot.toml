@@ -1,0 +1,31 @@
+# D1: C2 tracks (nu_I 0.9) with cold-e, hot-I starts: e0 <= 0.05, i0 0-40 deg uniform.
+# Question: does the e0-sorted excess stay flat in i0 above 15 deg (the observed excess
+# is ~2 below I_p 15 deg and ~1 above)? Disc a0 as C2 (Jupiter starting zone).
+[run]
+run_id = "mig_d1_c2_hot"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/c2_jupiter_nu09.csv"
+
+[giants.saturn]
+track_csv = "tracks/c2_saturn_nu09.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 15000
+a_min_au = 15.17
+a_max_au = 16.65
+e_max = 0.05
+inc_max_deg = 40.0
+seed = 20261109
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

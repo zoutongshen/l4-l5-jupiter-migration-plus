@@ -1,0 +1,31 @@
+# D4: C2 exactly (same seed, so the same particles) run to 10 Myr after the gas phase with
+# the giants free. Question: does the 1.37 (1.81 at e0 < 0.025) survive, and does the
+# compact-ish free system (J 5.4, S 11.5, U 19.9, N 31.2) erode L4 and L5 alike?
+[run]
+run_id = "mig_d4_c2_long"
+t_classify_yr = 1.0e7
+
+[jupiter]
+track_csv = "tracks/c2_jupiter_nu09.csv"
+
+[giants.saturn]
+track_csv = "tracks/c2_saturn_nu09.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 15.17
+a_max_au = 16.65
+e_max = 0.1
+inc_max_deg = 15.0
+seed = 20261108
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

@@ -1,0 +1,32 @@
+# D2: C2 (nu_I 0.9) with M_gap 12.5 M_E (C2: 25): the gap opens earlier, so Jupiter
+# slows sooner (nu at 10/30 M_E = 0.60/0.06; C2 0.84/0.33). J 10.35 -> 5.40, S 15.95 -> 11.50
+# (starts inside the 2:1, diverges through it while light). Disc a0 = a_start x 0.948-1.040.
+# Question: which part of Jupiter's growth sets the excess?
+[run]
+run_id = "mig_d2_mgap12"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/c3_jupiter_mgap12.csv"
+
+[giants.saturn]
+track_csv = "tracks/c3_saturn_mgap12.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 9.81
+a_max_au = 10.76
+e_max = 0.1
+inc_max_deg = 15.0
+seed = 20261110
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

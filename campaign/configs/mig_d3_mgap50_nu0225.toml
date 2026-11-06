@@ -1,0 +1,31 @@
+# D3: C0b rate (nu_I 0.225) with M_gap 50 M_E (C0b: 25). J 12.99 -> 5.40 (Delta a close
+# to C1's), S 22.73 -> 11.50 (no 2:1 crossing). nu at 10/30 M_E = 0.22/0.19 (C1: 0.44/0.17).
+# With D2 and C0b-C2: is the excess set by the rate at ~10-20 M_E or by the total excursion?
+[run]
+run_id = "mig_d3_mgap50_nu0225"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/c3_jupiter_mgap50_nu0225.csv"
+
+[giants.saturn]
+track_csv = "tracks/c3_saturn_mgap50_nu0225.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 12.31
+a_max_au = 13.51
+e_max = 0.1
+inc_max_deg = 15.0
+seed = 20261111
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8
