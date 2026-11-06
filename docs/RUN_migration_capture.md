@@ -306,3 +306,26 @@ disc a0 15.17–16.65, e0 ≤ 0.1, i0 ≤ 15°. 2967 Trojans.
 - **Still flat in i0 at every rate.** The gas-era migration excess is sorted by e0;
   at best ≈ 1.8 for e0 < 0.025 and ≈ 1.4 overall for e0 ≤ 0.1. It does not by itself
   produce an inclination-dependent ratio.
+
+### D1: C2 rate, near-circular starts at inclinations up to 40° (2026-11-06 19:07)
+
+`mig_d1_c2_hot`: C2 tracks (ν_I 0.9, J 16.00 → 5.40, S 24.25 → 11.50, ice giants as C0);
+disc a0 15.17–16.65, **e0 ≤ 0.05, i0 0–40° uniform**, 15000 pairs. 3206 Trojans.
+Jupiter replay matches snapshots to 1.3e-9 au.
+
+| i0 (°) | 0–5 | 5–10 | 10–15 | 15–20 | 20–25 | 25–30 | 30–35 | 35–40 |
+|---|---|---|---|---|---|---|---|---|
+| N4/N5 | 1.28 ± 0.12 | 1.52 ± 0.13 | 1.36 ± 0.12 | 1.75 ± 0.16 | 1.82 ± 0.20 | 2.13 ± 0.26 | 1.99 ± 0.29 | 2.16 ± 0.40 |
+| capture eff. | 0.134 | 0.162 | 0.152 | 0.131 | 0.099 | 0.082 | 0.057 | 0.036 |
+
+- **Overall 1.61 ± 0.06.** By e0: below 15° the e0 < 0.025 half gives 1.47–1.99 and the
+  0.025–0.05 half 1.08–1.29 (as C2); above 20° both halves are ≈ 2.
+- **The excess rises with i0**, from ≈ 1.3 at i0 < 5° to ≈ 2.1 above 25°. Capture falls
+  with i0 on both sides, faster for L5. In final inclination: 1.28 ± 0.09 (I < 10°),
+  1.4–1.6 (10–20°), 1.74 ± 0.14 (20–30°), 2.1 ± 0.2 (> 30°).
+- Captured Trojans are pumped in I at high i0 (median 32° → 45° for i0 30–40°);
+  L5 Trojans have smaller libration amplitudes than L4 (D 15–29° vs 20–31°).
+- **Implication:** gas-era migration makes a HOT-L4 excess, the opposite of the observed
+  one (≈ 2 below I_p 15°, ≈ 1 above). On these tracks, migration cannot be the source
+  of the cold excess unless the hot population is replaced or diluted later by a
+  symmetric component (e.g. capture at the instability, Nesvorný+2013 style).
