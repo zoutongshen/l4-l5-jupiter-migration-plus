@@ -259,10 +259,28 @@ reshapes it is a stage-2 question (`PIRANI_MODEL_STAGES.md`: s4, s5, C).
 - **Overall 1.08 ± 0.04.** The migration asymmetry depends on e0, not on i0: it needs
   near-circular starts (e0 ≲ 0.05) and is flat in i0 up to 15°. C0's cold lean was noise.
 - Trojans keep their inclination (median final I 8.1° vs i0 7.4°).
-- Side ratio among co-orbitals builds 1.0 → 1.14 between 140 and 240 kyr (Jupiter
-  8 → 15 M⊕... 36 M⊕), then settles at 1.07–1.09.
+- Side ratio among co-orbitals builds 1.0 → 1.14 between 140 and 240 kyr (Jupiter 8 → 36 M⊕), then settles at 1.07–1.09.
 - **Implication for the cold-L4 excess:** with these tracks, gas-era migration makes
   an e-dependent, I-independent excess of ≤ 1.25, not the observed I-dependent 2.0.
   An I-dependence would have to come from a later stage (e.g. a symmetric, hotter
   captured component diluting the primordial one) or from a disc whose e and I
   are correlated (cold and circular together).
+
+### C1: twice the migration rate, cold zone (2026-11-06 02:06)
+
+`mig_c1_nu045_cold`: ν_I = 0.45 (C0b: 0.225); J 11.36 → 5.40, co-eval S 18.45 → 11.50
+(never reaches P_S/P_J = 2); ice giants as C0; disc a0 10.95–11.75, e0 ≤ 0.1, i0 ≤ 15°.
+4401 Trojans.
+
+| | all | e0 < 0.025 | 0.025–0.05 | 0.05–0.075 | 0.075–0.1 |
+|---|---|---|---|---|---|
+| C0b (ν_I 0.225) | 1.08 ± 0.04 | 1.25 ± 0.10 | 1.15 ± 0.08 | 0.97 ± 0.07 | 1.05 ± 0.07 |
+| **C1 (ν_I 0.45)** | **1.25 ± 0.04** | **1.66 ± 0.12** | 1.30 ± 0.08 | 1.11 ± 0.06 | 1.08 ± 0.06 |
+
+- By i0 (0–15° in 2.5° bins): 1.39, 1.14, 1.31, 1.19, 1.18, 1.29 (± 0.1): still flat in i0.
+- Co-orbital side ratio peaks at 1.41 (190 kyr, Jupiter 18 M⊕), settles at 1.25 once
+  Jupiter passes ~40 M⊕, and is then frozen. Only 2% of co-orbitals are lost after
+  the gas phase (4478 → 4403), so the different Saturn end does not matter.
+- **Reading.** A faster rate raises the excess, and for near-circular starts reaches
+  Pirani's saturated range (1.6–1.8). The dependence is on e0, never on i0, so the
+  mechanism produces an e-sorted, not an I-sorted, L4 excess.
