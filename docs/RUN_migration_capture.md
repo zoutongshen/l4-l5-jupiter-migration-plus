@@ -284,3 +284,25 @@ reshapes it is a stage-2 question (`PIRANI_MODEL_STAGES.md`: s4, s5, C).
 - **Reading.** A faster rate raises the excess, and for near-circular starts reaches
   Pirani's saturated range (1.6–1.8). The dependence is on e0, never on i0, so the
   mechanism produces an e-sorted, not an I-sorted, L4 excess.
+
+### C2: four times the rate, cold zone (2026-11-06 03:59)
+
+`mig_c2_nu09_cold`: ν_I = 0.9; J 16.00 → 5.40; co-eval S 24.25 → 11.50 (same end as C1);
+disc a0 15.17–16.65, e0 ≤ 0.1, i0 ≤ 15°. 2967 Trojans.
+
+**Rate series (cold zone, all four giants):**
+
+| ν_I | all | e0 < 0.025 | 0.025–0.05 | 0.05–0.075 | 0.075–0.1 | i0 trend |
+|---|---|---|---|---|---|---|
+| 0.225 (C0b) | 1.08 ± 0.04 | 1.25 ± 0.10 | 1.15 ± 0.08 | 0.97 ± 0.07 | 1.05 ± 0.07 | flat |
+| 0.45 (C1) | 1.25 ± 0.04 | 1.66 ± 0.12 | 1.30 ± 0.08 | 1.11 ± 0.06 | 1.08 ± 0.06 | flat |
+| 0.9 (C2) | **1.37 ± 0.05** | **1.81 ± 0.14** | 1.43 ± 0.10 | 1.18 ± 0.09 | 1.18 ± 0.09 | flat (1.28–1.52) |
+
+- The excess grows with the rate but more slowly each doubling (e0 < 0.025: +0.41,
+  then +0.15): it is saturating, at about Pirani's 1.6–1.8 (her Table 3).
+- Co-orbital side ratio peaks at 1.85 (180 kyr, Jupiter 15 M⊕), relaxes to 1.37 as
+  Jupiter grows to ~50 M⊕, then frozen; 3% loss after the gas phase. The diverging
+  2:1 crossing at 144 kyr (M_S 8 M⊕) leaves no mark.
+- **Still flat in i0 at every rate.** The gas-era migration excess is sorted by e0;
+  at best ≈ 1.8 for e0 < 0.025 and ≈ 1.4 overall for e0 ≤ 0.1. It does not by itself
+  produce an inclination-dependent ratio.

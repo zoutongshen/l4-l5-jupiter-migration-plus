@@ -1,0 +1,35 @@
+# C1b (cold zone): nu_I = 0.9 (4x C0b, 2x C1). Jupiter 16.00 -> 5.40 au. Saturn forms
+# with Jupiter and ends at 11.5 au, the same end configuration as C1, so only the rate
+# changes. P_S/P_J crosses 2.0 once, DIVERGING, at 144 kyr while M_S = 8 M_E (no capture),
+# then 5:2 and 3:1 likewise; ends 3.11. Saturn starts at 24.3 au and passes the Uranus
+# seed (0.017 M_E, forced on its track) at 196 kyr: negligible. Ice giants as C0.
+# Disc: cold starts in Jupiter's starting zone, scaled from C0b (a_start x 0.948-1.040).
+# Question: does the e0 < 0.025 excess saturate (Pirani: 1.6-1.8 above x0.5)?
+[run]
+run_id = "mig_c2_nu09_cold"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/c2_jupiter_nu09.csv"
+
+[giants.saturn]
+track_csv = "tracks/c2_saturn_nu09.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 15.17
+a_max_au = 16.65
+e_max = 0.1
+inc_max_deg = 15.0
+seed = 20261108
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8
