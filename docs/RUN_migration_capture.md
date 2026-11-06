@@ -344,3 +344,26 @@ a0 9.81–10.76, e0 ≤ 0.1, i0 ≤ 15°. 3044 Trojans. Replay matches to 1.3e-9
   the co-orbital side ratio still peaks (1.64 at 158 kyr) but Jupiter slows before it
   is heavy enough to freeze that ratio in. The excess is set by how fast Jupiter
   migrates while it is ≈ 10–30 M⊕, not by ν_I alone.
+
+### D3: base rate with a late gap, M_gap 50 M⊕ (2026-11-06 23:15)
+
+`mig_d3_mgap50_nu0225`: ν_I 0.225, M_gap 50 (C0b: 25); J 12.99 → 5.40, S 22.73 → 11.50;
+disc a0 12.31–13.51, e0 ≤ 0.1, i0 ≤ 15°. 3283 Trojans. Replay matches to 1.3e-9 au.
+
+**Five runs, cold zone (e0 ≤ 0.1, i0 ≤ 15°), ordered by ν at 20 M⊕:**
+
+| run | ν_I | M_gap | ν(10 / 20 / 30 M⊕) | all | e0 < 0.025 | peak side ratio |
+|---|---|---|---|---|---|---|
+| C0b | 0.225 | 25 | 0.21 / 0.15 / 0.08 | 1.08 ± 0.04 | 1.25 ± 0.10 | 1.18 |
+| D2 | 0.9 | 12.5 | 0.60 / 0.18 / 0.06 | 1.19 ± 0.04 | 1.38 ± 0.11 | 1.64 |
+| **D3** | 0.225 | 50 | 0.22 / 0.21 / 0.19 | **1.19 ± 0.04** | **1.39 ± 0.11** | 1.27 |
+| C1 | 0.45 | 25 | 0.42 / 0.30 / 0.17 | 1.25 ± 0.04 | 1.66 ± 0.12 | 1.46 |
+| C2 | 0.9 | 25 | 0.84 / 0.60 / 0.33 | 1.37 ± 0.05 | 1.81 ± 0.14 | 1.85 |
+
+- D3 sits between C0b and C1. D2 and D3 reach the same final excess along very
+  different ν(m): D2 is fast while light and slow by 30 M⊕, D3 is slow throughout but
+  stays slow past 30 M⊕. Neither ν_I, ν(10 M⊕) nor ν(30 M⊕) orders the five runs; ν near
+  20 M⊕ does (monotonic in both columns). A fast early phase builds a large side ratio
+  (D2 peaks at 1.64) that relaxes if Jupiter slows before ≈ 20 M⊕.
+- By i0 (0–5 / 5–10 / 10–15): 1.17 / 1.35 / 1.06; no trend within 15°.
+- Caveat: five runs, ±0.1 errors; "ν at ≈ 20 M⊕" is an ordering, not a fit.

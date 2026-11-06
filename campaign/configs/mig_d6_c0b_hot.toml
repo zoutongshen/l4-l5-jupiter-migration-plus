@@ -1,0 +1,31 @@
+# D6: D1 at the C0b rate (nu_I 0.225): C0b tracks and disc zone, e0 <= 0.05, i0 0-40 deg.
+# Question: does the L4 excess rise with i0 at the base rate?
+
+[run]
+run_id = "mig_d6_c0b_hot"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/gen_jupiter_x025.csv"
+
+[giants.saturn]
+track_csv = "tracks/c0_saturn.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 15000
+a_min_au = 8.2
+a_max_au = 9.0
+e_max = 0.05
+inc_max_deg = 40.0
+seed = 20261113
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8
