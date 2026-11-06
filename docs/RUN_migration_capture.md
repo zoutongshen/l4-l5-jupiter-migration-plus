@@ -329,3 +329,18 @@ Jupiter replay matches snapshots to 1.3e-9 au.
   one (≈ 2 below I_p 15°, ≈ 1 above). On these tracks, migration cannot be the source
   of the cold excess unless the hot population is replaced or diluted later by a
   symmetric component (e.g. capture at the instability, Nesvorný+2013 style).
+
+### D2: C2 rate with an earlier gap, M_gap 12.5 M⊕ (2026-11-06 21:10)
+
+`mig_d2_mgap12`: ν_I 0.9, M_gap 12.5 (C2: 25); J 10.35 → 5.40, S 15.95 → 11.50; disc
+a0 9.81–10.76, e0 ≤ 0.1, i0 ≤ 15°. 3044 Trojans. Replay matches to 1.3e-9 au.
+
+| | all | e0 < 0.025 | 0.025–0.05 | 0.05–0.075 | 0.075–0.1 | i0 0–5 / 5–10 / 10–15 |
+|---|---|---|---|---|---|---|
+| C2 (M_gap 25) | 1.37 ± 0.05 | 1.81 ± 0.14 | 1.43 ± 0.10 | 1.18 ± 0.09 | 1.18 ± 0.09 | 1.40 / 1.29 / 1.44 |
+| **D2 (M_gap 12.5)** | **1.19 ± 0.04** | **1.38 ± 0.11** | 1.12 ± 0.08 | 1.04 ± 0.07 | 1.29 ± 0.10 | 1.16 / 1.10 / 1.34 |
+
+- Halving M_gap lowers the excess from C2 to about C1's level, although ν_I is the same:
+  the co-orbital side ratio still peaks (1.64 at 158 kyr) but Jupiter slows before it
+  is heavy enough to freeze that ratio in. The excess is set by how fast Jupiter
+  migrates while it is ≈ 10–30 M⊕, not by ν_I alone.
