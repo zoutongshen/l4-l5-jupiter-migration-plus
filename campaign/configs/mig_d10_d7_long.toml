@@ -1,0 +1,30 @@
+# mig_d10_d7_long: mig_d7_c2_warm exactly (same seed and particles) run to 10 Myr after the gas phase.
+# Question: with hot (and eccentric) Trojans present, is the later erosion I-dependent?
+[run]
+run_id = "mig_d10_d7_long"
+t_classify_yr = 1.0e7
+
+[jupiter]
+track_csv = "tracks/c2_jupiter_nu09.csv"
+
+[giants.saturn]
+track_csv = "tracks/c2_saturn_nu09.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 20000
+a_min_au = 15.17
+a_max_au = 16.65
+e_max = 0.3
+inc_max_deg = 40.0
+seed = 20261114
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

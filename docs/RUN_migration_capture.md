@@ -463,3 +463,32 @@ N4/N5 (capture efficiency) by e0 and i0:
   the excess is too weakly sorted in e0 here for an e–I correlation to matter.
 - With D7: the I-slope flips sign between ν_I 0.45 (slightly falling) and 0.9 (rising).
   D9 (ν_I 0.65) probes the crossover.
+
+### D9: intermediate rate, ν_I 0.65 (2026-11-07 20:20)
+
+`mig_d9_nu065`: ν_I 0.65, M_gap 25; J 13.52 → 5.40, S 21.12 → 11.50; disc a0 12.82–14.06,
+e0 ≤ 0.1, i0 ≤ 40°, 20000 pairs. 4530 Trojans; overall 1.29 ± 0.04.
+
+| e0 \ i0 | 0–10° | 10–20° | 20–30° | 30–40° |
+|---|---|---|---|---|
+| < 0.025 | 1.58 ± 0.18 | 1.68 ± 0.19 | 1.82 ± 0.24 | 1.42 ± 0.22 |
+| 0.025–0.05 | 1.18 ± 0.12 | 1.28 ± 0.13 | 1.40 ± 0.16 | 1.11 ± 0.19 |
+| 0.05–0.1 | 1.04 ± 0.08 | 1.26 ± 0.09 | 1.31 ± 0.13 | 1.06 ± 0.14 |
+| all | 1.18 ± 0.06 | 1.35 ± 0.07 | 1.45 ± 0.09 | 1.18 ± 0.10 |
+
+- No crossover rate: at ν_I 0.65 the ratio is ≈ flat-to-rising up to 30° and dips at
+  30–40°, in between D8 and D7. In final I: 1.17 / 1.26 / 1.40 / 1.36.
+
+### Block D summary (2026-11-07)
+
+Across 12 runs on physical tracks (ν_I 0.225–0.9, M_gap 12.5–50, e0 ≤ 0.3, i0 ≤ 40°, to 10 Myr):
+1. The migration excess is set during the gas phase, by the rate near Jupiter ≈ 20 M⊕,
+   and is frozen afterwards (D4: 42 L4 and 42 L5 lost in 10 Myr, no swaps).
+2. It is largest for circular starts (≈ 1.8 at e0 < 0.025 for ν_I ≥ 0.65).
+3. Its I-dependence changes sign with rate: slightly falling at ν_I 0.45 (1.25 → 1.0),
+   flat at 0.225 and 0.65, rising at 0.9 (1.3 → 2.1). No rate and no disc reweighting
+   (independent or e–I correlated) gives the observed 2.15 / 1.38 / 0.93 / 1.12.
+4. So forced-circular gas-era migration explains at most part of the cold excess;
+   the observed I-sorting needs a later, I-dependent process (e.g. instability-era
+   capture or loss) or physics this model lacks (resonant J–S coupling, gas drag on
+   planetesimals, eccentric giants).
