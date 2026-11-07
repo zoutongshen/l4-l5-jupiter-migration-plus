@@ -1,0 +1,29 @@
+# D8: D7 at the C1 rate (nu_I 0.45): C1 tracks and zone, e0 <= 0.3, i0 <= 40 deg, 20000 pairs.
+[run]
+run_id = "mig_d8_c1_warm"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/c1_jupiter_nu045.csv"
+
+[giants.saturn]
+track_csv = "tracks/c1_saturn_nu045.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 20000
+a_min_au = 10.95
+a_max_au = 11.75
+e_max = 0.3
+inc_max_deg = 40.0
+seed = 20261115
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8
