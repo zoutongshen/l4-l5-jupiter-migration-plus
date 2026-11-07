@@ -419,3 +419,25 @@ thresholds of 14° and 16° give 612/540 | 696/640 and 684/614 | 624/566.)
   least 10 Myr afterwards (D4). It never makes the observed cold-only excess (≈ 2 below
   I_p 15°, ≈ 1 above). That needs another ingredient: a later symmetric hot component, an
   e–I correlated planetesimal disc, or an I-dependent loss after the gas phase.
+
+### D7: full (e0, i0) map at the C2 rate (2026-11-07 14:52)
+
+`mig_d7_c2_warm`: C2 tracks and zone (a0 15.17–16.65), **e0 ≤ 0.3, i0 ≤ 40°**, 20000 pairs.
+2174 Trojans; overall 1.81 ± 0.08. Replay matches to 1.3e-9 au.
+
+N4/N5 (capture efficiency) by e0 and i0:
+
+| e0 \ i0 | 0–10° | 10–20° | 20–30° | 30–40° |
+|---|---|---|---|---|
+| 0–0.05 | 1.73 ± 0.22 (0.160) | 1.57 ± 0.22 (0.118) | 2.08 ± 0.35 (0.093) | 2.41 ± 0.61 (0.045) |
+| 0.05–0.1 | 1.29 ± 0.16 (0.152) | 1.53 ± 0.20 (0.143) | 2.15 ± 0.45 (0.061) | 2.28 ± 0.64 (0.035) |
+| 0.1–0.15 | 1.44 ± 0.22 (0.111) | 2.76 ± 0.60 (0.076) | 3.07 ± 0.91 (0.036) | 2.8 ± 1.5 (0.011) |
+| 0.15–0.2 | 1.61 ± 0.32 (0.062) | 3.3 ± 1.0 (0.040) | 1.13 ± 0.32 (0.030) | – |
+| 0.2–0.3 | 2.88 ± 0.66 (0.029) | 3.0 ± 0.9 (0.017) | 2.3 ± 1.0 (0.007) | – |
+
+- At e0 ≤ 0.1 and i0 < 15° it matches C2 (dip at e0 0.05–0.1). Beyond that the
+  excess **grows with both e0 and i0**: wherever capture is inefficient, L5 capture fails first.
+- Reweighted to discs (`s8_reweight.py`, N4/N5 in final-I bins 0–10/10–20/20–30/>30°):
+  every model, independent or cold-circular + hot-eccentric mixtures, gives a ratio
+  that RISES with I (e.g. mix_50: 1.66 / 1.77 / 2.23 / 2.18; observed 2.15 / 1.38 / 0.93 / 1.12).
+  At the C2 rate an e–I correlated disc does not rescue the cold-only pattern.
