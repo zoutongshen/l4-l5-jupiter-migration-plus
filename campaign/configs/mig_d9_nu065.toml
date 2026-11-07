@@ -1,0 +1,32 @@
+# D9: intermediate rate nu_I 0.65 (M_gap 25): J 13.52 -> 5.40, S 21.12 -> 11.50 (starts inside
+# the 2:1, diverges through it while light). Disc a0 12.82-14.06, e0 <= 0.1, i0 <= 40 deg.
+# Question: between C1 (flat or slightly falling with I) and C2 (rising with I), is there a
+# rate where the cold excess is large and the hot one ~1?
+[run]
+run_id = "mig_d9_nu065"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/c4_jupiter_nu065.csv"
+
+[giants.saturn]
+track_csv = "tracks/c4_saturn_nu065.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 20000
+a_min_au = 12.82
+a_max_au = 14.06
+e_max = 0.1
+inc_max_deg = 40.0
+seed = 20261116
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8

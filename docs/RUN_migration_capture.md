@@ -441,3 +441,25 @@ N4/N5 (capture efficiency) by e0 and i0:
   every model, independent or cold-circular + hot-eccentric mixtures, gives a ratio
   that RISES with I (e.g. mix_50: 1.66 / 1.77 / 2.23 / 2.18; observed 2.15 / 1.38 / 0.93 / 1.12).
   At the C2 rate an e–I correlated disc does not rescue the cold-only pattern.
+
+### D8: full (e0, i0) map at the C1 rate (2026-11-07 17:37)
+
+`mig_d8_c1_warm`: C1 tracks and zone (a0 10.95–11.75), e0 ≤ 0.3, i0 ≤ 40°, 20000 pairs.
+3992 Trojans; overall 1.19 ± 0.04. Replay matches to 1.3e-9 au.
+
+| e0 \ i0 | 0–10° | 10–20° | 20–30° | 30–40° |
+|---|---|---|---|---|
+| 0–0.05 | 1.21 ± 0.13 | 1.10 ± 0.13 | 1.37 ± 0.18 | 0.86 ± 0.16 |
+| 0.05–0.1 | 1.28 ± 0.13 | 0.94 ± 0.10 | 1.13 ± 0.15 | 0.69 ± 0.13 |
+| 0.1–0.15 | 1.43 ± 0.16 | 1.32 ± 0.16 | 1.32 ± 0.20 | 0.85 ± 0.22 |
+| 0.15–0.2 | 1.15 ± 0.15 | 1.55 ± 0.27 | 1.36 ± 0.27 | 0.78 ± 0.21 |
+| 0.2–0.3 | 1.32 ± 0.18 | 1.46 ± 0.24 | 1.14 ± 0.26 | – |
+
+- At this rate the excess is ≈ 1.2–1.3 nearly everywhere and **falls to ≈ 0.8 at
+  i0 30–40°** at every e0 (D5 also: 0.97 at 35–40°). In final I (uniform weights):
+  1.26 / 1.25 / 1.17 / 1.00 ± 0.07: the right SIGN of I-dependence, a third of the
+  observed amplitude (2.15 / 1.38 / 0.93 / 1.12).
+- Disc reweighting barely changes it (all models 1.2–1.25 below 20°, 1.0–1.2 above):
+  the excess is too weakly sorted in e0 here for an e–I correlation to matter.
+- With D7: the I-slope flips sign between ν_I 0.45 (slightly falling) and 0.9 (rising).
+  D9 (ν_I 0.65) probes the crossover.
