@@ -384,3 +384,38 @@ Replay matches to 1.3e-9 au over 10.7 Myr. 58.5 CPU-h.
 - The migration excess is frozen once the gas phase ends; with the free wide
   configuration, 10 Myr of erosion is symmetric and small (as the no-migration control
   and the 10 Myr pilot).
+
+### D5, D6: inclinations to 40° at the C1 and C0b rates (2026-11-07 12:32)
+
+D1's set-up (e0 ≤ 0.05, i0 0–40° uniform, 15000 pairs) on the C1 tracks
+(`mig_d5_c1_hot`, a0 10.95–11.75) and the C0b tracks (`mig_d6_c0b_hot`, a0 8.2–9.0).
+4741 and 3782 Trojans. Replays match to 1.3e-9 au.
+
+**N4/N5 by i0, three rates:**
+
+| i0 (°) | 0–5 | 5–10 | 10–15 | 15–20 | 20–25 | 25–30 | 30–35 | 35–40 | all |
+|---|---|---|---|---|---|---|---|---|---|
+| D6 (ν_I 0.225) | 1.23 | 1.00 | 1.14 | 1.23 | 1.20 | 1.18 | 1.12 | 0.88 | 1.13 ± 0.04 |
+| D5 (ν_I 0.45) | 1.15 | 1.32 | 1.23 | 1.43 | 1.32 | 1.23 | 1.20 | 0.97 | 1.25 ± 0.04 |
+| D1 (ν_I 0.9) | 1.28 | 1.52 | 1.36 | 1.75 | 1.82 | 2.13 | 1.99 | 2.16 | 1.61 ± 0.06 |
+
+(per-bin errors ≈ 0.08–0.12 for D5/D6, 0.12–0.40 for D1)
+
+| e0 / i0 | D6 0–15 | D6 15–40 | D5 0–15 | D5 15–40 | D1 0–15 | D1 15–40 |
+|---|---|---|---|---|---|---|
+| < 0.025 | 1.16 ± 0.09 | 1.24 ± 0.08 | 1.40 ± 0.09 | 1.45 ± 0.08 | 1.75 ± 0.13 | 2.12 ± 0.17 |
+| 0.025–0.05 | 1.07 ± 0.07 | 1.07 ± 0.06 | 1.11 ± 0.06 | 1.11 ± 0.06 | 1.17 ± 0.08 | 1.72 ± 0.13 |
+
+(D5's 0.025–0.05 halves have identical counts, 654/590 each; checked: a coincidence,
+thresholds of 14° and 16° give 612/540 | 696/640 and 684/614 | 624/566.)
+
+- **At ν_I ≤ 0.45 the excess is flat in i0 out to 35°** (perhaps falling to ≈ 0.9–1.0 at
+  35–40°). It rises with i0 only at the fastest rate (D1), where high-i L5 capture fails.
+  In final I, D6 gives 1.14 / 1.15 / 1.07 and D5 1.24 / 1.32 / 1.17 for I < 15 / 15–30 / > 30°.
+- Capture efficiency falls with i0 at every rate (D6: 0.14 → 0.08; D5: 0.19 → 0.07).
+- **Summary of Block D for the cold-L4 question:** gas-era migration on physical tracks
+  makes an excess sorted by e0 (circular starts) and set by the rate near 20 M⊕; it
+  is either flat in I (ν_I ≤ 0.45) or larger at high I (ν_I 0.9), and it is frozen for at
+  least 10 Myr afterwards (D4). It never makes the observed cold-only excess (≈ 2 below
+  I_p 15°, ≈ 1 above). That needs another ingredient: a later symmetric hot component, an
+  e–I correlated planetesimal disc, or an I-dependent loss after the gas phase.
