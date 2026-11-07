@@ -367,3 +367,20 @@ disc a0 12.31–13.51, e0 ≤ 0.1, i0 ≤ 15°. 3283 Trojans. Replay matches to 
   (D2 peaks at 1.64) that relaxes if Jupiter slows before ≈ 20 M⊕.
 - By i0 (0–5 / 5–10 / 10–15): 1.17 / 1.35 / 1.06; no trend within 15°.
 - Caveat: five runs, ±0.1 errors; "ν at ≈ 20 M⊕" is an ordering, not a fit.
+
+### D4: C2 continued to 10 Myr after the gas phase (2026-11-07 07:49)
+
+`mig_d4_c2_long`: C2 exactly (same seed and particles), classified in the last 1 Myr of
+10 Myr after the forcing ends; giants free (J 5.40, S 11.50, U 19.9, N 31.2).
+Replay matches to 1.3e-9 au over 10.7 Myr. 58.5 CPU-h.
+
+| | all | e0 < 0.025 | 0.025–0.05 | 0.05–0.075 | 0.075–0.1 | i0 0–5 / 5–10 / 10–15 |
+|---|---|---|---|---|---|---|
+| C2 (1.2 Myr) | 1.37 ± 0.05 | 1.81 ± 0.14 | 1.43 ± 0.10 | 1.18 ± 0.09 | 1.18 ± 0.09 | 1.40 / 1.29 / 1.44 |
+| **D4 (10 Myr)** | **1.38 ± 0.05** | **1.82 ± 0.15** | 1.42 ± 0.10 | 1.20 ± 0.09 | 1.19 ± 0.09 | 1.41 / 1.30 / 1.45 |
+
+- Particle by particle: of C2's 1716 L4 and 1251 L5 Trojans, exactly 42 of each are
+  lost by 10 Myr (survival 97.6% vs 96.6%); no particle changes swarm, none is gained.
+- The migration excess is frozen once the gas phase ends; with the free wide
+  configuration, 10 Myr of erosion is symmetric and small (as the no-migration control
+  and the 10 Myr pilot).
