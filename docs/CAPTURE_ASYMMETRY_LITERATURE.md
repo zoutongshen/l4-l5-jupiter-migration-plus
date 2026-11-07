@@ -221,13 +221,28 @@ proposed capture models" (gas-era ones).
 
 ### 1.9 Things that were asked for but are not mechanisms of ΔI
 
-- **Hou, Scheeres & Liu (2014, CeMDA 119, 119; 2016, CeMDA 125, 451).** Both are
-  **Unverified** (closed access). Di Sisto et al. (2014, §1, p. 3) report that Hou+2014
-  "showed that a temporary asymmetry m[a]y be obtained with the same initial conditions in
-  both tadpole regions". The 2016 abstract, seen only through a search-engine summary, says it
-  "studies the symmetry problem between the Jupiter L4 and L5 Lagrangian points when the two
-  planets are in migration". **This is the one paper that could pre-empt §2. Get it from
-  Leiden first.**
+- **Hou, Scheeres & Liu 2016 (CeMDA 125, 451). READ 2026-11-07** (`literature/02_mechanisms/Hou+2016_…pdf`).
+  - **Set-up.** Restricted four-body problem (Sun, J, S, Trojan), **planar only**: "only the planar
+    problem … is studied. This restriction does not allow us to study some important
+    properties of the vertical motions" (§7, p. 480). No growth, no gas, no capture from a
+    disc, so there is **no inclination or ΔI content at all**.
+  - **Mechanisms** (all act on pre-existing Trojans, i.e. survival/escape, not gas-era capture):
+    1. a large short-time-scale spatial asymmetry while J and S are in or near the 2:1;
+    2. the fast change of J's and S's orbits during migration (only for τ ≈ 10⁵ yr);
+    3. chaos amplifying or reducing an initial asymmetry in slow migration.
+    A tangential force on J is "generally too weak" (§1, p. 453).
+  - **Sign:** random. "Current observed asymmetry is only a random result if these mechanisms
+    are the main reasons" (§6.4, p. 480). In their fast-migration runs it is L5 that survives
+    better (Fig. 11).
+  - **Method overlap.** They start from initial grids that are "geometrically symmetric" with
+    respect to the two TLPs (ω = ω_J ± 60°, Eq. 51), or to the two "dynamical substitutes"
+    (Eq. 52), to isolate the forcing's asymmetry. That is close in spirit to our mirror-twin
+    disc. Ours adds the explicit (x, y, z, t) → (x, −y, z, −t) map, 3-D, and pairing
+    particle by particle. Cite it as precedent.
+  - **Hou+2014 (CeMDA 119, 119)**, per Hou+2016 §1: in the present J–S configuration the stable
+    regions are dynamically symmetric over long times. Still not read itself.
+  - **Verdict:** it does NOT pre-empt §2 (time-reversal framing), the gas-era capture results,
+    or anything about inclination. The one overlap is the symmetric-initial-condition method.
 - **Robutel & Bodossian (2009)** (the file named RobutelGabern2009). They map L4 only and use
   symmetries *within* a swarm (p. 9–10). There is no L4/L5 comparison, so the paper says
   nothing on ΔI.
@@ -302,8 +317,8 @@ non-conservative or time-dependent drift is established (S&D 2003; Pirani 2019a;
 So is the fact that conservative, time-reversible dynamics gives symmetric temporary captures
 (Horner & Evans 2006). The *explicit* time-reversal formulation, the capture/escape pairing,
 the steady-state corollary (H0/P2) and the Pirani–Li mirror reconciliation are, as far as I
-can find, **unstated**. Two caveats: Hou, Scheeres & Liu (2016) is unread and is the main
-risk, and ADS full-text search was unavailable. **Strongest prior statement:** Sicardy &
+can find, **unstated**. One caveat (Hou, Scheeres & Liu 2016 is now read: planar, survival-side, random sign,
+no time-reversal statement; §1.9): ADS full-text search was unavailable. **Strongest prior statement:** Sicardy &
 Dubois (2003, §6, p. 335): "an inward migration of Jupiter during the formation of the
 Trojans increases the size of the L4 region with respect to the L5 region, and could in
 principle explain this asymmetry."
@@ -412,7 +427,7 @@ Local paths are relative to `literature/`. "New" means downloaded today (arXiv).
 - Hellmich, Mottola, Hahn, Kührt & de Niem 2019, A&A 630, A148; arXiv:1909.08584. New: `02_mechanisms/Hellmich+2019_Yarkovsky_force_on_Jupiter_Trojans.pdf`
 - Holt, Nesvorný, Horner et al. 2020, MNRAS (doi:10.1093/mnras/staa1348); arXiv:2005.03635. New: `02_mechanisms/Holt+2020_Stability_of_Jovian_Trojans_and_families.pdf`
 - Horner & Evans 2006, MNRAS 367, L20; arXiv:astro-ph/0511791. New: `02_mechanisms/HornerEvans2006_Capture_of_Centaurs_as_Trojans.pdf`
-- Hou, Scheeres & Liu 2014, CeMDA 119, 119 (doi:10.1007/s10569-014-9544-9); 2016, CeMDA 125, 451 (doi:10.1007/s10569-016-9692-1). **Unread, closed access.**
+- Hou, Scheeres & Liu 2014, CeMDA 119, 119 (doi:10.1007/s10569-014-9544-9); 2016, CeMDA 125, 451 (doi:10.1007/s10569-016-9692-1). 2016 read: `02_mechanisms/Hou+2016_Jupiter_Trojans_with_Saturns_perturbation_when_planets_migrate.pdf`; 2014 unread.
 - Leleu, Coleman & Ataiee 2019, A&A 631, A6; arXiv:1901.07640. `03_coorbital_theory/Leleu+2019_…pdf`
 - Lhotka & Celletti 2015, Icarus (doi:10.1016/j.icarus.2014.11.039); arXiv:1412.1630. New: `03_coorbital_theory/LhotkaCelletti2015_PR_drag_on_triangular_Lagrange_points.pdf`
 - Li, Xia, Georgakarakos & Yoshida 2023a, A&A 669, A68; arXiv:2211.13877. `02_mechanisms/Li+2023a_…pdf`
