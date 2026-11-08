@@ -11,7 +11,7 @@
 but it is sorted by the starting **eccentricity**, not by inclination. At no rate, gap mass
 or disc distribution does it reproduce the cold-only pattern above.
 
-Full log with every table: `docs/RUN_migration_capture.md` §6. Commits fae78ae … 2a6af04.
+Full log with every table: `docs/RUN_migration_capture.md` §6. Commits fae78ae … (D10/D11 latest).
 
 ---
 
@@ -62,6 +62,9 @@ The saturation level of about 1.8 matches Pirani's 1.6–1.8.
 - Ordered by ν at 20 M⊕, all five cold-zone runs line up monotonically. Neither ν_I nor ν at 10 or 30 M⊕ does that.
 
 **3. The excess is frozen once the gas phase ends.** C2 run on to 10 Myr with free giants (D4): 1.38 ± 0.05. Exactly 42 L4 and 42 L5 Trojans were lost, and none switched swarm.
+The warm maps behave the same way (D10, D11 = D7, D8 to 10 Myr): 2–4% lost, the same in both swarms
+and in every I bin, with no swaps. N4/N5 by final I is unchanged to within 0.04
+(D10: 1.50 / 1.64 / 2.20 / 2.32; D11: 1.26 / 1.24 / 1.16 / 1.01).
 
 **4. The inclination dependence is wrong at every rate.** Near-circular or full-warm starts, i0 0–40°, N4/N5 by i0:
 
@@ -101,7 +104,7 @@ Every model either stays at about 1.2 at all I or rises with I. Example in final
 - **Assumed tracks.** The ice-giant tracks are assumed; Pirani's rate runs carry only J + S.
 - **End configuration.** The wide configuration was chosen so that Trojans survive, not because it is the most realistic.
 - **Disc.** Starting elements are on a uniform grid, so other distributions are applied by reweighting afterwards.
-- **Time covered.** Only 1.2 Myr after the gas phase, 10 Myr in D4 (D10/D11 add 10 Myr for the warm maps, running now).
+- **Time covered.** 1.2 Myr after the gas phase, 10 Myr in D4, D10 and D11. No 4.5 Gyr erosion.
 - **No instability.** No instability step (Block E, deferred).
 
 ## Run list
@@ -123,5 +126,7 @@ Every model either stays at about 1.2 at all I or rises with I. Example in final
 | D7 | mig_d7_c2_warm | ν_I 0.9, e0 to 0.3, i0 to 40° | 2174 | 1.81 ± 0.08 |
 | D8 | mig_d8_c1_warm | ν_I 0.45, e0 to 0.3, i0 to 40° | 3992 | 1.19 ± 0.04 |
 | D9 | mig_d9_nu065 | ν_I 0.65, e0 to 0.1, i0 to 40° | 4530 | 1.29 ± 0.04 |
+| D10 | mig_d10_d7_long | D7 to 10 Myr | 2099 | 1.81 ± 0.08 |
+| D11 | mig_d11_d8_long | D8 to 10 Myr | 3925 | 1.18 ± 0.04 |
 
 GIFs (Trojans with Saturn, Uranus and Neptune drawn in): `campaign/reports/<run>/capture.gif`.

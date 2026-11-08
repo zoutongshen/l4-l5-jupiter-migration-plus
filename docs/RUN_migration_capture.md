@@ -492,3 +492,29 @@ Across 12 runs on physical tracks (ν_I 0.225–0.9, M_gap 12.5–50, e0 ≤ 0.3
    the observed I-sorting needs a later, I-dependent process (e.g. instability-era
    capture or loss) or physics this model lacks (resonant J–S coupling, gas drag on
    planetesimals, eccentric giants).
+
+### D10, D11: D7 and D8 continued to 10 Myr after the gas phase (2026-11-08 14:30)
+
+`mig_d10_d7_long`, `mig_d11_d8_long`: the same seeds and initial conditions as D7 and D8
+(checked particle by particle), with t_classify 1e7 yr (giants free after 0.69 Myr). Giant
+replay matches Jupiter to 1.3e-9 au. The Trojans are compared by particle id with the 1.2 Myr
+classification:
+
+| run | L4 lost | L5 lost | swaps | new | overall |
+|---|---|---|---|---|---|
+| D10 (ν_I 0.9) | 50 / 1401 (3.6%) | 25 / 773 (3.2%) | 0 | 0 | 1.81 → 1.81 ± 0.08 |
+| D11 (ν_I 0.45) | 40 / 2166 (1.8%) | 28 / 1826 (1.5%) | 0 | 1 (L5) | 1.19 → 1.18 ± 0.04 |
+
+N4/N5 by final I, 1.2 Myr → 10 Myr:
+
+| run | 0–10° | 10–20° | 20–30° | > 30° |
+|---|---|---|---|---|
+| D10 | 1.52 → 1.50 | 1.66 → 1.64 | 2.20 → 2.20 | 2.28 → 2.32 |
+| D11 | 1.26 → 1.26 | 1.25 → 1.24 | 1.17 → 1.16 | 1.00 → 1.01 |
+
+(errors ±0.07–0.25, as in D7/D8)
+
+- The erosion is a few percent, the same in both swarms, and has no inclination trend
+  (per-bin loss fractions 0.8–5.8%, L4 ≈ L5 in every bin). The warm maps are frozen just as
+  the cold one was (D4). Over 10 Myr of free evolution in the wide end configuration,
+  nothing turns the D7/D8 pattern into the observed cold-only excess.
