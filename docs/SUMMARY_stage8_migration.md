@@ -61,8 +61,9 @@ The saturation level of about 1.8 matches Pirani's 1.6–1.8.
 - Doubling it at ν_I 0.225 raises it to 1.19 (D3 vs C0b's 1.08).
 - The co-orbital L4/L5-side imbalance builds from about 3 M⊕, peaks, then partly relaxes. The peak
   sits at m ≈ 0.6–0.7 M_gap, where ν has fallen to 0.6–0.8 ν_I: 9 M⊕ (D2), 16–23 M⊕ (M_gap 25), 33 M⊕ (D3).
-- E1 moves the pebble isolation mass from 20 to 10 M⊕ and leaves the peak at 16 M⊕. So the brake
-  sets the peak, not the growth law. The "≈ 20 M⊕" seen earlier is just 0.7 × M_gap for M_gap = 25.
+- E1 and E1b move the pebble isolation mass from 20 to 10 and to 30 M⊕. The peak stays at 16–17 M⊕
+  (ν ≈ 0.70 ν_I) although it moves in time from 158 to 230 kyr. So the brake sets the peak, not the
+  growth law or the clock. The "≈ 20 M⊕" seen earlier is just 0.7 × M_gap for M_gap = 25.
 - The peak mass is independent of e0. The fraction of the peak that survives falls with e0
   (C2: 60% at e0 < 0.025, 25% at 0.05–0.1), which is where the e0-sorting comes from.
 
@@ -134,5 +135,6 @@ Every model either stays at about 1.2 at all I or rises with I. Example in final
 | D10 | mig_d10_d7_long | D7 to 10 Myr | 2099 | 1.81 ± 0.08 |
 | D11 | mig_d11_d8_long | D8 to 10 Myr | 3925 | 1.18 ± 0.04 |
 | E1 | mig_e1_miso10 | C2 with M_iso 10 | 2616 | 1.43 ± 0.06 |
+| E1b | mig_e1_miso30 | C2 with M_iso 30 | 3143 | 1.43 ± 0.05 |
 
 GIFs (Trojans with Saturn, Uranus and Neptune drawn in): `campaign/reports/<run>/capture.gif`.

@@ -542,3 +542,24 @@ Peak mass by e0 (0–0.025 / 0.025–0.05 / 0.05–0.1): C2 15 / 16 / 15, E1 17 
   falls with e0 (C2: 60% at e0 < 0.025, 25% at 0.05–0.1). The e0-sorting is set in the
   relaxation after the peak.
 - "20 M⊕" in the Block D summary is therefore ≈ 0.7 × M_gap for M_gap = 25, not an intrinsic mass.
+
+### E1b: M_iso 30 vs C2 (2026-11-09 21:53)
+
+`mig_e1_miso30`: C2 with M_iso 30 M⊕. ν(m) identical; Jupiter now grows faster early (20 M⊕ at
+172 kyr, 30 M⊕ at 200 kyr). J 15.39 → 5.40 au; a 14.59–16.00, 10000 pairs, seed 20261121.
+Replay matches to 1.2e-9 au.
+
+| run | M_iso | build-up peak (mass, time, ν) | peak → final side ratio | N4/N5 | e0 < 0.025 |
+|---|---|---|---|---|---|
+| E1 | 10 | 16.0 M⊕, 230 kyr, 0.71 | 1.86 → 1.43 | 1.43 ± 0.06 | 1.86 ± 0.16 |
+| C2 | 20 | 16.9 M⊕, 188 kyr, 0.69 | 1.85 → 1.37 | 1.37 ± 0.05 | 1.81 ± 0.14 |
+| E1b | 30 | 15.8 M⊕, 158 kyr, 0.72 | 1.88 → 1.43 | 1.43 ± 0.05 | 2.19 ± 0.18 |
+
+Final N4/N5 by e0 (0–0.025 / 0.025–0.05 / 0.05–0.1): C2 1.81 / 1.43 / 1.18; E1 1.86 / 1.33 / 1.34;
+E1b 2.19 / 1.24 / 1.28. Peak mass by e0: E1b 18 / 16 / 16.
+
+- Isolation mass 10, 20, 30 M⊕: the peak stays at 16–17 M⊕ and ν ≈ 0.70, with the same height
+  (1.85–1.88). Its time moves from 158 to 230 kyr. Growth kink above or below the peak makes no
+  difference; the brake sets it.
+- Overall N4/N5 is identical within 1σ in all three. E1b's cold bin (2.19) is 1.7σ above C2's;
+  not significant.
