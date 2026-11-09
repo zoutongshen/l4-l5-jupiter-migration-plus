@@ -518,3 +518,27 @@ N4/N5 by final I, 1.2 Myr → 10 Myr:
   (per-bin loss fractions 0.8–5.8%, L4 ≈ L5 in every bin). The warm maps are frozen just as
   the cold one was (D4). Over 10 Myr of free evolution in the wide end configuration,
   nothing turns the D7/D8 pattern into the observed cold-only excess.
+
+### E1: what sets the build-up peak? M_iso 10 vs C2 (2026-11-09 17:13)
+
+`mig_e1_miso10`: C2 (ν_I 0.9, M_gap 25) with the pebble isolation mass at 10 M⊕ (C2: 20).
+ν(m) is identical; only m(t) changes (Jupiter reaches 20 M⊕ at 250 kyr instead of 200).
+J 15.71 → 5.40 au; cold zone, 10000 pairs, seed 20261120. Replay matches to 1.4e-9 au.
+
+| run | M_iso | build-up peak (mass, time, ν) | peak → final side ratio | N4/N5 | e0 < 0.025 |
+|---|---|---|---|---|---|
+| C2 | 20 | 16.9 M⊕, 188 kyr, 0.69 | 1.85 → 1.37 | 1.37 ± 0.05 | 1.81 ± 0.14 |
+| E1 | 10 | 16.0 M⊕, 230 kyr, 0.71 | 1.86 → 1.43 | 1.43 ± 0.06 | 1.86 ± 0.16 |
+
+Peak mass by e0 (0–0.025 / 0.025–0.05 / 0.05–0.1): C2 15 / 16 / 15, E1 17 / 16 / 16.
+
+- Moving the growth kink from 20 to 10 M⊕ leaves the peak at the same mass, the same ν and the
+  same height, although it occurs 40 kyr later. The final excess is unchanged within 1σ.
+- So the peak is set by the gap brake (the mass in ν(m)), not by the growth law or the clock.
+  Across all runs the peak sits where ν has fallen to 0.6–0.8 ν_I, i.e. at m ≈ 0.6–0.7 M_gap
+  (D2 9, C0b/C1/C2/E1 16–23, D3 33 M⊕).
+- From existing snapshots (C0b, C1, C2, D2, D3 split by e0): the peak mass does not depend on e0
+  (so not a Hill-eccentricity effect), while the fraction of the peak excess that survives
+  falls with e0 (C2: 60% at e0 < 0.025, 25% at 0.05–0.1). The e0-sorting is set in the
+  relaxation after the peak.
+- "20 M⊕" in the Block D summary is therefore ≈ 0.7 × M_gap for M_gap = 25, not an intrinsic mass.

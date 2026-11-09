@@ -1,0 +1,33 @@
+# E1 (M_iso test): C2 (nu_I 0.9, M_gap 25) with the pebble isolation mass at 10 M_E (C2: 20).
+# nu(m) is identical to C2; only m(t) changes (isolation still at 200 kyr, so the core grows
+# at a different rate and the slow/gas kink moves to 10 M_E). J 15.71 -> 5.40 au; Saturn, Uranus,
+# Neptune as C2. Disc: cold zone, a_start x 0.948-1.040, same e0/i0 as C2.
+# Question: does the build-up peak (C2: 17 M_E) follow M_iso or stay with the brake?
+[run]
+run_id = "mig_e1_miso10"
+t_classify_yr = 1.2e6
+
+[jupiter]
+track_csv = "tracks/e1_jupiter_miso10.csv"
+
+[giants.saturn]
+track_csv = "tracks/c2_saturn_nu09.csv"
+[giants.uranus]
+track_csv = "tracks/c0_uranus.csv"
+[giants.neptune]
+track_csv = "tracks/c0_neptune.csv"
+
+[disc]
+n_pairs = 10000
+a_min_au = 14.89
+a_max_au = 16.34
+e_max = 0.1
+inc_max_deg = 15.0
+seed = 20261120
+
+[snapshots]
+fine_every_yr = 2000.0
+
+[parallel]
+n_chunks = 8
+workers = 8
