@@ -56,10 +56,15 @@ Cold zone (e0 ≤ 0.1, i0 ≤ 15°):
 
 The saturation level of about 1.8 matches Pirani's 1.6–1.8.
 
-**2. What sets it is the rate when Jupiter is about 20 M⊕.**
-- Halving the gap mass at ν_I 0.9 drops the excess to 1.19 (D2).
-- Doubling it at ν_I 0.225 raises it to 1.19 (D3).
-- Ordered by ν at 20 M⊕, all five cold-zone runs line up monotonically. Neither ν_I nor ν at 10 or 30 M⊕ does that.
+**2. What sets it is Jupiter's speed when the gap brake starts to bite.**
+- Halving the gap mass at ν_I 0.9 drops the excess to 1.19 (D2 vs C2's 1.37).
+- Doubling it at ν_I 0.225 raises it to 1.19 (D3 vs C0b's 1.08).
+- The co-orbital L4/L5-side imbalance builds from about 3 M⊕, peaks, then partly relaxes. The peak
+  sits at m ≈ 0.6–0.7 M_gap, where ν has fallen to 0.6–0.8 ν_I: 9 M⊕ (D2), 16–23 M⊕ (M_gap 25), 33 M⊕ (D3).
+- E1 moves the pebble isolation mass from 20 to 10 M⊕ and leaves the peak at 16 M⊕. So the brake
+  sets the peak, not the growth law. The "≈ 20 M⊕" seen earlier is just 0.7 × M_gap for M_gap = 25.
+- The peak mass is independent of e0. The fraction of the peak that survives falls with e0
+  (C2: 60% at e0 < 0.025, 25% at 0.05–0.1), which is where the e0-sorting comes from.
 
 **3. The excess is frozen once the gas phase ends.** C2 run on to 10 Myr with free giants (D4): 1.38 ± 0.05. Exactly 42 L4 and 42 L5 Trojans were lost, and none switched swarm.
 The warm maps behave the same way (D10, D11 = D7, D8 to 10 Myr): 2–4% lost, the same in both swarms
@@ -128,5 +133,6 @@ Every model either stays at about 1.2 at all I or rises with I. Example in final
 | D9 | mig_d9_nu065 | ν_I 0.65, e0 to 0.1, i0 to 40° | 4530 | 1.29 ± 0.04 |
 | D10 | mig_d10_d7_long | D7 to 10 Myr | 2099 | 1.81 ± 0.08 |
 | D11 | mig_d11_d8_long | D8 to 10 Myr | 3925 | 1.18 ± 0.04 |
+| E1 | mig_e1_miso10 | C2 with M_iso 10 | 2616 | 1.43 ± 0.06 |
 
 GIFs (Trojans with Saturn, Uranus and Neptune drawn in): `campaign/reports/<run>/capture.gif`.
