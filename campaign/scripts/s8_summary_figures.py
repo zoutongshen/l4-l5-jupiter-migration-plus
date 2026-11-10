@@ -2,9 +2,11 @@
 
 Reads campaign/reports/<run>/ (particles.parquet, coorbital.csv, reweighted.csv), the
 Jupiter track headers in configs/tracks/, and the observed catalogue (complete sample,
-H <= 13.6, V24 families removed, proper I). Writes PNGs and one combined PDF:
+H <= 13.6, V24 families removed, proper I; cached to <out>/observed_proper_I.csv so later
+runs work without the SSD). Writes PNGs and one combined PDF (assembled from all PNGs in <out>):
 
     python campaign/scripts/s8_summary_figures.py --out updates/11102026
+    python campaign/scripts/s8_summary_figures.py --only 03 09     # just some figures
 """
 
 import argparse
@@ -17,7 +19,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from matplotlib.backends.backend_pdf import PdfPages  # noqa: E402
 from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 
 from trojans import paths  # noqa: E402
@@ -88,11 +89,16 @@ def binned_ratio(t, col="inc", edges=I_EDGES):
     return (*ratio(n4, n5), n4, n5)
 
 
-def observed():
+def observed(out):
+    cache = out / "observed_proper_I.csv"
+    if not CATALOGUE.exists() and cache.exists():
+        return pd.read_csv(cache)
     m = pd.read_parquet(CATALOGUE, columns=["swarm", "v24_selected", "complete", "v24_family", "label_region",
                                             "v24_sini_p"])
     s = m[m.v24_selected & m.complete & m.v24_family.isna() & (m.label_region != "V24") & m.v24_sini_p.notna()]
-    return pd.DataFrame({"swarm": s.swarm, "inc": np.degrees(np.arcsin(s.v24_sini_p.clip(-1, 1)))})
+    obs = pd.DataFrame({"swarm": s.swarm, "inc": np.degrees(np.arcsin(s.v24_sini_p.clip(-1, 1)))})
+    obs.to_csv(cache, index=False)
+    return obs
 
 
 def label(run_id, p):
@@ -288,7 +294,9 @@ def fig_buildup():
         lab = f"{RUNS[r][0]}: ν_I {p['nu_I']:g}, M_gap {p['m_gap_earth']:g}"
         ax1.plot(c.jupiter_m_earth, c["pos/neg"], color=NU_COLOR[p["nu_I"]], ls=ls, label=lab)
         ax2.plot(c.t_yr / 1e3, c["pos/neg"], color=NU_COLOR[p["nu_I"]], ls=ls)
-    ax1.axvline(20, color=MUTED, lw=1)
+    for mg, ls in [(12.5, ":"), (25.0, "-"), (50.0, "--")]:
+        ax1.axvline(0.65 * mg, color=MUTED, lw=1, ls=ls)
+    ax1.text(0.65 * 50 * 1.08, 1.75, "dotted / solid / dashed:\n0.65 × M_gap = 8 / 16 / 33 M⊕", fontsize=8.5, color=TEXT_2)
     ax1.axhline(1, color=MUTED, lw=1)
     ax1.set(xscale="log", xlabel="Jupiter mass [M⊕]", ylabel="co-orbital L4-side / L5-side",
             title="(a) When the asymmetry builds, by Jupiter's mass")
@@ -297,6 +305,47 @@ def fig_buildup():
     ax2.axvline(690, color=MUTED, lw=1)
     ax2.text(700, ax2.get_ylim()[1] * 0.98, "gas gone,\ngiants free", fontsize=8.5, color=TEXT_2, va="top")
     ax2.set(xlabel="t [kyr]", title="(b) Same, by time: frozen after the gas phase")
+    return fig
+
+
+E_RUNS = [("mig_e1_miso10", "E1", "#86b6ef"), ("mig_c2_nu09_cold", "C2", "#3987e5"),
+          ("mig_e1_miso30", "E1b", "#0d366b")]
+
+
+def smooth(c):
+    return c["pos/neg"].rolling(9, center=True).mean()
+
+
+def fig_miso():
+    """C2 with pebble isolation mass 10 / 20 / 30 M_E: same nu(m), different m(t)."""
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 4.4), constrained_layout=True)
+    for r, name, col in E_RUNS:
+        p, tr = track_params(r)
+        c = pd.read_csv(paths.report_dir(r) / "coorbital.csv")
+        c = c[c.jupiter_m_earth > 0.05].reset_index(drop=True)
+        sm = smooth(c)
+        i = sm[c.jupiter_m_earth > 0.5].idxmax()
+        rr, ee = ratio((trojans(r).swarm == "L4").sum(), (trojans(r).swarm == "L5").sum())
+        lab = f"{name}: M_iso {p['m_iso_earth']:g} M⊕ → peak {c.jupiter_m_earth[i]:.1f} M⊕; N4/N5 {rr:.2f} ± {ee:.2f}"
+        ax1.plot(tr.t / 1e3, tr.m, color=col, label=lab)
+        ax1.plot(c.t_yr[i] / 1e3, c.jupiter_m_earth[i], "o", ms=8, color=col, mec=SURFACE, mew=1.5)
+        for ax, x in [(ax2, c.jupiter_m_earth), (ax3, c.t_yr / 1e3)]:
+            ax.plot(x, c["pos/neg"], color=col, lw=0.8, alpha=0.3)
+            ax.plot(x, sm, color=col)
+            ax.plot(x[i], sm[i], "o", ms=8, color=col, mec=SURFACE, mew=1.5)
+        ax1.axhline(p["m_iso_earth"], color=col, lw=1, ls=":")
+    ax1.set(yscale="log", xlim=(0, 450), ylim=(0.5, 400), xlabel="t [kyr]", ylabel="m_J [M⊕]",
+            title="(a) Jupiter's mass; dotted = isolation mass, dot = peak")
+    ax1.legend(fontsize=8.5, loc="lower right")
+    ax2.axvline(0.65 * 25, color=MUTED, lw=1)
+    ax2.text(0.65 * 25 * 1.06, 1.0, "0.65 × M_gap", fontsize=8.5, color=TEXT_2, va="bottom")
+    ax2.axhline(1, color=MUTED, lw=1)
+    ax2.set(xscale="log", xlim=(0.5, 320), xlabel="Jupiter mass [M⊕]", ylabel="co-orbital L4-side / L5-side",
+            title="(b) By mass: the peak does not move")
+    ax3.axhline(1, color=MUTED, lw=1)
+    ax3.set(xlim=(0, 450), xlabel="t [kyr]", title="(c) By time: the peak moves 158 → 230 kyr")
+    fig.suptitle("Isolation-mass test (ν_I 0.9, M_gap 25, cold zone): the gap brake, not growth, sets the peak",
+                 x=0.01, ha="left", fontsize=12.5)
     return fig
 
 
@@ -324,21 +373,31 @@ def fig_frozen():
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, default=ROOT / "updates" / "11102026")
-    out = ap.parse_args().out
+    ap.add_argument("--only", nargs="*", help="figure numbers to (re)make, e.g. 03 09; default all")
+    a = ap.parse_args()
+    out = a.out
     out.mkdir(parents=True, exist_ok=True)
-    obs = observed()
-    figs = [("01_tracks_nu_mgap", fig_tracks())]
-    f, table = fig_ratio_vs_nu()
-    table.to_csv(out / "02_ratio_vs_nu.csv", index=False)
-    figs += [("02_ratio_vs_nu", f), ("03_buildup_vs_mass", fig_buildup()), ("04_counts_by_I", fig_counts(obs)),
-             ("05_cdf_by_I", fig_cdf(obs)), ("06_ratio_by_I", fig_ratio_by_I()), ("07_e0_i0_maps", fig_maps()),
-             ("08_frozen_10myr", fig_frozen())]
-    with PdfPages(out / "stage8_figures.pdf") as pdf:
-        for name, fig in figs:
-            fig.savefig(out / f"{name}.png", dpi=160)
-            pdf.savefig(fig)
-            plt.close(fig)
-            print("wrote", out / f"{name}.png")
+
+    def ratio_vs_nu():
+        f, table = fig_ratio_vs_nu()
+        table.to_csv(out / "02_ratio_vs_nu.csv", index=False)
+        return f
+
+    makers = {"01_tracks_nu_mgap": fig_tracks, "02_ratio_vs_nu": ratio_vs_nu,
+              "03_buildup_vs_mass": fig_buildup, "04_counts_by_I": lambda: fig_counts(observed(out)),
+              "05_cdf_by_I": lambda: fig_cdf(observed(out)), "06_ratio_by_I": fig_ratio_by_I,
+              "07_e0_i0_maps": fig_maps, "08_frozen_10myr": fig_frozen, "09_isolation_mass": fig_miso}
+    for name, make in makers.items():
+        if a.only and name[:2] not in a.only:
+            continue
+        fig = make()
+        fig.savefig(out / f"{name}.png", dpi=160)
+        plt.close(fig)
+        print("wrote", out / f"{name}.png")
+    from PIL import Image
+    pages = [Image.open(out / f"{n}.png").convert("RGB") for n in makers if (out / f"{n}.png").exists()]
+    pages[0].save(out / "stage8_figures.pdf", save_all=True, append_images=pages[1:], resolution=160)
+    print("wrote", out / "stage8_figures.pdf", f"({len(pages)} pages)")
 
 
 if __name__ == "__main__":
