@@ -1,0 +1,25 @@
+{
+  "runs": {
+    "pir_test3_tenth": {
+      "n_particles": 4400,
+      "t_end_myr": 4.999972624029344,
+      "N4": 19,
+      "N5": 5,
+      "N_tot": 24,
+      "N4/N5": 3.8,
+      "err": 1.9099738218101314,
+      "hildas": 73,
+      "alive": 2822,
+      "jupiter_a_end": 5.062436622220353,
+      "N_tot_pre_migration_mean": 15.367088607594937,
+      "N_tot_peak": 40,
+      "t_peak_myr": 2.71022258826015,
+      "trojan_origin_median_au": 18.228277830443496
+    }
+  },
+  "n_runs": 1,
+  "N_tot_mean": 24.0,
+  "N_tot_std": null,
+  "N4/N5_mean": 3.8,
+  "N4/N5_std": null
+}

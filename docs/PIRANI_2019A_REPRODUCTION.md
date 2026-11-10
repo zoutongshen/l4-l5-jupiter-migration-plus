@@ -193,11 +193,31 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 ## 4. Status and next steps
 1. ✓ Physics modules and tests (c0444de). ✓ Tracks and verification (a86d7a3 and the commit with this document).
-2. ☐ Runner and report: `s9_run_pirani.py` and `s9_pirani_report.py`, with per-scenario configs and repeats 0–9. The report gives her quantities: Trojans by q, Q within 2.5 R_H at 5 Myr; N(t) and N4/N5(t) (Figs. 7, 11); Hildas (Tables 4, 5); belt implantation; e and i histograms (Fig. 9); Trojan origin (Fig. 10). Statistics as hers: mean and unbiased std of the 10.
-3. ☐ Haagsebeek: clone, `trojan-rb` env, data on `/data2/zshen`.
-4. ☐ P0 benchmark, then the **P1 pilot**: one nominal run to 5 Myr, compared with Figs. 7, 10, 11 and Table 2. Expected: ~60 Trojans before migration, a peak of ~400, ~270 at 5 Myr, N4/N5 ≈ 1.8; horseshoe sides 50/50 → 270/150; J–S end in the 1:2.
-5. ☐ P2 (nominal and in situ, ×10), P3 (rate scan and outward), P4 (nominal to 200 Myr), P5 (§5 instability).
-   - Estimated cost: 11,000–22,000 CPU-h for P2 + P3, i.e. 3–6 weeks on haagsebeek's ~24 cores.
+2. ✓ Runner and report: `s9_run_pirani.py` and `s9_pirani_report.py`, with per-scenario configs and repeats 0–9 (bac466a). The report gives: Trojans by q, Q within 2.5 R_H; N(t) and N4/N5(t) (Fig. 7); co-orbital sides (Fig. 11); Trojan origin (Fig. 10); and a Hilda *region* count (G6). Statistics as hers: mean and unbiased std of the repeats. Still to add: belt implantation, e/i histograms (Fig. 9), and a Hilda libration test.
+3. ✓ Haagsebeek: bare repo plus clone, `trojan-rb` env and data, all on `/data2/zshen`.
+4. ✓ Test 1 (planets only, 0–5 Myr): J–S lock into the 1:2. ✓ P0 benchmark (C force kernel).
+   ✓ **Test 3, 2026-11-10** (`reports/pir_test3_tenth/`): the nominal scenario with 1/10 of her disc (100 per ring, 4,400 particles), 0–5 Myr, 24 workers, 1.4 h wall. Her full-disc numbers ×1/10 against ours:
+
+   | quantity | hers ×1/10 | test 3 |
+   |---|---|---|
+   | Trojans before migration (1.5–2.29 Myr) | ~6 | 15 |
+   | peak (2.3–3 Myr) | ~40 | 40 (at 2.71 Myr) |
+   | Trojans at 5 Myr | ~27 | 24 |
+   | N4/N5 at 5 Myr | 1.8 | 3.8 ± 1.9 (19/5; Poisson-limited) |
+   | co-orbital sides at 3.4 Myr, L4/L5 (Fig. 11) | 27/15 | 26/14 |
+   | Trojan origin (Fig. 10) | peak at ~18 au | all 24 from 18.08–18.40 au (the seed's ring) |
+   | Hildas at 5 Myr (Table 4) | ~170 | 73 (region count, G6) |
+   | Jupiter at 5 Myr | ~5.0 au | 5.06 au, 316.7 M⊕ |
+   | particles alive at 5 Myr | – | 2,822 of 4,400 |
+
+   - The peak, the end count and the Fig. 11 split all match.
+   - Our pre-migration count is 2.5× hers. Before 2.31 Myr the seed is 0.01 M⊕ (2.5 R_H ≈ 0.1 au), so this count is pure geometry: particles whose q and Q happen to fall in the window. It depends on her ring set-up and seed mass, so it is worth asking her.
+   - Our Hilda count is a region count, not a libration test. Definition still open (G6).
+   - **Cost:** 34.7 CPU-h, i.e. 5.68 CPU-s per particle-Myr over the whole run. That is 4× the quiet-phase benchmark, because encounters during migration cost more.
+5. ☐ **P1 pilot**: one full nominal run (44,000 particles) to 5 Myr. About 350 CPU-h, ~14 h wall on 24 workers.
+6. ☐ P2 (nominal and in situ, ×10), P3 (rate scan and outward), P4 (nominal to 200 Myr), P5 (§5 instability).
+   - Measured cost: ~350 CPU-h per full run. P2 + P3 (101 runs) is therefore ~35,000 CPU-h, about 2 months on haagsebeek alone. In situ and rate runs carry only J and S, so they may come in cheaper; P2 will tell.
+   - To bring this down: fewer particles per ring for the rate scan, or more machines.
 
 **Ask Pirani** (email still to send): her track files (G1, G2), the disc extent at ×1.25–2 (G3), the outward run's planets (G7), the interloper e-cut and Hilda definition (G6), and whether her gas onset was capped (§3.6).
 
