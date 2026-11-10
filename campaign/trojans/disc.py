@@ -85,6 +85,43 @@ def disc_states(disc: Disc):
     return out_pos, out_vel
 
 
+@dataclass(frozen=True)
+class RingDisc:
+    """Pirani+2019a sect. 3: rings of width ``ring_au`` with ``n_per_ring`` particles each.
+
+    Equal numbers per ring give Sigma ~ r^-1. a is uniform within each ring, e uniform in
+    [0, e_max], I uniform in [0, inc_max_deg]; Omega, omega, M uniform. No mirror twins.
+    ``seed`` is one of her ten re-randomised realisations.
+    """
+    a_min: float = 4.0
+    a_max: float = 26.0
+    ring_au: float = 0.5
+    n_per_ring: int = 1000
+    e_max: float = 0.01
+    inc_max_deg: float = 0.01
+    seed: int = 0
+
+    @property
+    def n_rings(self) -> int:
+        return int(round((self.a_max - self.a_min) / self.ring_au))
+
+    @property
+    def n(self) -> int:
+        return self.n_rings * self.n_per_ring
+
+
+def ring_disc_states(disc: RingDisc):
+    """Heliocentric positions, velocities (n, 3) and starting a, ring by ring."""
+    rng = np.random.default_rng(disc.seed)
+    lo = disc.a_min + disc.ring_au * np.repeat(np.arange(disc.n_rings), disc.n_per_ring)
+    a = lo + rng.uniform(0.0, disc.ring_au, disc.n)
+    e = rng.uniform(0.0, disc.e_max, disc.n)
+    inc = rng.uniform(0.0, disc.inc_max_deg, disc.n)
+    Omega, omega, M = (rng.uniform(0.0, 360.0, disc.n) for _ in range(3))
+    pos, vel = diagnostics.cartesian(a, e, inc, Omega, omega, M, constants.G * constants.CENTRAL_MASS)
+    return pos, vel, a
+
+
 def particle_ids(n_pairs: int) -> np.ndarray:
     """Particle 2k and its twin 2k + 1 share k = (id - FIRST_PARTICLE_HASH) // 2."""
     return FIRST_PARTICLE_HASH + np.arange(2 * n_pairs, dtype=np.int64)
@@ -133,7 +170,7 @@ class GrowthForcing:
 GIANT_HASH = {"jupiter": JUPITER_HASH, "saturn": 6, "uranus": 7, "neptune": 8}
 
 
-def build_system(pos, vel, ids, planets, a0, m0, dt_yr: float) -> rebound.Simulation:
+def build_system(pos, vel, ids, planets, a0, m0, dt_yr: float, integrator: str = "whfast") -> rebound.Simulation:
     """Sun, then the giants on circular planar orbits, then the disc particles.
 
     ``planets`` are names (Jupiter first), ``a0`` and ``m0`` their starting a and mass.
@@ -143,7 +180,7 @@ def build_system(pos, vel, ids, planets, a0, m0, dt_yr: float) -> rebound.Simula
     """
     sim = rebound.Simulation()
     sim.G = constants.G
-    sim.integrator = "whfast"
+    sim.integrator = integrator
     sim.dt = dt_yr
     sim.add(m=constants.CENTRAL_MASS, hash=SUN_HASH)
     for k, (name, a, m) in enumerate(zip(planets, a0, m0)):

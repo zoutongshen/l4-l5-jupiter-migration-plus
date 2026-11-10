@@ -42,8 +42,8 @@ NO_SAMPLES, TADPOLE_L4, TADPOLE_L5, HORSESHOE, QUASI_SATELLITE, CIRCULATING = ra
 CLASS_NAMES = ["no_samples", "tadpole_L4", "tadpole_L5", "horseshoe", "quasi_satellite", "circulating"]
 
 # Removal reasons stored per Trojan.
-ALIVE, REMOVED_HILL, REMOVED_R_MAX, REMOVED_NON_FINITE = range(4)
-REMOVAL_NAMES = ["alive", "hill", "r_max", "non_finite"]
+ALIVE, REMOVED_HILL, REMOVED_R_MAX, REMOVED_NON_FINITE, REMOVED_COLLISION = range(5)
+REMOVAL_NAMES = ["alive", "hill", "r_max", "non_finite", "collision"]
 
 WINDOW_FIELDS = ["a", "e", "inc", "A", "B", "C", "sigma_min", "sigma_max", "sigma_cmean"]
 JUPITER_FIELDS = ["jupiter_a", "jupiter_m"]          # per window; absent in files from before stage 8
@@ -68,6 +68,11 @@ class Settings:
     snapshot_every_yr: float = 0.0
     snapshot_fine_every_yr: float = 0.0
     snapshot_fine_until_yr: float = 0.0
+    # Stage 9 (Pirani reproduction): "mercurius" for the hybrid integrator; removal on
+    # impact with the Sun (radius in au) or a planet (radii set by the forcing in
+    # runner.planet_radius_au; zero = off). Defaults keep earlier stages unchanged.
+    integrator: str = "whfast"
+    sun_radius_au: float = 0.0
 
     @property
     def check_interval_yr(self) -> float:
@@ -162,11 +167,22 @@ class ChunkRunner:
         self.snapshot_index = 0
         self._snapshot_buffer = []
         self._jupiter_now = (np.nan, np.nan)
+        self.planet_radius_au = np.zeros(len(self.planets))
 
-        sim.ri_whfast.safe_mode = settings.safe_mode
-        sim.ri_whfast.corrector = settings.corrector
-        if settings.safe_mode == 0:
-            sim.ri_whfast.keep_unsynchronized = 1
+        if settings.integrator == "mercurius":
+            sim.ri_mercurius.safe_mode = settings.safe_mode
+        else:
+            sim.ri_whfast.safe_mode = settings.safe_mode
+            sim.ri_whfast.corrector = settings.corrector
+            if settings.safe_mode == 0:
+                sim.ri_whfast.keep_unsynchronized = 1
+
+    def recalculate_coordinates(self) -> None:
+        """Tell the integrator that particles were changed or removed from outside it."""
+        if self.s.integrator == "mercurius":
+            self.sim.ri_mercurius.recalculate_coordinates_this_timestep = 1
+        else:
+            self.sim.ri_whfast.recalculate_coordinates_this_timestep = 1
 
     # --- construction -------------------------------------------------------
 
@@ -265,8 +281,14 @@ class ChunkRunner:
         ev["planet_hill_record"][slots[enter_record]] = nearest[enter_record]
 
         hill_hit = finite & (closest < self.s.remove_hill_radii)
-        far = finite & (np.linalg.norm(pos, axis=1) > self.s.r_max_au)
-        reason = np.where(~finite, REMOVED_NON_FINITE, np.where(hill_hit, REMOVED_HILL, np.where(far, REMOVED_R_MAX, ALIVE)))
+        r_sun = np.linalg.norm(pos, axis=1)
+        far = finite & (r_sun > self.s.r_max_au)
+        impact = finite & (r_sun < self.s.sun_radius_au)
+        if np.any(self.planet_radius_au > 0.0):
+            phys = dist * self.hill[None, :]
+            impact |= finite & np.any(phys < self.planet_radius_au[None, :], axis=1)
+        reason = np.where(~finite, REMOVED_NON_FINITE, np.where(impact, REMOVED_COLLISION, np.where(
+            hill_hit, REMOVED_HILL, np.where(far, REMOVED_R_MAX, ALIVE))))
         gone = reason != ALIVE
         ev["t_hill_remove"][slots[hill_hit]] = t
         ev["planet_hill_remove"][slots[hill_hit]] = nearest[hill_hit]
@@ -317,7 +339,7 @@ class ChunkRunner:
         for h in hashes[n_active:][gone]:
             self.sim.remove(hash=int(h))
         if gone.any():
-            self.sim.ri_whfast.recalculate_coordinates_this_timestep = 1
+            self.recalculate_coordinates()
 
     # --- windows and checkpoints ----------------------------------------------
 
