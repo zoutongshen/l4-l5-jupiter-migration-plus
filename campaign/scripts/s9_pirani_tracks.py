@@ -10,7 +10,10 @@ What is taken from her figures and what is modelled:
               eqs. 59-61) to isolation, then Piso & Youdin contraction, then Machida runaway capped
               at 0.8 Mdot*. Calibrated: FLUX_FACTOR (pebble flux x Ida eq. 54), fitted to Jupiter's
               clock from her Figs. 1+13 and final mass; ISO_FACTOR (x BLJ15 eq. 16), so that the gas
-              phase starts where her dashed lines start, for J and S together. Ice-giant start times
+              phase starts where her dashed lines start, for J and S together; TAU_S (pebble Stokes number,
+              not given by her), chosen from the planets' positions in her Figs. 4/5 snapshots
+              (one nominal run, 2.3-3.0 Myr): tau = 0.08 puts J and S within 9 kyr of every
+              snapshot, against 32 kyr with Ida's eq. 47 tau (~0.14). Ice-giant start times
               (her "~2.70 Myr") inferred from their final masses.
   rate scan   her sect. 3.3 "contraction or expansion of the nominal track": a_k(t) = a_end,k +
               k (a_nom(t) - a_end,nom), same m(t) (verified on Figs. 3 and 13: k constant to 1%).
@@ -44,10 +47,11 @@ DIG = CAMPAIGN / "configs" / "tracks" / "pirani19a"
 OUT_TRACKS = DIG
 REPORT = CAMPAIGN / "reports" / "pirani_tracks"
 
-FLUX_FACTOR = 8.0
+FLUX_FACTOR = 4.3                      # x Ida+2016 eq. 54 (with TAU_S)
+TAU_S = 0.08                           # pebble Stokes number (BLJ15's range 0.05-0.5); see docstring
 ISO_FACTOR = 1.066
 TORQUE_SCALE = 0.6                     # forward-model check only
-START = {"jupiter": 2.31e6, "saturn": 2.56e6}
+START = {"jupiter": 2.31e6, "saturn": 2.56e6}     # her sect. 3.1; Jupiter's is refined by jupiter_start()
 FINAL_MASS_FIG1 = {"jupiter": 306.0, "saturn": 113.0, "uranus": 18.1, "neptune": 14.4}
 RATES = {0.125: "x0.15", 0.25: "x0.25", 0.5: "x0.50", 0.75: "x0.75", 1.0: "x1.00", 1.25: "x1.25",
          1.5: "x1.50", 2.0: "x2.00"}
@@ -86,7 +90,7 @@ def load(name, smooth=True):
 
 def params(t0, m_seed, **kw):
     return pt.TrackParams(t0_yr=t0, m_seed_earth=m_seed, flux_factor=FLUX_FACTOR, iso_factor=ISO_FACTOR,
-                          dt_yr=50.0, **kw)
+                          tau_s=TAU_S, dt_yr=50.0, **kw)
 
 
 M_JOIN = 3.0          # Jupiter: below this mass the path is built from her Fig. 13 rate
@@ -155,6 +159,18 @@ def clock(name, t0):
     return r
 
 
+def jupiter_start():
+    """Jupiter's start (her "t ~ 2.31 Myr") from her Fig. 4 snapshots at 2.5 and 2.6 Myr, when the other
+    giants are still seeds, so her Jupiter is on its track: the mean timing offset there is set to zero."""
+    snap = np.loadtxt(DIG / "fig4_planets.csv", delimiter=",", skiprows=1)
+    clean = [(t, a) for t, a in zip(snap[:, 0], snap[:, 1]) if t in (2.5, 2.6)]
+
+    def offset(t0):
+        r = clock("jupiter", t0)
+        return np.mean([r["t"][np.argmax(r["a"] < a)] / 1e6 - t for t, a in clean])
+    return brentq(offset, 2.25e6, 2.35e6, xtol=200.0)
+
+
 def ice_start(name):
     m, a, _ = load(f"fig1_{name}")
     f = lambda t0: pt.integrate(params(t0, m[0]), path=(m, a))["m"][-1] - FINAL_MASS_FIG1[name]
@@ -189,9 +205,11 @@ def her_clock():
 
 def main():
     REPORT.mkdir(parents=True, exist_ok=True)
-    summary = {"alpha": pt.gasdisc.ALPHA, "flux_factor": FLUX_FACTOR, "iso_factor": ISO_FACTOR, "tracks": {}, "checks": {}}
+    summary = {"alpha": pt.gasdisc.ALPHA, "flux_factor": FLUX_FACTOR, "tau_s": TAU_S, "iso_factor": ISO_FACTOR,
+               "tracks": {}, "checks": {}}
     clocks = {}
     starts = dict(START)
+    starts["jupiter"] = jupiter_start()
     for n in ("uranus", "neptune"):
         starts[n] = ice_start(n)
     for n in ("jupiter", "saturn", "uranus", "neptune"):
@@ -253,11 +271,12 @@ def main():
     for n in ("jupiter", "saturn", "uranus", "neptune"):
         m0, a0, _ = load(f"fig1_{n}")
         fwd[n] = pt.integrate(pt.TrackParams(t0_yr=starts[n], a0_au=float(a0[0]), m_seed_earth=float(m0[0]),
-                                             flux_factor=FLUX_FACTOR, iso_factor=ISO_FACTOR,
+                                             flux_factor=FLUX_FACTOR, iso_factor=ISO_FACTOR, tau_s=TAU_S,
                                              torque_scale=TORQUE_SCALE, dt_yr=100.0))
         summary["checks"].setdefault("forward_model", {})[n] = {"a_end": float(fwd[n]["a"][-1]),
                                                              "a_end_fig1": float(load(f"fig1_{n}")[1].min()),
                                                              "m_end": float(fwd[n]["m"][-1])}
+    summary["checks"]["snapshots"] = snapshot_check(summary["tracks"])
     (REPORT / "summary.json").write_text(json.dumps(summary, indent=2, default=float))
     figure(clocks, fwd, gm, th, vh, starts)
     wobble_figure(clocks["jupiter"])
@@ -302,6 +321,31 @@ def figure(clocks, fwd, gm, th, vh, starts):
                  ylim=(0.1, 1000), title="(d) Migration rate: her Fig. 13 (thick), N-body tracks (thin; equal by construction 3-100 M_E)")
     ax[1, 1].legend(fontsize=8)
     fig.savefig(REPORT / "verification.png", dpi=140)
+
+
+def snapshot_check(tracks):
+    """Tracks against the planet dots of her Figs. 4/5 (one nominal simulation): position and timing."""
+    snap = np.loadtxt(DIG / "fig4_planets.csv", delimiter=",", skiprows=1)
+    names = ["jupiter", "saturn", "uranus", "neptune"]
+    out = {}
+    fig, ax = plt.subplots(figsize=(7, 4.5), constrained_layout=True)
+    cols = {"jupiter": "#d62728", "saturn": "#ff7f0e", "uranus": "#2ca02c", "neptune": "#1f77b4"}
+    for k, n in enumerate(names):
+        t, a, m = np.loadtxt(OUT_TRACKS / tracks[f"nominal_{n}"], delimiter=",", skiprows=1).T
+        rows = []
+        for tm, ah in zip(snap[:, 0], snap[:, k + 1]):
+            ours = float(np.interp(tm * 1e6, t, a))
+            moving = a[0] - 0.3 > ah > a[-1] + 0.1
+            dt = float((t[np.argmax(a < ah)] / 1e6 - tm) * 1e3) if moving else None
+            rows.append({"t_myr": tm, "her_a": ah, "our_a": ours, "da": ours - ah, "timing_kyr": dt})
+        out[n] = rows
+        ax.plot(t / 1e6, a, color=cols[n], lw=1.3, label=f"{n} track")
+        ax.plot(snap[:, 0], snap[:, k + 1], "o", color=cols[n], mec="k", ms=6)
+    ax.plot([], [], "ko", label="her Fig. 4 snapshots")
+    ax.set(xlim=(2.25, 3.02), xlabel="t [Myr]", ylabel="a [au]", title="Tracks vs the planets in her Fig. 4")
+    ax.legend(fontsize=8)
+    fig.savefig(REPORT / "snapshots.png", dpi=140)
+    return out
 
 
 def wobble_figure(r):

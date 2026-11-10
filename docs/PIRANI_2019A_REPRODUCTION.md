@@ -93,7 +93,7 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 | piece | prescription |
 |---|---|
-| pebble accretion | Ida+2016 eqs. 59–61 (χ = 1, η′ = η, ζ = 1/(1 + τ²)). Flux = **FLUX_FACTOR** × Ida eq. 54. Stokes number from Ida eq. 47 |
+| pebble accretion | Ida+2016 eqs. 59–61 (χ = 1, η′ = η, ζ = 1/(1 + τ²)). Flux = **FLUX_FACTOR** × Ida eq. 54. Stokes number **TAU_S** (fixed; Ida eq. 47 is available as an option) |
 | isolation | BLJ15 eq. 16, 20 (h/0.05)³ M⊕, × **ISO_FACTOR**. 10% of the accreted mass is envelope before isolation |
 | contraction | Piso & Youdin 2014 (BLJ15 eq. 17; f = 0.2, κ_env = 0.05 cm²/g, ρ_c = 5.5 g/cm³) while M_env < M_core |
 | runaway | Machida+2010 (BLJ15 eqs. 18–19), the smaller branch, **capped at 0.8 Ṁ*** |
@@ -104,9 +104,11 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 | | value | fitted to |
 |---|---|---|
-| FLUX_FACTOR | **8** | Jupiter's clock (her Figs. 1 + 13) and its 306 M⊕ at 3 Myr. BLJ15's own flux is "corrected" without a number |
+| TAU_S | **0.08** | the planets' positions in her Fig. 4 snapshots (§3.5). BLJ15's range is 0.05–0.5; Ida eq. 47 gives ~0.14, which puts Saturn 32 kyr early |
+| FLUX_FACTOR | **4.3** | Jupiter's 306 M⊕ at 3 Myr with TAU_S. BLJ15's own flux is "corrected" without a number |
 | ISO_FACTOR | **1.066** | where her dashed (gas) lines start, for J and S together (her 20.6 and 22.7 M⊕) |
-| U, N start times (her "~2.70 Myr") | **2.721, 2.739 Myr** | their final masses (18.1, 14.4 M⊕) |
+| Jupiter start (her "t ~ 2.31 Myr") | **2.298 Myr** | her Fig. 4 snapshots at 2.5 and 2.6 Myr, while the other giants are still seeds; her 2.3 Myr panel already shows Jupiter 0.04 au inside its start |
+| U, N start times (her "~2.70 Myr") | **2.708, 2.719 Myr** | their final masses (18.1, 14.4 M⊕) |
 | TORQUE_SCALE | 0.6 | forward check only (§3.5) |
 
 ### 3.4 How the N-body tracks are built (`scripts/s9_pirani_tracks.py`)
@@ -118,35 +120,55 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 **Clock m(t).**
 - **Jupiter:**
-  - 0.018 → 3 M⊕: the growth model.
-  - **3 → 100 M⊕: her own clock**, dm/dt = |ȧ|_Fig13 / |da/dm|_Fig1 (see §3.6).
-  - Above 100 M⊕: the growth model, stretched by 1.088 so that it ends at 3.0 Myr with 305 M⊕.
-- **Saturn, Uranus, Neptune:** the growth model along their Fig. 1 paths, from 2.56 / 2.721 / 2.739 Myr.
+  - 0.018 → 3 M⊕: the growth model, from 2.298 Myr.
+  - **3 → 100 M⊕: her own clock**, dm/dt = |ȧ|_Fig13 / |da/dm|_Fig1 (see §3.6). It is 222 kyr long; the model alone takes 224.
+  - Above 100 M⊕: the growth model, stretched by 1.005 so that it ends at 3.0 Myr, with 317 M⊕.
+- **Saturn, Uranus, Neptune:** the growth model along their Fig. 1 paths, from 2.56 / 2.708 / 2.719 Myr.
 
 **Format.** Each table starts at t = 0 with the seed parked at its starting a, then has 3000 rows to 3 Myr. Columns: t_yr, a_au, m_earth.
 
 | file (`configs/tracks/pirani19a/`) | what | start → end |
 |---|---|---|
-| `track_nominal_jupiter.csv` | nominal Jupiter | 18.26 → 5.08 au, 0.018 → 305 M⊕ |
-| `track_nominal_saturn.csv` | nominal Saturn | 21.27 → 8.02 au, → 116 M⊕ |
+| `track_nominal_jupiter.csv` | nominal Jupiter | 18.26 → 5.08 au, 0.018 → 317 M⊕ |
+| `track_nominal_saturn.csv` | nominal Saturn | 21.27 → 8.02 au, → 113 M⊕ |
 | `track_nominal_uranus.csv`, `_neptune.csv` | nominal ice giants | 22.50 → 16.01 au, → 18.1 M⊕; 24.00 → 18.57 au, → 14.4 M⊕ |
 | `track_rate_x{0.15,0.25,0.50,0.75,1.00,1.25,1.50,2.00}_jupiter.csv` | a_end,k + k(a_nom − a_end,nom), same m(t); ends from Fig. 3 | e.g. ×0.15: 7.08 → 5.43; ×2.00: 32.04 → 5.68 |
 | `track_rate_x…_saturn.csv` | same rule on nominal Saturn; end chosen so the start equals Table 1 (G2) | 10.45 … 35.5 au starts, exactly Table 1 |
 | `track_insitu_{jupiter,saturn}.csv` | 5.4 and 8.6 au, nominal clocks | — |
 | `track_outward_jupiter.csv` | nominal path mirrored, a = 5.08 + 18.26 − a_nom | 5.08 → 18.26 au |
 
-### 3.5 Verification (`reports/pirani_tracks/verification.png`, `wobble.png`, `summary.json`)
+### 3.5 Verification (`reports/pirani_tracks/`: `verification.png`, `snapshots.png`, `wobble.png`, `summary.json`)
+
+**Planet positions in her Fig. 4** (= Fig. 5 to 0.05 au). These come from one of her nominal N-body simulations, read from the raster panels (±0.1 au). They're a direct check of the clocks, because her figures of the tracks have no time axis.
+
+| t (Myr) | J: hers / ours | S: hers / ours | U: hers / ours | N: hers / ours |
+|---|---|---|---|---|
+| 2.3 | 18.36 / 18.22 | 21.22 / 21.26 | 22.48 / 22.50 | 24.00 / 24.00 |
+| 2.5 | 13.97 / 13.94 | 21.22 / 21.26 | 22.48 / 22.50 | 24.00 / 24.00 |
+| 2.6 | 6.99 / 6.99 | 21.22 / 21.24 | 22.48 / 22.50 | 24.00 / 24.00 |
+| 2.7 | 6.27 / 6.30 | 20.50 / 20.63 | 22.57 / 22.50 | 24.00 / 24.00 |
+| 2.8 | 5.82 / 5.86 | 16.84 / 16.30 | 22.30 / 22.40 | 23.82 / 23.91 |
+| 2.9 | 5.37 / 5.42 | 9.51 / 9.62 | 20.60 / 21.03 | 23.01 / 22.89 |
+| 3.0 | 4.93 / 5.08 | 7.88 / 8.02 | 15.48 / 16.01 | 19.25 / 18.57 |
+
+**Timing offsets** (ours later +):
+- Jupiter: 0 / 0 / +7 / +9 / +11 kyr at 2.5–2.9 Myr.
+- Saturn: +6 / −8 / +3 kyr at 2.7–2.9 Myr.
+
+**Residuals:**
+- **All four planets end inside or outside their own plotted tracks in her N-body.** J and S end 0.15 au inside, and U and N are 0.5 and 0.7 au off in opposite directions. Her planets are free bodies under an imposed migration, so these are planet–planet interactions (G4). Our N-body has the same set-up, so the pilot should show them too.
+- **Uranus at 2.9 Myr** is 0.43 au further out than hers, i.e. 13 kyr late. That's a small timing offset in the ice-giant clock.
 
 | check | ours | hers | status |
 |---|---|---|---|
-| Jupiter mass at 3 Myr | 305 M⊕ | 306 | fitted |
-| **Saturn mass at 3 Myr** | **116 M⊕** | **113** | **predicted (3%)** |
+| Jupiter mass at 3 Myr | 317 M⊕ | 306 | +3.6%, from the earlier start fitted to the snapshots (1% in Hill radius) |
+| **Saturn mass at 3 Myr** | **113.2 M⊕** | **113** | **not fitted** (the flux is fixed by Jupiter) |
 | gas phase starts, J / S | 20.1 / 22.4 M⊕ | 20.6 / 22.7 | ISO_FACTOR shared by both |
-| growth model's own clock vs hers, relative to t(5 M⊕), at 1 / 2 / 10 / 20 / 30 / 50 / 100 M⊕ | +9 / +3 / +1 / +9 / +11 / +17 / +32 kyr | — | the model is 12% slower than her figures imply over 3–100 M⊕ (253 vs 222 kyr), hence §3.4 |
+| Jupiter clock, 3–100 M⊕: growth model alone vs her Figs. 1 + 13 | 224 kyr | 222 | **1%**; with τ from Ida eq. 47 it was 253 kyr |
 | her type-I speed vs Tanaka+2002 in the Ida disc, 0.2–8 M⊕ | — | 0.42–0.48×, constant | consistent with a partly positive corotation torque |
 | her type-I speed vs PBK11 | — | 0.59–0.84×, rising with m | PBK11 gets the mass trend, not the normalisation |
-| forward model (migration integrated): final masses | J 304, S 113, U 17.7, N 14.1 M⊕ | 306, 113, 18.1, 14.4 | **growth verified** |
-| forward model: final a | J 3.8, S 6.0, U 17.4, N 20.0 au | 5.1, 8.0, 16.0, 18.6 | migration physics only approximate → we use her paths |
+| forward model (migration integrated, PBK11 × 0.6): final masses | J 316, S 110, U 17.3, N 13.9 M⊕ | 306, 113, 18.1, 14.4 | **growth verified** |
+| forward model: final a | J 4.2, S 6.5, U 18.3, N 20.7 au | 5.1, 8.0, 16.0, 18.6 | migration physics only approximate → we use her paths |
 | track speeds vs Fig. 13 at 4 rates | equal from 0.2 to 100 M⊕ | — | by construction (§3.4) |
 | track starts vs Table 1 | within 1% (J ×2.00: 32.04 vs 32.3) | — | ✓ |
 
@@ -163,7 +185,7 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 **Why her Fig. 13 can't show it.** Her Fig. 13 has a vertex only every ~17% in mass, at 20 and 24 M⊕, so it would smooth over any real dip. Either her gas onset is not capped like BLJ15's, or her real rate also dipped. Her figures don't distinguish the two.
 
-**Why it matters.** This is the window where the stage-8 runs built their L4/L5 imbalance (peak at ~16–20 M⊕). Crossing 15–45 M⊕, Jupiter moves 5.6 au, and the model clock took 75 kyr against the 64 kyr her figures imply.
+**Why it matters.** This is the window where the stage-8 runs built their L4/L5 imbalance (peak at ~16–20 M⊕). Crossing 15–45 M⊕, Jupiter moves 5.6 au, and the first model clock (τ from Ida eq. 47) took 75 kyr there, against the 64 kyr her figures imply. With τ = 0.08 the model's total over 3–100 M⊕ agrees to 1%, but the kinks remain, so the window clock is still used.
 
 **What we did.** For Jupiter between 3 and 100 M⊕ the clock is the one her two figures imply. The tracks then reproduce both her Fig. 1 path and her Fig. 13 rate. The cost is a growth rate briefly above BLJ15's cap, which is consistent with her own figures. Saturn has no Fig. 13, so its track keeps the model clock, and the same kind of wobble exists in Saturn's ȧ around its kinks (22.7 M⊕). Saturn's speed doesn't drive Jupiter's Trojans.
 

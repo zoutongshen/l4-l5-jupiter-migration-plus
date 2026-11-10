@@ -11,6 +11,9 @@ tick labels (checked against the label positions on the page):
                   489.1 pt = 1e-1 and 369.4 pt = 1e3 au/Myr (log; the frame's bottom, 498.1, is 10^-1.3)
 
 Legend sample lines (short horizontal segments in the legend box) are dropped.
+
+Figs. 4/5 (raster panels) give the four planets' positions at t = 2.3 ... 3.0 Myr in one of her
+nominal simulations: fig4_planets.csv, a direct check of the tracks' clocks.
 Solid (core accretion) and dashed (gas accretion) pieces are kept, with a phase flag.
 
     python campaign/scripts/s9_digitize_pirani.py      # writes campaign/configs/tracks/pirani19a/*.csv
@@ -100,8 +103,59 @@ def extract(name):
     return curves
 
 
+SNAPSHOT_TIMES_MYR = [2.3, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0]       # Figs. 4 and 5, panels in reading order
+
+
+def extract_snapshots(page_index):
+    """Planet positions (the big black dots on the e = 0 / i = 0 axis) in Fig. 4 (p. 6) or Fig. 5 (p. 7).
+
+    These panels are raster images (432 x 288 px, ~11 px/au). The frame is found from its black
+    lines (x: 0..30 au), the dots as pure-black blobs in the 14 px above the bottom axis and
+    beyond 4.5 au (the asteroid-belt outline is black too); merged dots are split by width.
+    Returns rows (t_myr, a_1, ..., a_4), innermost first.
+    """
+    from PIL import Image
+    from scipy import ndimage
+    doc = pymupdf.open(PDF)
+    page = doc[page_index]
+    rows = []
+    for k, t in enumerate(SNAPSHOT_TIMES_MYR):
+        xref = page.get_image_info(xrefs=True)[k]["xref"]
+        pix = pymupdf.Pixmap(doc, xref)
+        if pix.alpha or pix.n > 3:
+            pix = pymupdf.Pixmap(pymupdf.csRGB, pix)
+        img = np.asarray(Image.frombytes("RGB", (pix.width, pix.height), pix.samples)).astype(int)
+        dark = img.max(axis=2) < 80
+        cols = np.where(dark.sum(axis=0) > 0.42 * img.shape[0])[0]
+        lines = np.where(dark.sum(axis=1) > 0.35 * img.shape[1])[0]
+        x0, x1, ybot = cols.min(), cols.max(), lines.max()
+        black = img.max(axis=2) < 40
+        band = np.zeros_like(black)
+        band[ybot - 14:ybot + 1, x0 + 3:x1 - 2] = True
+        lab, n = ndimage.label(black & band)
+        dots = []
+        for i in range(1, n + 1):
+            ys, xs = np.where(lab == i)
+            if len(xs) < 20 or (xs.mean() - x0) / (x1 - x0) * 30 < 4.5:
+                continue
+            w = xs.max() - xs.min() + 1
+            nd = max(1, int(round(w / 12.5)))
+            for j in range(nd):
+                sel = (xs >= xs.min() + j * w / nd) & (xs < xs.min() + (j + 1) * w / nd)
+                dots.append((xs[sel].mean() - x0) / (x1 - x0) * 30)
+        rows.append([t, *sorted(dots)])
+    return rows
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    f4, f5 = extract_snapshots(5), extract_snapshots(6)
+    for r4, r5 in zip(f4, f5):
+        assert len(r4) == 5 and np.allclose(r4, r5, atol=0.05), (r4, r5)      # the two figures agree
+    np.savetxt(OUT / "fig4_planets.csv", np.array(f4), delimiter=",", fmt="%.3f",
+               header="t_myr,a_jupiter,a_saturn,a_uranus,a_neptune  # Pirani+2019a Fig. 4 (= Fig. 5 to 0.05 au), "
+                      "one nominal simulation, planet dots", comments="")
+    print("fig4_planets.csv:", f4)
     header = {"fig1": "a_au,m_earth,gas_phase", "fig3": "a_au,m_earth,gas_phase", "fig13": "m_earth,adot_au_per_myr,dashed"}
     for name in PANELS:
         for label, arr in extract(name).items():
