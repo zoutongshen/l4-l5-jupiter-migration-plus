@@ -115,26 +115,57 @@ Every model either stays at about 1.2 at all I or rises with I. Example in final
 
 ## Run list
 
-| id | run | key change | Trojans | N4/N5 |
+Jupiter's track: start → end semi-major axis, type I rate ν_I, brake (gap) mass M_gap and pebble
+isolation mass M_iso, in M⊕. Every generated track ends at 5.4 au at 0.69 Myr. A faster rate
+therefore means a start further out (8.6 au at ν_I 0.225, 16 au at 0.9). B2/B3 use Pirani's
+digitized ×0.25 track, which has no ν_I or M_gap. t_end = 0.69 Myr of gas phase + 1.2 Myr
+(or 10 Myr) with free giants. "zone" = a narrow band around Jupiter's start
+(about 0.95–1.04 a_start; the cold runs have e0 ≤ 0.1, i0 ≤ 15°); flat = e0, i0 ≤ 0.01 over 5–9.4 au;
+warm (C0) = e0 ≤ 0.3, i0 ≤ 40° over 5–9.25 au.
+dt = 1% of P_J at 5.4 au (0.125 yr) throughout.
+
+| id | a_J [au] | ν_I | M_gap | M_iso | e0, i0 max | t_end [Myr] |
+|---|---|---|---|---|---|---|
+| B2 | 8.76→5.59 | – | – | – | 0.01, 0.01° | 1.89 |
+| B3 | 5.59→8.76 | – | – | – | 0.01, 0.01° | 1.89 |
+| C0 | 8.64→5.40 | 0.225 | 25 | 20 | 0.3, 40° (5–9.25 au) | 1.89 |
+| C0b | 8.64→5.40 | 0.225 | 25 | 20 | 0.1, 15° (zone) | 1.89 |
+| C1 | 11.36→5.40 | 0.45 | 25 | 20 | 0.1, 15° (zone) | 1.89 |
+| C2 | 16.00→5.40 | 0.9 | 25 | 20 | 0.1, 15° (zone) | 1.89 |
+| D1 | 16.00→5.40 | 0.9 | 25 | 20 | 0.05, 40° (zone) | 1.89 |
+| D2 | 10.35→5.40 | 0.9 | 12.5 | 20 | 0.1, 15° (zone) | 1.89 |
+| D3 | 12.99→5.40 | 0.225 | 50 | 20 | 0.1, 15° (zone) | 1.89 |
+| D4 | 16.00→5.40 | 0.9 | 25 | 20 | 0.1, 15° (zone) | 10.69 |
+| D5 | 11.36→5.40 | 0.45 | 25 | 20 | 0.05, 40° (zone) | 1.89 |
+| D6 | 8.64→5.40 | 0.225 | 25 | 20 | 0.05, 40° (zone) | 1.89 |
+| D7 | 16.00→5.40 | 0.9 | 25 | 20 | 0.3, 40° (zone) | 1.89 |
+| D8 | 11.36→5.40 | 0.45 | 25 | 20 | 0.3, 40° (zone) | 1.89 |
+| D9 | 13.52→5.40 | 0.65 | 25 | 20 | 0.1, 40° (zone) | 1.89 |
+| D10 | 16.00→5.40 | 0.9 | 25 | 20 | 0.3, 40° (zone) | 10.69 |
+| D11 | 11.36→5.40 | 0.45 | 25 | 20 | 0.3, 40° (zone) | 10.69 |
+| E1 | 15.71→5.40 | 0.9 | 25 | 10 | 0.1, 15° (zone) | 1.89 |
+| E1b | 15.39→5.40 | 0.9 | 25 | 30 | 0.1, 15° (zone) | 1.89 |
+
+| id | run | note | Trojans | N4/N5 |
 |---|---|---|---|---|
-| B2 | mig_g2_pirani | Pirani track + Saturn crosses the 2:1 | 0 | – |
+| B2 | mig_g2_pirani | Saturn crosses the 2:1 | 0 | – |
 | B3 | mig_g3_pirani_out | B2 reversed | 176 | 0.83 ± 0.13 |
-| C0 | mig_c0_nominal | warm disc, ν_I 0.225 | 396 | 0.96 ± 0.10 |
-| C0b | mig_c0b_cold_zone | cold zone, ν_I 0.225 | 3312 | 1.08 ± 0.04 |
-| C1 | mig_c1_nu045_cold | ν_I 0.45 | 4401 | 1.25 ± 0.04 |
-| C2 | mig_c2_nu09_cold | ν_I 0.9 | 2967 | 1.37 ± 0.05 |
-| D1 | mig_d1_c2_hot | ν_I 0.9, i0 to 40° | 3206 | 1.61 ± 0.06 |
-| D2 | mig_d2_mgap12 | ν_I 0.9, M_gap 12.5 | 3044 | 1.19 ± 0.04 |
-| D3 | mig_d3_mgap50_nu0225 | ν_I 0.225, M_gap 50 | 3283 | 1.19 ± 0.04 |
+| C0 | mig_c0_nominal | nominal | 396 | 0.96 ± 0.10 |
+| C0b | mig_c0b_cold_zone | cold zone | 3312 | 1.08 ± 0.04 |
+| C1 | mig_c1_nu045_cold | rate ×2 | 4401 | 1.25 ± 0.04 |
+| C2 | mig_c2_nu09_cold | rate ×4 | 2967 | 1.37 ± 0.05 |
+| D1 | mig_d1_c2_hot | C2, inclined | 3206 | 1.61 ± 0.06 |
+| D2 | mig_d2_mgap12 | brake earlier | 3044 | 1.19 ± 0.04 |
+| D3 | mig_d3_mgap50_nu0225 | brake later | 3283 | 1.19 ± 0.04 |
 | D4 | mig_d4_c2_long | C2 to 10 Myr | 2883 | 1.38 ± 0.05 |
-| D5 | mig_d5_c1_hot | ν_I 0.45, i0 to 40° | 4741 | 1.25 ± 0.04 |
-| D6 | mig_d6_c0b_hot | ν_I 0.225, i0 to 40° | 3782 | 1.13 ± 0.04 |
-| D7 | mig_d7_c2_warm | ν_I 0.9, e0 to 0.3, i0 to 40° | 2174 | 1.81 ± 0.08 |
-| D8 | mig_d8_c1_warm | ν_I 0.45, e0 to 0.3, i0 to 40° | 3992 | 1.19 ± 0.04 |
-| D9 | mig_d9_nu065 | ν_I 0.65, e0 to 0.1, i0 to 40° | 4530 | 1.29 ± 0.04 |
+| D5 | mig_d5_c1_hot | C1, inclined | 4741 | 1.25 ± 0.04 |
+| D6 | mig_d6_c0b_hot | C0b, inclined | 3782 | 1.13 ± 0.04 |
+| D7 | mig_d7_c2_warm | C2, warm | 2174 | 1.81 ± 0.08 |
+| D8 | mig_d8_c1_warm | C1, warm | 3992 | 1.19 ± 0.04 |
+| D9 | mig_d9_nu065 | rate ×2.9 | 4530 | 1.29 ± 0.04 |
 | D10 | mig_d10_d7_long | D7 to 10 Myr | 2099 | 1.81 ± 0.08 |
 | D11 | mig_d11_d8_long | D8 to 10 Myr | 3925 | 1.18 ± 0.04 |
-| E1 | mig_e1_miso10 | C2 with M_iso 10 | 2616 | 1.43 ± 0.06 |
-| E1b | mig_e1_miso30 | C2 with M_iso 30 | 3143 | 1.43 ± 0.05 |
+| E1 | mig_e1_miso10 | C2, M_iso 10 | 2616 | 1.43 ± 0.06 |
+| E1b | mig_e1_miso30 | C2, M_iso 30 | 3143 | 1.43 ± 0.05 |
 
 GIFs (Trojans with Saturn, Uranus and Neptune drawn in): `campaign/reports/<run>/capture.gif`.
