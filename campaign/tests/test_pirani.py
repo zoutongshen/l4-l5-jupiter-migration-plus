@@ -175,3 +175,11 @@ def test_rate_tracks_are_scaled_nominal():
     tk, ak, mk = np.loadtxt(d / "track_rate_x0.25_jupiter.csv", delimiter=",", skiprows=1).T
     assert np.array_equal(t1, tk) and np.allclose(m1, mk)
     assert np.allclose(ak - ak[-1], 0.25 * (a1 - a1[-1]), atol=1e-6)
+
+
+def test_alpha_is_pirani_value_everywhere():
+    """Pirani sect. 3.1: Ida+2016 disc with alpha = 1e-3 (BLJ15 had 0.0054)."""
+    from trojans import pirani_tracks as pt
+    assert gasdisc.ALPHA == 1e-3 and pt.TrackParams().alpha == 1e-3
+    with pytest.raises(ValueError):
+        pt.integrate(pt.TrackParams(alpha=5.4e-3, t_end_yr=2.32e6))

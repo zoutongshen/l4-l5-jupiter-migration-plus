@@ -226,6 +226,8 @@ def integrate(p: TrackParams, path=None):
     ``path = (m_earth, a_au)``: prescribe a(m) (e.g. Pirani's own Fig. 1 curve) instead of
     integrating the migration; only the growth (the clock) is then modelled.
     """
+    if p.alpha != gasdisc.ALPHA:
+        raise ValueError(f"alpha {p.alpha} differs from the disc's gasdisc.ALPHA = {gasdisc.ALPHA} (Pirani: 1e-3)")
     if path is not None:
         pm, pa = (np.asarray(x, float) for x in path)
         o = np.argsort(pm)

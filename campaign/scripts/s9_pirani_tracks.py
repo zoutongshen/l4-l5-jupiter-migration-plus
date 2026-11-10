@@ -110,12 +110,47 @@ def jupiter_path(r):
     return np.concatenate([lo, m[hi]]), np.concatenate([a_lo, a[hi]])
 
 
+HER_CLOCK = (3.0, 100.0)   # Jupiter: between these masses the clock is hers, |adot|_Fig13 / |da/dm|_Fig1
+
+
+def her_window_clock(r, pm, pa, lo=HER_CLOCK[0], hi=HER_CLOCK[1], t_end=3.0e6):
+    """Replace the model clock between ``lo`` and ``hi`` M_E by the one her Figs. 1 and 13 imply.
+
+    Her path has two sharp kinks there (gas onset at 20.5 M_E; runaway once M_env = M_core,
+    ~37 M_E); with the model's capped gas accretion the track's adot then dips to ~48 and
+    spikes to ~130 au/Myr, while her Fig. 13 (42 vertices) is smooth. Her implied clock needs
+    dm/dt up to ~1800 M_E/Myr just after isolation, ~3x BLJ15's 0.8 Mdot* cap: either her
+    onset is not capped like that or Fig. 13 is too coarse to show a dip; we follow her figure.
+    Above ``hi`` the model clock is stretched so that the track still ends at ``t_end``.
+    """
+    mm = np.maximum.accumulate(r["m"])
+    keep = np.concatenate([[True], np.diff(mm) > 0])
+    mm, tt = mm[keep], r["t"][keep]
+    mr, vr, _ = np.loadtxt(DIG / "fig13_nominal.csv", delimiter=",", skiprows=1).T
+    o = np.argsort(mr)
+    G = np.logspace(np.log10(lo), np.log10(hi), 600)
+    slope = np.abs(np.gradient(np.interp(G, pm, pa), G))
+    v = 10 ** np.interp(np.log10(G), np.log10(mr[o]), np.log10(vr[o])) / 1e6
+    t_lo, t_hi = np.interp(lo, mm, tt), np.interp(hi, mm, tt)
+    t_win = t_lo + np.concatenate([[0.0], np.cumsum(0.5 * (slope[1:] / v[1:] + slope[:-1] / v[:-1]) * np.diff(G))])
+    below, above = mm < lo, mm > hi
+    stretch = (t_end - t_win[-1]) / (t_end - t_hi)
+    m_new = np.concatenate([mm[below], G, mm[above]])
+    t_new = np.concatenate([tt[below], t_win, t_win[-1] + (tt[above] - t_hi) * stretch])
+    out = dict(r)
+    out.update(model_t=tt, model_m=mm, t=t_new, m=m_new, a=np.interp(np.log10(m_new), np.log10(pm), pa),
+               her_clock_window=(lo, hi), late_stretch=float(stretch), window_kyr_model=float((t_hi - t_lo) / 1e3),
+               window_kyr_her=float((t_win[-1] - t_lo) / 1e3))
+    return out
+
+
 def clock(name, t0):
     m, a, _ = load(f"fig1_{name}")
     r = pt.integrate(params(t0, m[0]), path=(m, a))
     if name == "jupiter":                          # second pass along the Fig.-13-based low-mass path
         pm, pa = jupiter_path(r)
         r = pt.integrate(params(t0, pm[0]), path=(pm, pa))
+        r = her_window_clock(r, pm, pa)
         r["path"] = (pm, pa)
     return r
 
@@ -154,7 +189,7 @@ def her_clock():
 
 def main():
     REPORT.mkdir(parents=True, exist_ok=True)
-    summary = {"flux_factor": FLUX_FACTOR, "iso_factor": ISO_FACTOR, "tracks": {}, "checks": {}}
+    summary = {"alpha": pt.gasdisc.ALPHA, "flux_factor": FLUX_FACTOR, "iso_factor": ISO_FACTOR, "tracks": {}, "checks": {}}
     clocks = {}
     starts = dict(START)
     for n in ("uranus", "neptune"):
@@ -166,6 +201,10 @@ def main():
             np.max(np.abs(np.interp(np.log10(mr_), np.log10(ms_), as_) - ar_)))
         r = clock(n, starts[n])
         clocks[n] = r
+        if n == "jupiter":
+            summary["checks"]["jupiter_her_clock_window"] = {
+                "masses_earth": r["her_clock_window"], "model_kyr": r["window_kyr_model"],
+                "her_kyr": r["window_kyr_her"], "late_stretch": r["late_stretch"]}
         summary["checks"][n] = {"t_start_myr": starts[n] / 1e6, "m_3myr_model": float(r["m"][-1]),
                                 "m_3myr_fig1": FINAL_MASS_FIG1[n], "a_end": float(r["a"][-1]),
                                 "m_isolation_model": r["m_iso_reached"],
@@ -182,6 +221,10 @@ def main():
     off = (tm - tm[i5]) - (th - th[i5])
     summary["checks"]["jupiter_clock_offset_kyr"] = {f"{M:g}": float(np.interp(M, gm, off) / 1e3)
                                                     for M in (1, 2, 10, 20, 30, 50, 100)}
+    tmod = np.interp(gm, rj["model_m"], rj["model_t"])
+    off_model = (tmod - tmod[i5]) - (th - th[i5])
+    summary["checks"]["jupiter_model_clock_offset_kyr"] = {f"{M:g}": float(np.interp(M, gm, off_model) / 1e3)
+                                                          for M in (1, 2, 10, 20, 30, 50, 100)}
 
     # rate scan and in situ: Jupiter (her Fig. 3 ends) and Saturn (Table 1 starts)
     tJ, aJ, mJ = table(rj["t"], rj["a"], rj["m"])
@@ -217,6 +260,7 @@ def main():
                                                              "m_end": float(fwd[n]["m"][-1])}
     (REPORT / "summary.json").write_text(json.dumps(summary, indent=2, default=float))
     figure(clocks, fwd, gm, th, vh, starts)
+    wobble_figure(clocks["jupiter"])
     print(json.dumps(summary["checks"], indent=1, default=float))
 
 
@@ -238,7 +282,10 @@ def figure(clocks, fwd, gm, th, vh, starts):
     tm = np.interp(gm, rj["m"], rj["t"])
     i5 = np.argmin(abs(gm - 5))
     ax[0, 1].plot(gm, (th - th[i5]) / 1e3, color="#d62728", lw=4, alpha=0.3, label="her clock: Figs. 1 + 13")
-    ax[0, 1].plot(gm, (tm - tm[i5]) / 1e3, color="k", lw=1.2, label="model along her path")
+    tmod = np.interp(gm, rj["model_m"], rj["model_t"])
+    ax[0, 1].plot(gm, (tmod - tmod[i5]) / 1e3, color="k", lw=1.2, label="growth model alone, along her path")
+    ax[0, 1].plot(gm, (tm - tm[i5]) / 1e3, color="#1f77b4", lw=1.0, ls="--",
+                  label=f"N-body track (hers on {HER_CLOCK[0]:g}-{HER_CLOCK[1]:g} M_E)")
     ax[0, 1].set(xscale="log", xlabel="m_J [M_E]", ylabel="t - t(5 M_E) [kyr]", title="(b) Jupiter's clock")
     ax[0, 1].legend(fontsize=8)
     ax[1, 0].set(yscale="log", xlabel="t - 2.3 Myr [kyr]", ylabel="m [M_E]", ylim=(1e-2, 1e3),
@@ -252,9 +299,41 @@ def figure(clocks, fwd, gm, th, vh, starts):
         ax[1, 1].plot(mr[o], vr[o], color=c, lw=4, alpha=0.3, label=f"her Fig. 13 {lab}")
         ax[1, 1].plot(gm, k * v_model, color=c, lw=1.2)
     ax[1, 1].set(xscale="log", yscale="log", xlabel="m_J [M_E]", ylabel="|da/dt| [au/Myr]", xlim=(0.1, 100),
-                 ylim=(0.1, 1000), title="(d) Migration rate: her Fig. 13 (thick) and the N-body tracks (thin)")
+                 ylim=(0.1, 1000), title="(d) Migration rate: her Fig. 13 (thick), N-body tracks (thin; equal by construction 3-100 M_E)")
     ax[1, 1].legend(fontsize=8)
     fig.savefig(REPORT / "verification.png", dpi=140)
+
+
+def wobble_figure(r):
+    """Why the tracks' |adot| wobbles at 20-40 M_E: adot = (da/dm)(dm/dt)."""
+    pm, pa = r["path"]
+    mraw, araw, _ = load("fig1_jupiter", smooth=False)
+    mr, vr, _ = np.loadtxt(DIG / "fig13_nominal.csv", delimiter=",", skiprows=1).T
+    o = np.argsort(mr)
+    G = np.logspace(np.log10(8), np.log10(80), 200)
+    slope = np.abs(np.gradient(np.interp(G, pm, pa), G))
+    slope_raw = np.abs(np.gradient(np.interp(G, mraw, araw), G))
+    mm = np.maximum.accumulate(r["m"])
+    mdot = np.gradient(G, np.interp(G, mm, r["t"])) * 1e6
+    v13 = 10 ** np.interp(np.log10(G), np.log10(mr[o]), np.log10(vr[o]))
+    fig, ax = plt.subplots(1, 3, figsize=(14, 4), constrained_layout=True)
+    ax[0].plot(G, slope_raw, color="#d62728", lw=3, alpha=0.4, label="her Fig. 1 path")
+    ax[0].plot(G, slope, "k", lw=1, label="track path (smoothed)")
+    ax[0].set(xscale="log", xlabel="m_J [M_E]", ylabel="|da/dm| [au/M_E]", title="(a) Path slope: two kinks in her path")
+    ax[1].plot(G, v13 / slope_raw, color="#d62728", lw=3, alpha=0.4, label="hers implied: |adot|_Fig13 / |da/dm|_Fig1")
+    ax[1].plot(G, mdot, "k", lw=1, label="model clock")
+    ax[1].axhline(0.8 * float(pt.gasdisc.mdot(2.55e6)) / pt.M_EARTH * 1e6, color="0.5", ls=":", lw=1,
+                  label="0.8 Mdot* at 2.55 Myr (BLJ15 cap)")
+    ax[1].set(xscale="log", yscale="log", xlabel="m_J [M_E]", ylabel="dm/dt [M_E/Myr]", title="(b) Growth rate")
+    ax[2].plot(mr[o], vr[o], "o-", color="#1f77b4", ms=3, lw=3, alpha=0.4, label="her Fig. 13 (42 vertices)")
+    ax[2].plot(G, slope * mdot, "k", lw=1, label="track: |da/dm| dm/dt")
+    ax[2].set(xscale="log", xlim=(8, 80), ylim=(0, 140), xlabel="m_J [M_E]", ylabel="|adot| [au/Myr]",
+              title="(c) Migration rate")
+    for a_ in ax:
+        a_.axvspan(20.5, 24, color="0.9", zorder=0)
+        a_.axvspan(35, 42, color="0.9", zorder=0)
+        a_.legend(fontsize=7.5)
+    fig.savefig(REPORT / "wobble.png", dpi=140)
 
 
 if __name__ == "__main__":
