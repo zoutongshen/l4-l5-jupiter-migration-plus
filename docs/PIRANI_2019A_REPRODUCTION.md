@@ -116,7 +116,7 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 **Path a(m): her Fig. 1 curve.**
 - **Smoothing:** medians in log-m bins (0.25 dex below 2 M⊕, 0.08 dex above), joined by a monotone spline. Her plotted vertices step by 0.01–0.03 au where a barely changes, and the N-body forcing differentiates a(t). The largest deviation from her curve is 0.19 au (J) and 0.21 au (S), at the isolation corner, and ≤ 0.012 au for U and N.
-- **Jupiter below 3 M⊕:** a(m) is built from her Fig. 13 rate along the clock, because her path is too flat there to differentiate. That puts Jupiter's seed at **18.26 au**, against her 18.40.
+- **Jupiter below 3 M⊕:** a(m) is built from her Fig. 13 rate along the clock, because her path is too flat there to differentiate. That puts Jupiter's seed at **18.22 au**, against her 18.40 (×2.00 then starts at 31.96 vs Table 1 32.3).
 
 **Clock m(t).**
 - **Jupiter:**
@@ -129,13 +129,13 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 | file (`configs/tracks/pirani19a/`) | what | start → end |
 |---|---|---|
-| `track_nominal_jupiter.csv` | nominal Jupiter | 18.26 → 5.08 au, 0.018 → 317 M⊕ |
+| `track_nominal_jupiter.csv` | nominal Jupiter | 18.22 → 5.08 au, 0.018 → 317 M⊕ |
 | `track_nominal_saturn.csv` | nominal Saturn | 21.27 → 8.02 au, → 113 M⊕ |
 | `track_nominal_uranus.csv`, `_neptune.csv` | nominal ice giants | 22.50 → 16.01 au, → 18.1 M⊕; 24.00 → 18.57 au, → 14.4 M⊕ |
-| `track_rate_x{0.15,0.25,0.50,0.75,1.00,1.25,1.50,2.00}_jupiter.csv` | a_end,k + k(a_nom − a_end,nom), same m(t); ends from Fig. 3 | e.g. ×0.15: 7.08 → 5.43; ×2.00: 32.04 → 5.68 |
+| `track_rate_x{0.15,0.25,0.50,0.75,1.00,1.25,1.50,2.00}_jupiter.csv` | a_end,k + k(a_nom − a_end,nom), same m(t); ends from Fig. 3 | e.g. ×0.15: 7.08 → 5.43; ×2.00: 31.96 → 5.68 |
 | `track_rate_x…_saturn.csv` | same rule on nominal Saturn; end chosen so the start equals Table 1 (G2) | 10.45 … 35.5 au starts, exactly Table 1 |
 | `track_insitu_{jupiter,saturn}.csv` | 5.4 and 8.6 au, nominal clocks | — |
-| `track_outward_jupiter.csv` | nominal path mirrored, a = 5.08 + 18.26 − a_nom | 5.08 → 18.26 au |
+| `track_outward_jupiter.csv` | nominal path mirrored, a = 5.08 + 18.22 − a_nom | 5.08 → 18.22 au |
 
 ### 3.5 Verification (`reports/pirani_tracks/`: `verification.png`, `snapshots.png`, `wobble.png`, `summary.json`)
 
