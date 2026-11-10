@@ -295,7 +295,7 @@ def figure(clocks, fwd, gm, th, vh, starts):
         ax[1, 0].axhline(FINAL_MASS_FIG1[n], color=c, lw=0.6, ls=":")
     ax[0, 0].plot([], [], "k--", lw=1.2, label="forward model (migration integrated)")
     ax[0, 0].set(yscale="log", xlabel="a [au]", ylabel="m [M_E]", xlim=(0, 30), ylim=(1e-2, 1e3),
-                 title="(a) Paths: her Fig. 1 (thick) and the physics alone (dashed)")
+                 title="(a) Paths: her Fig. 1 (thick), physics alone (dashed)")
     ax[0, 0].legend(fontsize=8)
     rj = clocks["jupiter"]
     tm = np.interp(gm, rj["m"], rj["t"])
@@ -308,7 +308,7 @@ def figure(clocks, fwd, gm, th, vh, starts):
     ax[0, 1].set(xscale="log", xlabel="m_J [M_E]", ylabel="t - t(5 M_E) [kyr]", title="(b) Jupiter's clock")
     ax[0, 1].legend(fontsize=8)
     ax[1, 0].set(yscale="log", xlabel="t - 2.3 Myr [kyr]", ylabel="m [M_E]", ylim=(1e-2, 1e3),
-                 title="(c) Clocks used for the N-body tracks (dotted: her final masses)")
+                 title="(c) N-body track clocks (dotted: her final masses)")
     ax[1, 0].legend(fontsize=8)
     v_model = np.abs(np.gradient(np.interp(gm, rj["m"], rj["a"]), np.interp(gm, rj["m"], rj["t"]))) * 1e6
     for lab, k, c in [("nominal", 1.0, "#1f77b4"), ("x0.25", 0.25, "#2ca02c"), ("x0.15", 0.125, "#d62728"),
@@ -318,7 +318,7 @@ def figure(clocks, fwd, gm, th, vh, starts):
         ax[1, 1].plot(mr[o], vr[o], color=c, lw=4, alpha=0.3, label=f"her Fig. 13 {lab}")
         ax[1, 1].plot(gm, k * v_model, color=c, lw=1.2)
     ax[1, 1].set(xscale="log", yscale="log", xlabel="m_J [M_E]", ylabel="|da/dt| [au/Myr]", xlim=(0.1, 100),
-                 ylim=(0.1, 1000), title="(d) Migration rate: her Fig. 13 (thick), N-body tracks (thin; equal by construction 3-100 M_E)")
+                 ylim=(0.1, 1000), title="(d) Rate: her Fig. 13 (thick), tracks (thin)")
     ax[1, 1].legend(fontsize=8)
     fig.savefig(REPORT / "verification.png", dpi=140)
 
