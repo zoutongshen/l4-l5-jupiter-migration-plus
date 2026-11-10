@@ -1,0 +1,150 @@
+{
+  "flux_factor": 8.0,
+  "iso_factor": 1.066,
+  "tracks": {
+    "nominal_jupiter": "track_nominal_jupiter.csv",
+    "nominal_saturn": "track_nominal_saturn.csv",
+    "nominal_uranus": "track_nominal_uranus.csv",
+    "nominal_neptune": "track_nominal_neptune.csv",
+    "rate_x0.15_jupiter": "track_rate_x0.15_jupiter.csv",
+    "rate_x0.15_saturn": "track_rate_x0.15_saturn.csv",
+    "rate_x0.25_jupiter": "track_rate_x0.25_jupiter.csv",
+    "rate_x0.25_saturn": "track_rate_x0.25_saturn.csv",
+    "rate_x0.50_jupiter": "track_rate_x0.50_jupiter.csv",
+    "rate_x0.50_saturn": "track_rate_x0.50_saturn.csv",
+    "rate_x0.75_jupiter": "track_rate_x0.75_jupiter.csv",
+    "rate_x0.75_saturn": "track_rate_x0.75_saturn.csv",
+    "rate_x1.00_jupiter": "track_rate_x1.00_jupiter.csv",
+    "rate_x1.00_saturn": "track_rate_x1.00_saturn.csv",
+    "rate_x1.25_jupiter": "track_rate_x1.25_jupiter.csv",
+    "rate_x1.25_saturn": "track_rate_x1.25_saturn.csv",
+    "rate_x1.50_jupiter": "track_rate_x1.50_jupiter.csv",
+    "rate_x1.50_saturn": "track_rate_x1.50_saturn.csv",
+    "rate_x2.00_jupiter": "track_rate_x2.00_jupiter.csv",
+    "rate_x2.00_saturn": "track_rate_x2.00_saturn.csv",
+    "insitu_jupiter": "track_insitu_jupiter.csv",
+    "insitu_saturn": "track_insitu_saturn.csv",
+    "outward_jupiter": "track_outward_jupiter.csv"
+  },
+  "checks": {
+    "smoothing_max_dev_au": {
+      "jupiter": 0.18576833502581813,
+      "saturn": 0.2092484879129568,
+      "uranus": 0.01218721489356156,
+      "neptune": 0.009588000578514055
+    },
+    "jupiter": {
+      "t_start_myr": 2.31,
+      "m_3myr_model": 305.1230158992062,
+      "m_3myr_fig1": 306.0,
+      "a_end": 5.080303458206224,
+      "m_isolation_model": 20.127532017471065,
+      "m_gas_start_fig1": 20.552301252755598
+    },
+    "saturn": {
+      "t_start_myr": 2.56,
+      "m_3myr_model": 115.74891731112842,
+      "m_3myr_fig1": 113.0,
+      "a_end": 8.02427,
+      "m_isolation_model": 22.37152068574854,
+      "m_gas_start_fig1": 22.671093745253813
+    },
+    "uranus": {
+      "t_start_myr": 2.7212466581500294,
+      "m_3myr_model": 18.097284609013403,
+      "m_3myr_fig1": 18.1,
+      "a_end": 16.011851454803086,
+      "m_isolation_model": null,
+      "m_gas_start_fig1": null
+    },
+    "neptune": {
+      "t_start_myr": 2.7393462748117097,
+      "m_3myr_model": 14.401255420096973,
+      "m_3myr_fig1": 14.4,
+      "a_end": 18.572281494749305,
+      "m_isolation_model": null,
+      "m_gas_start_fig1": null
+    },
+    "jupiter_clock_offset_kyr": {
+      "1": 9.092372212284818,
+      "2": 2.98760413042989,
+      "10": 1.031112637989651,
+      "20": 9.306266450229316,
+      "30": 11.017130588480772,
+      "50": 16.76698870866003,
+      "100": 31.783459232076186
+    },
+    "rate_starts": {
+      "x0.15": {
+        "jupiter": 7.08181019805771,
+        "table1_j": 7.1,
+        "saturn": 10.45,
+        "table1_s": 10.45
+      },
+      "x0.25": {
+        "jupiter": 8.740060396115418,
+        "table1_j": 8.8,
+        "saturn": 11.9,
+        "table1_s": 11.9
+      },
+      "x0.50": {
+        "jupiter": 11.661540792230834,
+        "table1_j": 11.7,
+        "saturn": 14.6,
+        "table1_s": 14.6
+      },
+      "x0.75": {
+        "jupiter": 14.888881188346252,
+        "table1_j": 15.0,
+        "saturn": 18.0,
+        "table1_s": 18.0
+      },
+      "x1.00": {
+        "jupiter": 18.25174158446167,
+        "table1_j": 18.4,
+        "saturn": 21.3,
+        "table1_s": 21.3
+      },
+      "x1.25": {
+        "jupiter": 21.814621980577087,
+        "table1_j": 22.2,
+        "saturn": 25.5,
+        "table1_s": 25.5
+      },
+      "x1.50": {
+        "jupiter": 25.407512376692505,
+        "table1_j": 25.6,
+        "saturn": 28.9,
+        "table1_s": 28.9
+      },
+      "x2.00": {
+        "jupiter": 32.04322316892334,
+        "table1_j": 32.3,
+        "saturn": 35.5,
+        "table1_s": 35.5
+      }
+    },
+    "forward_model": {
+      "jupiter": {
+        "a_end": 3.7631865727635554,
+        "a_end_fig1": 5.075370000000001,
+        "m_end": 304.24958556262186
+      },
+      "saturn": {
+        "a_end": 6.0253614473480654,
+        "a_end_fig1": 8.02427,
+        "m_end": 113.29262447920088
+      },
+      "uranus": {
+        "a_end": 17.38804173759012,
+        "a_end_fig1": 16.0003,
+        "m_end": 17.703410223838755
+      },
+      "neptune": {
+        "a_end": 19.97128152328928,
+        "a_end_fig1": 18.5693,
+        "m_end": 14.140786426405793
+      }
+    }
+  }
+}

@@ -150,3 +150,28 @@ def test_restart_is_bitwise_with_pirani_forces(tmp_path):
     resumed = runner_for(tmp_path / "split", 1600.0, resume=True)
     resumed.run(log=lambda *_: None)
     assert np.array_equal(straight._states()[0], resumed._states()[0])
+
+
+# --- growth tracks ------------------------------------------------------------------
+
+def test_tracks_reproduce_her_final_masses():
+    """Along her Fig. 1 paths, the calibrated growth model ends J and S at her masses (+-3%, +-5%)."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    import s9_pirani_tracks as s9
+    if not (s9.DIG / "fig1_jupiter.csv").exists():
+        pytest.skip("run s9_digitize_pirani.py first")
+    assert s9.clock("jupiter", 2.31e6)["m"][-1] == pytest.approx(306.0, rel=0.03)
+    assert s9.clock("saturn", 2.56e6)["m"][-1] == pytest.approx(113.0, rel=0.05)
+
+
+def test_rate_tracks_are_scaled_nominal():
+    from pathlib import Path
+    d = Path(__file__).resolve().parents[1] / "configs" / "tracks" / "pirani19a"
+    if not (d / "track_rate_x0.25_jupiter.csv").exists():
+        pytest.skip("run s9_pirani_tracks.py first")
+    t1, a1, m1 = np.loadtxt(d / "track_nominal_jupiter.csv", delimiter=",", skiprows=1).T
+    tk, ak, mk = np.loadtxt(d / "track_rate_x0.25_jupiter.csv", delimiter=",", skiprows=1).T
+    assert np.array_equal(t1, tk) and np.allclose(m1, mk)
+    assert np.allclose(ak - ak[-1], 0.25 * (a1 - a1[-1]), atol=1e-6)

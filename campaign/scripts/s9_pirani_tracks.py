@@ -1,0 +1,261 @@
+"""Pirani+2019a's growth tracks for the stage-9 N-body runs, with their verification.
+
+Inputs: her curves extracted from the PDF vectors (s9_digitize_pirani.py -> configs/tracks/pirani19a/).
+  Fig. 1  a(m) of J, S, U, N (nominal);  Fig. 3  a(m) of Jupiter at 8 rates;  Fig. 13  adot(m) of Jupiter.
+Model: trojans/pirani_tracks.py (BLJ15 recipe on the Ida+2016 disc).
+
+What is taken from her figures and what is modelled:
+  path a(m)   her Fig. 1 / Fig. 3 curves, exactly.
+  clock m(t)  the growth model run along her path (``integrate(..., path=...)``): pebbles (Ida+2016
+              eqs. 59-61) to isolation, then Piso & Youdin contraction, then Machida runaway capped
+              at 0.8 Mdot*. Calibrated: FLUX_FACTOR (pebble flux x Ida eq. 54), fitted to Jupiter's
+              clock from her Figs. 1+13 and final mass; ISO_FACTOR (x BLJ15 eq. 16), so that the gas
+              phase starts where her dashed lines start, for J and S together. Ice-giant start times
+              (her "~2.70 Myr") inferred from their final masses.
+  rate scan   her sect. 3.3 "contraction or expansion of the nominal track": a_k(t) = a_end,k +
+              k (a_nom(t) - a_end,nom), same m(t) (verified on Figs. 3 and 13: k constant to 1%).
+              k = 0.125 for her "x0.15" (Fig. 13 rate ratio 0.126, Fig. 8 Delta a = 1.7 au).
+  Saturn in the rate scan: same rule on her nominal Saturn path, with the end chosen so the start
+              is her Table 1 value (the paper gives no Saturn rate tracks).
+
+Checks written to campaign/reports/pirani_tracks/: summary.json and verification.png, including
+the full forward model (migration integrated, PBK11 torque scaled by TORQUE_SCALE) against Fig. 1.
+
+    python campaign/scripts/s9_pirani_tracks.py
+"""
+
+import json
+import sys
+from pathlib import Path
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+from scipy.interpolate import PchipInterpolator  # noqa: E402
+from scipy.optimize import brentq  # noqa: E402
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from trojans import pirani_tracks as pt  # noqa: E402
+
+CAMPAIGN = Path(__file__).resolve().parents[1]
+DIG = CAMPAIGN / "configs" / "tracks" / "pirani19a"
+OUT_TRACKS = DIG
+REPORT = CAMPAIGN / "reports" / "pirani_tracks"
+
+FLUX_FACTOR = 8.0
+ISO_FACTOR = 1.066
+TORQUE_SCALE = 0.6                     # forward-model check only
+START = {"jupiter": 2.31e6, "saturn": 2.56e6}
+FINAL_MASS_FIG1 = {"jupiter": 306.0, "saturn": 113.0, "uranus": 18.1, "neptune": 14.4}
+RATES = {0.125: "x0.15", 0.25: "x0.25", 0.5: "x0.50", 0.75: "x0.75", 1.0: "x1.00", 1.25: "x1.25",
+         1.5: "x1.50", 2.0: "x2.00"}
+TABLE1 = {0.0: (5.4, 8.6), 0.125: (7.1, 10.45), 0.25: (8.8, 11.9), 0.5: (11.7, 14.6), 0.75: (15.0, 18.0),
+          1.0: (18.4, 21.3), 1.25: (22.2, 25.5), 1.5: (25.6, 28.9), 2.0: (32.3, 35.5)}
+N_ROWS = 3000
+
+
+def load(name, smooth=True):
+    """Her a(m) curve. Smoothed: medians in log-m bins (0.25 dex below 2 M_E, 0.08 dex above),
+    joined by a monotone (PCHIP) spline. Her plotted vertices step by ~0.01-0.03 au where a barely
+    changes (m < 1 M_E), and the N-body forcing differentiates a(t). The largest deviation from
+    her curve is recorded in summary.json (smoothing_max_dev_au)."""
+    a, m, g = np.loadtxt(DIG / f"{name}.csv", delimiter=",", skiprows=1).T
+    o = np.argsort(m)
+    m, a, g = m[o], np.minimum.accumulate(a[o]), g[o]
+    if not smooth:
+        return m, a, g
+    lm = np.log10(m)
+    split = np.log10(2.0)                          # coarser below 2 M_E, where a barely moves
+    edges = np.concatenate([np.arange(lm[0], split, 0.25), np.arange(split, lm[-1] + 0.08, 0.08)])
+    nodes, vals = [lm[0]], [a[0]]
+    for lo, hi in zip(edges[:-1], edges[1:]):
+        sel = (lm > lo) & (lm <= hi)
+        if sel.sum() >= 2:
+            nodes.append(float(np.median(lm[sel])))
+            vals.append(float(np.median(a[sel])))
+    nodes.append(lm[-1])
+    vals.append(a[-1])
+    nodes, idx = np.unique(nodes, return_index=True)
+    vals = np.minimum.accumulate(np.array(vals)[idx])
+    grid = np.linspace(lm[0], lm[-1], 600)
+    a_s = PchipInterpolator(nodes, vals)(grid)
+    return 10**grid, np.minimum.accumulate(a_s), np.interp(grid, lm, g)
+
+
+def params(t0, m_seed, **kw):
+    return pt.TrackParams(t0_yr=t0, m_seed_earth=m_seed, flux_factor=FLUX_FACTOR, iso_factor=ISO_FACTOR,
+                          dt_yr=50.0, **kw)
+
+
+M_JOIN = 3.0          # Jupiter: below this mass the path is built from her Fig. 13 rate
+
+
+def jupiter_path(r):
+    """Jupiter's a(m): her Fig. 1 above M_JOIN; below it a(m) = a_her(M_JOIN) + int |adot_Fig13| dt
+    along the clock r, so that adot(t) of the track is her Fig. 13 rate where her path is too flat
+    to differentiate."""
+    m, a, _ = load("fig1_jupiter")
+    mr, vr, _ = np.loadtxt(DIG / "fig13_nominal.csv", delimiter=",", skiprows=1).T
+    o = np.argsort(mr)
+    mm, tt = np.maximum.accumulate(r["m"]), r["t"]
+    lo = np.logspace(np.log10(m[0]), np.log10(M_JOIN), 200)
+    t_lo = np.interp(lo, mm, tt)
+    v = 10 ** np.interp(np.log10(lo), np.log10(mr[o]), np.log10(vr[o]), left=np.log10(vr[o][0])) / 1e6
+    da = np.concatenate([[0.0], np.cumsum(0.5 * (v[1:] + v[:-1]) * np.diff(t_lo))])
+    a_join = float(np.interp(np.log10(M_JOIN), np.log10(m), a))
+    a_lo = a_join + (da[-1] - da)
+    hi = m > M_JOIN
+    return np.concatenate([lo, m[hi]]), np.concatenate([a_lo, a[hi]])
+
+
+def clock(name, t0):
+    m, a, _ = load(f"fig1_{name}")
+    r = pt.integrate(params(t0, m[0]), path=(m, a))
+    if name == "jupiter":                          # second pass along the Fig.-13-based low-mass path
+        pm, pa = jupiter_path(r)
+        r = pt.integrate(params(t0, pm[0]), path=(pm, pa))
+        r["path"] = (pm, pa)
+    return r
+
+
+def ice_start(name):
+    m, a, _ = load(f"fig1_{name}")
+    f = lambda t0: pt.integrate(params(t0, m[0]), path=(m, a))["m"][-1] - FINAL_MASS_FIG1[name]
+    return brentq(f, 2.6e6, 2.95e6, xtol=200.0)
+
+
+def table(t, a, m, t_end=3.0e6):
+    """Rows (t, a, m) from t = 0 (seed parked at its start a) to the end of the gas, N_ROWS samples."""
+    grid = np.concatenate([[0.0], np.linspace(t[0], t_end, N_ROWS - 1)])
+    return grid, np.interp(grid, t, a), np.exp(np.interp(grid, t, np.log(m)))
+
+
+def write(name, t, a, m, note):
+    path = OUT_TRACKS / f"track_{name}.csv"
+    with open(path, "w") as f:
+        f.write(f"t_yr,a_au,m_earth  # Pirani+2019a reproduction: {note}\n")
+        np.savetxt(f, np.column_stack([t, a, m]), delimiter=",", fmt="%.10g")
+    return path.name
+
+
+def her_clock():
+    """Jupiter's clock from her Figs. 1 + 13 alone, t(m) = int da / adot on 0.2-100 M_E."""
+    mJ, aJ, _ = load("fig1_jupiter")
+    mr, vr, _ = np.loadtxt(DIG / "fig13_nominal.csv", delimiter=",", skiprows=1).T
+    o = np.argsort(mr)
+    grid = np.logspace(np.log10(0.2), 2, 300)
+    ag = np.interp(np.log10(grid), np.log10(mJ), aJ)
+    vg = 10 ** np.interp(np.log10(grid), np.log10(mr[o]), np.log10(vr[o]))
+    t = np.concatenate([[0.0], np.cumsum(-np.diff(ag) / (0.5 * (vg[1:] + vg[:-1])) * 1e6)])
+    return grid, t, vg
+
+
+def main():
+    REPORT.mkdir(parents=True, exist_ok=True)
+    summary = {"flux_factor": FLUX_FACTOR, "iso_factor": ISO_FACTOR, "tracks": {}, "checks": {}}
+    clocks = {}
+    starts = dict(START)
+    for n in ("uranus", "neptune"):
+        starts[n] = ice_start(n)
+    for n in ("jupiter", "saturn", "uranus", "neptune"):
+        mr_, ar_, _ = load(f"fig1_{n}", smooth=False)
+        ms_, as_, _ = load(f"fig1_{n}")
+        summary["checks"].setdefault("smoothing_max_dev_au", {})[n] = float(
+            np.max(np.abs(np.interp(np.log10(mr_), np.log10(ms_), as_) - ar_)))
+        r = clock(n, starts[n])
+        clocks[n] = r
+        summary["checks"][n] = {"t_start_myr": starts[n] / 1e6, "m_3myr_model": float(r["m"][-1]),
+                                "m_3myr_fig1": FINAL_MASS_FIG1[n], "a_end": float(r["a"][-1]),
+                                "m_isolation_model": r["m_iso_reached"],
+                                "m_gas_start_fig1": float(load(f"fig1_{n}")[0][load(f"fig1_{n}")[2] == 1].min())
+                                if (load(f"fig1_{n}")[2] == 1).any() else None}
+        t, a, m = table(r["t"], r["a"], r["m"])
+        summary["tracks"][f"nominal_{n}"] = write(f"nominal_{n}", t, a, m, f"nominal {n}, Fig. 1 path, modelled clock")
+
+    # Jupiter's clock against her own (Figs. 1 + 13)
+    gm, th, vh = her_clock()
+    rj = clocks["jupiter"]
+    tm = np.interp(gm, rj["m"], rj["t"])
+    i5 = np.argmin(abs(gm - 5))
+    off = (tm - tm[i5]) - (th - th[i5])
+    summary["checks"]["jupiter_clock_offset_kyr"] = {f"{M:g}": float(np.interp(M, gm, off) / 1e3)
+                                                    for M in (1, 2, 10, 20, 30, 50, 100)}
+
+    # rate scan and in situ: Jupiter (her Fig. 3 ends) and Saturn (Table 1 starts)
+    tJ, aJ, mJ = table(rj["t"], rj["a"], rj["m"])
+    rs = clocks["saturn"]
+    tS, aS, mS = table(rs["t"], rs["a"], rs["m"])
+    aJ_end, aS_end = aJ[-1], aS[-1]
+    for k, lab in RATES.items():
+        ends = load(f"fig3_{lab}")[1].min()
+        a_k = ends + k * (aJ - aJ_end)
+        summary["tracks"][f"rate_{lab}_jupiter"] = write(f"rate_{lab}_jupiter", tJ, a_k, mJ,
+                                                        f"rate k = {k} (her {lab}), Jupiter")
+        aS0 = TABLE1[k][1]
+        endS = aS0 - k * (aS[1] - aS_end)
+        summary["tracks"][f"rate_{lab}_saturn"] = write(f"rate_{lab}_saturn", tS, endS + k * (aS - aS_end), mS,
+                                                       f"rate k = {k} (her {lab}), Saturn, start = Table 1")
+        summary["checks"].setdefault("rate_starts", {})[lab] = {"jupiter": float(a_k[1]), "table1_j": TABLE1[k][0],
+                                                              "saturn": float(endS + k * (aS[1] - aS_end)),
+                                                              "table1_s": aS0}
+    summary["tracks"]["insitu_jupiter"] = write("insitu_jupiter", tJ, np.full_like(tJ, 5.4), mJ, "in situ Jupiter, 5.4 au")
+    summary["tracks"]["insitu_saturn"] = write("insitu_saturn", tS, np.full_like(tS, 8.6), mS, "in situ Saturn, 8.6 au")
+    a_out = aJ[-1] + aJ[1] - aJ                       # 5.08 -> 18.4 au, her sect. 4.2 outward test
+    summary["tracks"]["outward_jupiter"] = write("outward_jupiter", tJ, a_out, mJ, "outward Jupiter (nominal mirrored)")
+
+    # forward model (migration integrated): does the physics alone land on her path?
+    fwd = {}
+    for n in ("jupiter", "saturn", "uranus", "neptune"):
+        m0, a0, _ = load(f"fig1_{n}")
+        fwd[n] = pt.integrate(pt.TrackParams(t0_yr=starts[n], a0_au=float(a0[0]), m_seed_earth=float(m0[0]),
+                                             flux_factor=FLUX_FACTOR, iso_factor=ISO_FACTOR,
+                                             torque_scale=TORQUE_SCALE, dt_yr=100.0))
+        summary["checks"].setdefault("forward_model", {})[n] = {"a_end": float(fwd[n]["a"][-1]),
+                                                             "a_end_fig1": float(load(f"fig1_{n}")[1].min()),
+                                                             "m_end": float(fwd[n]["m"][-1])}
+    (REPORT / "summary.json").write_text(json.dumps(summary, indent=2, default=float))
+    figure(clocks, fwd, gm, th, vh, starts)
+    print(json.dumps(summary["checks"], indent=1, default=float))
+
+
+def figure(clocks, fwd, gm, th, vh, starts):
+    cols = {"jupiter": "#d62728", "saturn": "#ff7f0e", "uranus": "#2ca02c", "neptune": "#1f77b4"}
+    fig, ax = plt.subplots(2, 2, figsize=(12, 8.5), constrained_layout=True)
+    for n, c in cols.items():
+        m, a, g = load(f"fig1_{n}", smooth=False)
+        ax[0, 0].plot(a, m, color=c, lw=4, alpha=0.3, label=f"{n}: her Fig. 1")
+        ax[0, 0].plot(fwd[n]["a"], fwd[n]["m"], color=c, lw=1.2, ls="--")
+        r = clocks[n]
+        ax[1, 0].plot((r["t"] - 2.3e6) / 1e3, r["m"], color=c, lw=1.5, label=f"{n} (start {starts[n] / 1e6:.3f} Myr)")
+        ax[1, 0].axhline(FINAL_MASS_FIG1[n], color=c, lw=0.6, ls=":")
+    ax[0, 0].plot([], [], "k--", lw=1.2, label="forward model (migration integrated)")
+    ax[0, 0].set(yscale="log", xlabel="a [au]", ylabel="m [M_E]", xlim=(0, 30), ylim=(1e-2, 1e3),
+                 title="(a) Paths: her Fig. 1 (thick) and the physics alone (dashed)")
+    ax[0, 0].legend(fontsize=8)
+    rj = clocks["jupiter"]
+    tm = np.interp(gm, rj["m"], rj["t"])
+    i5 = np.argmin(abs(gm - 5))
+    ax[0, 1].plot(gm, (th - th[i5]) / 1e3, color="#d62728", lw=4, alpha=0.3, label="her clock: Figs. 1 + 13")
+    ax[0, 1].plot(gm, (tm - tm[i5]) / 1e3, color="k", lw=1.2, label="model along her path")
+    ax[0, 1].set(xscale="log", xlabel="m_J [M_E]", ylabel="t - t(5 M_E) [kyr]", title="(b) Jupiter's clock")
+    ax[0, 1].legend(fontsize=8)
+    ax[1, 0].set(yscale="log", xlabel="t - 2.3 Myr [kyr]", ylabel="m [M_E]", ylim=(1e-2, 1e3),
+                 title="(c) Clocks used for the N-body tracks (dotted: her final masses)")
+    ax[1, 0].legend(fontsize=8)
+    v_model = np.abs(np.gradient(np.interp(gm, rj["m"], rj["a"]), np.interp(gm, rj["m"], rj["t"]))) * 1e6
+    for lab, k, c in [("nominal", 1.0, "#1f77b4"), ("x0.25", 0.25, "#2ca02c"), ("x0.15", 0.125, "#d62728"),
+                      ("x2.00", 2.0, "#9467bd")]:
+        mr, vr, _ = np.loadtxt(DIG / f"fig13_{lab}.csv", delimiter=",", skiprows=1).T
+        o = np.argsort(mr)
+        ax[1, 1].plot(mr[o], vr[o], color=c, lw=4, alpha=0.3, label=f"her Fig. 13 {lab}")
+        ax[1, 1].plot(gm, k * v_model, color=c, lw=1.2)
+    ax[1, 1].set(xscale="log", yscale="log", xlabel="m_J [M_E]", ylabel="|da/dt| [au/Myr]", xlim=(0.1, 100),
+                 ylim=(0.1, 1000), title="(d) Migration rate: her Fig. 13 (thick) and the N-body tracks (thin)")
+    ax[1, 1].legend(fontsize=8)
+    fig.savefig(REPORT / "verification.png", dpi=140)
+
+
+if __name__ == "__main__":
+    main()
