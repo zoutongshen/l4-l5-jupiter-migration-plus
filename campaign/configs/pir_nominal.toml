@@ -22,6 +22,7 @@ seed = 1000
 [integrator]    # her MERCURY hybrid at 50 d
 name = "mercurius"
 dt_days = 50.0
+check_every_steps = 32     # sample/force-update every 4.4 yr (libration ~150 yr; damping >= 100 yr)
 
 [physics]
 drag = true

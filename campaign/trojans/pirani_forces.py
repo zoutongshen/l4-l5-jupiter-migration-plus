@@ -13,8 +13,10 @@ Giants (particles 1..n after the Sun), unlike stage 8 they are never put on a ci
     damps i at 1/(2 t_i) (measured, tests/test_pirani.py); Pirani's B.2 and Tanaka & Ward
     2004 state di/dt = -i/t_i, so the factor 2 is used (as REBOUNDx's modify_orbits);
   - mass m(t) from the track, set at every runner check (positions/velocities untouched).
-The accelerations are a REBOUND ``additional_forces`` callback over the giants only
-(O(n_giants) per step; REBOUNDx effects loop over every particle).
+The accelerations are a compiled REBOUND ``additional_forces`` function over the giants only
+(csrc/pirani_forces.c; O(n_giants) per step), with its coefficients (adot/2a, 1/t_e, 2/t_i)
+set from Python at every runner check. A Python callback cost ~1 ms per step (measured on
+haagsebeek: a fixed ~400 s per chunk per 50 kyr), which made extra workers useless.
 
 Disc particles: aerodynamic gas drag (Pirani App. A), the orbit-averaged rates of
 Adachi et al. 1976 (her eqs. A.5-A.7), r_p = 50 km, rho_p = 1 g/cm^3, C_D = 0.44, gas
@@ -27,8 +29,14 @@ Removal on impact (planet radii from a bulk density) is done by the runner's che
 REBOUND's own collision search is O(N^2) with test particles (100x slower, measured).
 """
 
+import ctypes
+import hashlib
 import math
+import os
+import subprocess
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import rebound
@@ -38,6 +46,37 @@ from trojans.disc import M_EARTH, hill_radius
 from trojans.history import SystemHistory
 
 M_DAMP_MAX = 30.0 * M_EARTH              # Pirani App. B: tidal drag only below 30 M_E
+_CSRC = Path(__file__).with_name("csrc") / "pirani_forces.c"
+_LIB = None
+
+
+def _forces_lib():
+    """Compile (once per source version, atomically, so parallel workers are safe) and load the C force."""
+    global _LIB
+    if _LIB is not None:
+        return _LIB
+    src = _CSRC.read_bytes()
+    tag = hashlib.sha1(src + rebound.__version__.encode()).hexdigest()[:12]
+    build = Path(os.environ.get("TROJANS_BUILD", Path.home() / ".cache" / "trojans"))
+    build.mkdir(parents=True, exist_ok=True)
+    so = build / f"pirani_forces_{tag}.so"
+    if not so.exists():
+        tmp = build / f".{so.name}.{os.getpid()}"
+        cc = os.environ.get("CC", "cc")
+        subprocess.run([cc, "-O3", "-fPIC", "-shared", "-I", str(Path(rebound.__file__).parent), str(_CSRC),
+                        "-o", str(tmp)] + (["-undefined", "dynamic_lookup"] if sys.platform == "darwin" else []),
+                       check=True)
+        os.replace(tmp, so)
+    lib = ctypes.CDLL(str(so))
+    ns = type("PiraniForcesLib", (), {})()
+    ns.cdll = lib
+    ns.pf_mig = (ctypes.c_double * 8).in_dll(lib, "pf_mig")
+    ns.pf_e = (ctypes.c_double * 8).in_dll(lib, "pf_e")
+    ns.pf_i = (ctypes.c_double * 8).in_dll(lib, "pf_i")
+    ns.pf_n = ctypes.c_int.in_dll(lib, "pf_n")
+    ns.fn = ctypes.cast(lib.pirani_forces, ctypes.c_void_p).value
+    _LIB = ns
+    return ns
 G_CM3 = gasdisc.G_CM3_TO_MSUN_AU3
 AU_CM = constants.AU_KM * 1e5
 
@@ -94,47 +133,43 @@ class PiraniForcing:
         self._attached = None
         self._callback = None
 
-    # --- giants: accelerations every step ------------------------------------
+    # --- giants: accelerations every step (compiled; coefficients set at each check) ----
 
-    def _forces(self, sim_pointer):
-        sim = sim_pointer.contents
-        t = sim.t
-        if not gasdisc.gas_present(t):
-            return
-        ps = sim.particles
-        sun = ps[0]
+    def _set_coefficients(self, sim, t) -> None:
+        """adot/(2a), 1/t_e and 2/t_i of each giant for the C force (csrc/pirani_forces.c).
+
+        Updated at every runner check (~1 yr); the damping times are >= 10 yr and adot(t) is
+        piecewise linear in a table with ~230 yr rows, so this matches a per-step evaluation.
+        """
+        lib = _forces_lib()
+        gas = gasdisc.gas_present(t)
+        sun = sim.particles[0]
         for k, hist in enumerate(self.system.histories):
-            p = ps[k + 1]
-            rx, ry, rz = p.x - sun.x, p.y - sun.y, p.z - sun.z
-            vx, vy, vz = p.vx - sun.vx, p.vy - sun.vy, p.vz - sun.vz
-            ax = ay = az = 0.0
-            adot = hist.adot(t)
-            if adot != 0.0:
-                f = adot / (2.0 * hist.a(t))
-                ax, ay, az = f * vx, f * vy, f * vz
-            if p.m < M_DAMP_MAX:
-                r2 = rx * rx + ry * ry + rz * rz
-                orb = p.orbit(primary=sun)
-                t_e, t_i = damping_times(p.m, orb.a, orb.e, orb.inc, t)
-                g = -2.0 * (rx * vx + ry * vy + rz * vz) / (r2 * t_e)
-                ax += g * rx
-                ay += g * ry
-                az += g * rz - 2.0 * vz / t_i      # 2x CN08 eq. 16, so that di/dt = -i/t_i
-            p.ax += ax
-            p.ay += ay
-            p.az += az
+            p = sim.particles[k + 1]
+            mig = e_rate = i_rate = 0.0
+            if gas:
+                adot = hist.adot(t)
+                if adot != 0.0:
+                    mig = adot / (2.0 * hist.a(t))
+                if p.m < M_DAMP_MAX:
+                    orb = p.orbit(primary=sun)
+                    t_e, t_i = damping_times(p.m, orb.a, orb.e, orb.inc, t)
+                    e_rate, i_rate = 1.0 / t_e, 2.0 / t_i        # 2x CN08 eq. 16, so that di/dt = -i/t_i
+            lib.pf_mig[k], lib.pf_e[k], lib.pf_i[k] = mig, e_rate, i_rate
 
     def _attach(self, sim: rebound.Simulation) -> None:
         if self._attached is sim:
             return
-        self._callback = self._forces                     # keep a reference for ctypes
-        sim.additional_forces = self._callback
+        lib = _forces_lib()
+        lib.pf_n.value = len(self.system.histories)
+        sim.additional_forces = lib.fn
         sim.force_is_velocity_dependent = 1
         self._attached = sim
 
     # --- the runner hook ---------------------------------------------------------
 
     def __call__(self, sim: rebound.Simulation, runner) -> None:
+        first = self._attached is not sim           # start, or resume: drag at this t is already done
         self._attach(sim)
         t = sim.t
         changed = False
@@ -148,7 +183,7 @@ class PiraniForcing:
                 changed = True
             hill[k] = hill_radius(h.a(t), m)
             radius[k] = planet_radius_au(m, self.density)
-        if self.drag.enabled and gasdisc.gas_present(t) and self._drag_due(sim, runner):
+        if self.drag.enabled and gasdisc.gas_present(t) and not first and self._drag_due(sim, runner):
             self._apply_drag(sim, t)
             changed = True
         if changed:
@@ -157,6 +192,7 @@ class PiraniForcing:
                 sim.ri_mercurius.recalculate_coordinates_this_timestep = 1
             else:
                 sim.ri_whfast.recalculate_coordinates_this_timestep = 1
+        self._set_coefficients(sim, t)
         runner.m_jupiter = self.system.jupiter.mass(t)
         runner.hill = hill
         runner.planet_radius_au = radius
