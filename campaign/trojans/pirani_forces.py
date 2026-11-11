@@ -125,8 +125,9 @@ class PiraniForcing:
     """``ChunkRunner`` forcing for stage 9. ``system``: one track per giant, Jupiter first."""
 
     def __init__(self, system: SystemHistory, drag: DragParams = DragParams(), planet_density_g_cm3: float = 1.33,
-                 integrator: str = "mercurius"):
+                 integrator: str = "mercurius", damping: bool = True):
         self.system = system
+        self.damping = damping                      # planet e/i damping (App. B); off only for tests
         self.drag = drag
         self.density = planet_density_g_cm3
         self.integrator = integrator
@@ -151,7 +152,7 @@ class PiraniForcing:
                 adot = hist.adot(t)
                 if adot != 0.0:
                     mig = adot / (2.0 * hist.a(t))
-                if p.m < M_DAMP_MAX:
+                if self.damping and p.m < M_DAMP_MAX:
                     orb = p.orbit(primary=sun)
                     t_e, t_i = damping_times(p.m, orb.a, orb.e, orb.inc, t)
                     e_rate, i_rate = 1.0 / t_e, 2.0 / t_i        # 2x CN08 eq. 16, so that di/dt = -i/t_i

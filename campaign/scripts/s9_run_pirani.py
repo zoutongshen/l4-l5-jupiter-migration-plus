@@ -11,7 +11,7 @@ Config sections (configs/pir_*.toml):
   [giants]     jupiter = "pirani19a/track_....csv", saturn = ..., ... (simulation order = this order)
   [disc]       a_min_au, a_max_au, ring_au, n_per_ring, e_max, inc_max_deg, seed
   [integrator] name ("mercurius"), dt_days; other integrate.Settings fields
-  [physics]    drag (bool), drag_every_yr, planet_density_g_cm3, sun_radius_au
+  [physics]    drag (bool), drag_every_yr, planet_density_g_cm3, planet_damping (bool, default true), sun_radius_au
   [snapshots]  fine_every_yr, fine_until_yr, every_yr
   [parallel]   n_chunks, workers
 
@@ -75,11 +75,14 @@ def build(config: dict, args):
         snapshot_fine_until_yr=float(snaps.get("fine_until_yr", 3.5e6)), **integ)
     drag = DragParams(enabled=bool(phys.get("drag", True)), every_yr=float(phys.get("drag_every_yr", 100.0)))
     density = float(phys.get("planet_density_g_cm3", 1.33))
+    density = (density, bool(phys.get("planet_damping", True)))
     return system, ring, settings, drag, density
 
 
 def _forcing(system, drag, density, integrator):
-    return PiraniForcing(system, drag, planet_density_g_cm3=density, integrator=integrator)
+    """``density``: (planet density in g/cc, planet e/i damping on)."""
+    rho, damping = density
+    return PiraniForcing(system, drag, planet_density_g_cm3=rho, integrator=integrator, damping=damping)
 
 
 def run_chunk(task: dict) -> dict:
@@ -177,7 +180,7 @@ def main() -> None:
     print(f"{run_id}: {', '.join(f'{p} {h.a(0.0):.2f}->{h.a(3e6):.2f} au, ->{h.mass(3e6) / disc.M_EARTH:.0f} M_E' for p, h in zip(system.planets, system.histories))}; "
           f"{ring.n} particles ({ring.n_rings} rings x {ring.n_per_ring}, {ring.a_min}-{ring.a_max} au, seed {ring.seed}); "
           f"{settings.integrator} dt {settings.dt_yr * 365.25:.1f} d, t_end {settings.t_end_yr / 1e6:.2f} Myr, "
-          f"alpha {gasdisc.ALPHA}, drag {'on' if drag.enabled else 'off'}; {n_chunks} chunks on {workers} workers")
+          f"alpha {gasdisc.ALPHA}, drag {'on' if drag.enabled else 'off'}, planet damping {'on' if density[1] else 'off'}; {n_chunks} chunks on {workers} workers")
     if args.dry_run:
         return
     if args.planets_only:
@@ -186,7 +189,7 @@ def main() -> None:
 
     record = {"run_id": run_id, "config_file": str(args.config), "config": config, "repeat": args.repeat,
               "system": asdict(system), "disc": asdict(ring), "settings": asdict(settings), "drag": asdict(drag),
-              "planet_density_g_cm3": density, "alpha": gasdisc.ALPHA, "n_chunks": n_chunks}
+              "planet_density_g_cm3": density[0], "planet_damping": density[1], "alpha": gasdisc.ALPHA, "n_chunks": n_chunks}
     root = paths.run_dir(run_id)
     if args.resume:
         previous = json.loads((root / "settings.json").read_text())

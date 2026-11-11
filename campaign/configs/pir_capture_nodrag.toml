@@ -1,0 +1,40 @@
+# Stage 9 capture test (particle gas drag off): why is our L5 capture at 2.31-2.45 Myr half of Pirani's?
+# Jupiter alone (Saturn starts at 2.56 Myr, U/N are 0.01 M_E seeds until 2.7), only the rings
+# 17-19.5 au at her full density (5 x 1000; 206 of our 226 Trojans started at 18.0-18.5 au),
+# 0 -> 2.6 Myr. Compare L4/L5 at 2.30, 2.40, 2.45, 2.6 Myr with P1 and her Fig. 7.
+[run]
+run_id = "pir_capture_nodrag"
+t_end_yr = 2.6e6
+
+[giants]
+jupiter = "pirani19a/track_nominal_jupiter.csv"
+
+[disc]
+a_min_au = 17.0
+a_max_au = 19.5
+ring_au = 0.5
+n_per_ring = 1000
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 1000
+
+[integrator]
+name = "mercurius"
+dt_days = 50.0
+check_every_steps = 32
+
+[physics]
+drag = false
+drag_every_yr = 100.0
+planet_density_g_cm3 = 1.33
+planet_damping = true
+sun_radius_au = 0.005
+
+[snapshots]
+fine_every_yr = 1.0e4
+fine_until_yr = 3.5e6
+every_yr = 5.0e4
+
+[parallel]
+n_chunks = 5
+workers = 5
