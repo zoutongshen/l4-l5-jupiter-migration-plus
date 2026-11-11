@@ -214,9 +214,30 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
    - Our pre-migration count is 2.5× hers. Before 2.31 Myr the seed is 0.01 M⊕ (2.5 R_H ≈ 0.1 au), so this count is pure geometry: particles whose q and Q happen to fall in the window. It depends on her ring set-up and seed mass, so it is worth asking her.
    - Our Hilda count is a region count, not a libration test. Definition still open (G6).
    - **Cost:** 34.7 CPU-h, i.e. 5.68 CPU-s per particle-Myr over the whole run. That is 4× the quiet-phase benchmark, because encounters during migration cost more.
-5. ☐ **P1 pilot**: one full nominal run (44,000 particles) to 5 Myr. About 350 CPU-h, ~14 h wall on 24 workers.
+5. ✓ **P1 pilot, 2026-11-10/11** (`reports/pir_p1_nominal_r0/`). Her full nominal set-up, repeat 0: 44,000 particles, 0–5 Myr, 24 workers.
+   - Cost: 8 h wall and 189 CPU-h, i.e. 3.09 CPU-s per particle-Myr. That is half of test 3's rate per particle; the full disc parallelises better.
+
+   | quantity | hers (nominal) | P1 |
+   |---|---|---|
+   | Trojans before migration | ~60 | 98 |
+   | peak | ~400 | 356 (at 2.70 Myr) |
+   | Trojans at 5 Myr | ~270 | 226 |
+   | **N4 / N5 at 5 Myr** | ~174 / ~96 (1.8) | **189 / 37 (5.1 ± 0.9)** |
+   | co-orbital sides at 3.4 Myr, L4/L5 (Fig. 11) | 270/150 | 265/115 |
+   | Trojan origin | peak at ~18 au | 206 of 226 from the seed's ring (18.0–18.5 au) |
+   | Jupiter at 5 Myr; J–S | 5.0 au, 1:2 | 5.06 au, 317 M⊕; 1:2 (test 1) |
+   | Hildas | ~1700 | 829, a region count only (G6). Before Jupiter arrives this is ~825 disc particles near a_32 |
+
+   - **What matches:** the total counts (within ~15%), the Fig. 11 co-orbital split, and N4 itself.
+   - **What doesn't: N5 is 2.6× too low**, so N4/N5 is 5.1 against her 1.8. This is >3σ for one run, and test 3 (an independent seed) also gave 3.8. So it is systematic, not noise.
+   - **Where the missing L5 Trojans are.** L5-side co-orbitals do exist (58 at 5 Myr). But they are hot: median e is 0.08 on L5 against 0.045 on L4, the upper quartile is 0.17, and inclinations are 0.3° against 0.007°. So many fail the q, Q ≤ 2.5 R_H test. L4 holds a cold population carried in from the seed's ring, with e ≈ 0.01 and i ≈ 0.01° through migration. L5 is heated during capture: at 2.6–3.0 Myr its median e is 0.11–0.19 and its inclination 3–9°, against 0.013–0.05 and ~0.01° on L4.
+   - **Candidate causes**, to check against her set-up (cheap 1/10-disc tests, ~1.5 h each):
+     1. The seed is 0.01 M⊕ for 2.3 Myr, so its co-orbital "Trojans" are just disc particles (our pre-migration 98 against her 60). What she did with the seed and its ring before 2.31 Myr matters.
+     2. The L5 heating by Saturn. Our Saturn trails Jupiter closely through 2.56–3 Myr; its start and clock (G2) are ours, not hers.
+     3. U/N drift off their tracks (as in her Fig. 4); test with J+S only.
+     4. Her "high-e interlopers excluded" cut and an unstated inclination treatment (G6). These only remove Trojans, so they can't raise N5, but they change what N_tot means.
 6. ☐ P2 (nominal and in situ, ×10), P3 (rate scan and outward), P4 (nominal to 200 Myr), P5 (§5 instability).
-   - Measured cost: ~350 CPU-h per full run. P2 + P3 (101 runs) is therefore ~35,000 CPU-h, about 2 months on haagsebeek alone. In situ and rate runs carry only J and S, so they may come in cheaper; P2 will tell.
+   - Measured cost (P1): ~190 CPU-h, i.e. 8 h on 24 workers, per full run. P2 + P3 (101 runs) is therefore ~19,000 CPU-h, about 5 weeks on haagsebeek alone. In situ and rate runs carry only J and S, so they may come in cheaper.
    - To bring this down: fewer particles per ring for the rate scan, or more machines.
 
 **Ask Pirani** (email still to send): her track files (G1, G2), the disc extent at ×1.25–2 (G3), the outward run's planets (G7), the interloper e-cut and Hilda definition (G6), and whether her gas onset was capped (§3.6).
