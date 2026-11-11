@@ -1,0 +1,42 @@
+# Stage 9 e-test: the nominal model (J S U N) on the Trojan source rings 17-19.5 au only, particle e in [0, 0.02]
+# (twice her stated 0.01; the capture tests recovered her L5 capture with this). Repeats 0, 1 = disc seeds 1000, 1001.
+# Control: P1's particles with a0 in 17-19.5 au.
+# docs/PIRANI_2019A_REPRODUCTION.md. Repeats 0..9 re-randomise the disc (seed + repeat).
+[run]
+run_id = "pir_ehot"
+t_end_yr = 5.0e6          # her Table 3 is read at 5 Myr
+
+[giants]                  # simulation order; tracks from s9_pirani_tracks.py
+jupiter = "pirani19a/track_nominal_jupiter.csv"
+saturn = "pirani19a/track_nominal_saturn.csv"
+uranus = "pirani19a/track_nominal_uranus.csv"
+neptune = "pirani19a/track_nominal_neptune.csv"
+
+[disc]          # her sect. 3: 44 rings of 0.5 au x 1000 particles, 4-26 au; e <= 0.01, i <= 0.01 deg
+a_min_au = 17.0
+a_max_au = 19.5
+ring_au = 0.5
+n_per_ring = 1000
+e_max = 0.02
+inc_max_deg = 0.01
+seed = 1000
+
+[integrator]    # her MERCURY hybrid at 50 d
+name = "mercurius"
+dt_days = 50.0
+check_every_steps = 32     # sample/force-update every 4.4 yr (libration ~150 yr; damping >= 100 yr)
+
+[physics]
+drag = true
+drag_every_yr = 100.0
+planet_density_g_cm3 = 1.33
+sun_radius_au = 0.005
+
+[snapshots]     # 10 kyr through the migration (her Figs. 7, 11), 50 kyr after
+fine_every_yr = 1.0e4
+fine_until_yr = 3.5e6
+every_yr = 5.0e4
+
+[parallel]
+n_chunks = 12
+workers = 12
