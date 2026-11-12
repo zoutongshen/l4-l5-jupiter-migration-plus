@@ -62,6 +62,7 @@ class Settings:
     remove_hill_radii: float = 1.0
     r_max_au: float = 100.0
     safe_mode: int = 1
+    r_crit_hill: float = 3.0          # MERCURIUS switchover radius in Hill radii (REBOUND default 3, as MERCURY)
     corrector: int = 0
     trojan_mass_msun: float = 0.0
     self_gravity: bool = False
@@ -171,6 +172,7 @@ class ChunkRunner:
 
         if settings.integrator == "mercurius":
             sim.ri_mercurius.safe_mode = settings.safe_mode
+            sim.ri_mercurius.r_crit_hill = settings.r_crit_hill
         else:
             sim.ri_whfast.safe_mode = settings.safe_mode
             sim.ri_whfast.corrector = settings.corrector
