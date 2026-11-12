@@ -1,0 +1,41 @@
+{
+  "runs": {
+    "pir_capture_dt25_r0": {
+      "n_particles": 5000,
+      "t_end_myr": 2.6002135536976785,
+      "N4": 224,
+      "N5": 67,
+      "N_tot": 291,
+      "N4/N5": 3.343283582089552,
+      "err": 0.46554139069809986,
+      "hildas": 0,
+      "alive": 5000,
+      "jupiter_a_end": 6.976789343646015,
+      "N_tot_pre_migration_mean": 106.86075949367088,
+      "N_tot_peak": 323,
+      "t_peak_myr": 2.42019876918188,
+      "trojan_origin_median_au": 18.211838108097368
+    },
+    "pir_capture_rcrit6_r0": {
+      "n_particles": 5000,
+      "t_end_myr": 2.6002135532782735,
+      "N4": 232,
+      "N5": 49,
+      "N_tot": 281,
+      "N4/N5": 4.73469387755102,
+      "err": 0.7443942886487375,
+      "hildas": 1,
+      "alive": 5000,
+      "jupiter_a_end": 6.976789003932205,
+      "N_tot_pre_migration_mean": 105.15189873417721,
+      "N_tot_peak": 318,
+      "t_peak_myr": 2.4001971260384978,
+      "trojan_origin_median_au": 18.221838973162907
+    }
+  },
+  "n_runs": 2,
+  "N_tot_mean": 286.0,
+  "N_tot_std": 7.0710678118654755,
+  "N4/N5_mean": 4.038988729820286,
+  "N4/N5_std": 0.9838756553335819
+}
