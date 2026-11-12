@@ -1,0 +1,73 @@
+{
+  "runs": {
+    "pir_src_insitu_r0": {
+      "n_particles": 5000,
+      "t_end_myr": 4.999972624029344,
+      "N4": 26,
+      "N5": 29,
+      "N_tot": 55,
+      "N4/N5": 0.896551724137931,
+      "err": 0.24214249995096773,
+      "hildas": 720,
+      "alive": 3747,
+      "jupiter_a_end": 5.388109063469808,
+      "N_tot_pre_migration_mean": 55.0,
+      "N_tot_peak": 64,
+      "t_peak_myr": 2.7702275164320826,
+      "trojan_origin_median_au": 5.399436243454555
+    },
+    "pir_src_x025_r0": {
+      "n_particles": 5000,
+      "t_end_myr": 4.999972624029344,
+      "N4": 65,
+      "N5": 44,
+      "N_tot": 109,
+      "N4/N5": 1.4772727272727273,
+      "err": 0.2883971156557525,
+      "hildas": 14,
+      "alive": 2474,
+      "jupiter_a_end": 5.430648596961751,
+      "N_tot_pre_migration_mean": 81.60759493670886,
+      "N_tot_peak": 134,
+      "t_peak_myr": 2.6302160173642397,
+      "trojan_origin_median_au": 8.727719197043406
+    },
+    "pir_src_x050_r0": {
+      "n_particles": 5000,
+      "t_end_myr": 4.999972624029344,
+      "N4": 90,
+      "N5": 35,
+      "N_tot": 125,
+      "N4/N5": 2.5714285714285716,
+      "err": 0.512240832571883,
+      "hildas": 2,
+      "alive": 4156,
+      "jupiter_a_end": 5.0547339934004825,
+      "N_tot_pre_migration_mean": 79.46835443037975,
+      "N_tot_peak": 162,
+      "t_peak_myr": 2.4201987687624755,
+      "trojan_origin_median_au": 11.642401719256107
+    },
+    "pir_src_x100_r0": {
+      "n_particles": 5000,
+      "t_end_myr": 4.999972624029344,
+      "N4": 159,
+      "N5": 29,
+      "N_tot": 188,
+      "N4/N5": 5.482758620689655,
+      "err": 1.10708378515805,
+      "hildas": 1,
+      "alive": 4737,
+      "jupiter_a_end": 5.061512231846185,
+      "N_tot_pre_migration_mean": 102.26582278481013,
+      "N_tot_peak": 278,
+      "t_peak_myr": 2.4201987687624755,
+      "trojan_origin_median_au": 18.210335442780238
+    }
+  },
+  "n_runs": 4,
+  "N_tot_mean": 119.25,
+  "N_tot_std": 54.75019025842133,
+  "N4/N5_mean": 2.6070029108822212,
+  "N4/N5_std": 2.0390496140858456
+}

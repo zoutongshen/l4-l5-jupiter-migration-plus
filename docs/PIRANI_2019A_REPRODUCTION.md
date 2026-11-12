@@ -242,6 +242,46 @@ The track model refuses any other α (`test_alpha_is_pirani_value_everywhere`), 
 
 **Ask Pirani** (email still to send): her track files (G1, G2), the disc extent at ×1.25–2 (G3), the outward run's planets (G7), the interloper e-cut and Hilda definition (G6), and whether her gas onset was capped (§3.6).
 
+### 4.1 Diagnosis of the L5 deficit (2026-11-11/12)
+All runs below use only the Trojan source rings at her density (1000 per 0.5 au), so counts are ~7% below a full disc.
+
+**Rate test, her stated disc (e <= 0.01 uniform), J + S, 0-5 Myr** (`reports/pir_src/`), against her Table 3:
+
+| run | ours N_tot | N4/N5 | hers N_tot | N4/N5 |
+|---|---|---|---|---|
+| in situ | 55 | 26/29 = 0.90 ± 0.24 | 51 ± 8 | 0.94 ± 0.35 |
+| x0.25 | 109 | 65/44 = 1.48 ± 0.29 | 106 ± 11 | 1.60 ± 0.44 |
+| x0.5 | 125 | 90/35 = 2.57 ± 0.51 | 165 ± 11 | 1.63 ± 0.29 |
+| x1.0 | 188 | 159/29 = 5.48 ± 1.11 | 240 ± 9 | 1.80 ± 0.26 |
+
+- In situ and x0.25 reproduce her numbers. The deficit appears only for fast migration.
+- L4 matches her at every rate: implied hers 102 and 154 for x0.5 and x1.0, against our 90 and 159.
+- The missing Trojans are all on L5. Ours gives 35 and 29 there; her numbers imply 63 and 86.
+- x1.0 with J + S alone gives the same ratio as the full nominal (P1): Uranus and Neptune play no role.
+
+**What has been ruled out** (capture tests, Jupiter alone, rings 17-19.5 au, 0-2.6 Myr; `reports/pir_capture*`, `pir_convergence`):
+
+| change | L5 at 2.6 Myr | verdict |
+|---|---|---|
+| base | 57 | – |
+| particle gas drag off | 75 | no effect: drag at 18 au moves a by 0.001 au/Myr and damps e over 30-300 Myr |
+| planet e/i damping off | 57 | no effect: Jupiter starts circular, so there is nothing to damp |
+| Jupiter on her own Figs. 1+13 clock from the seed (seed 18.40 au) | 47 | no effect |
+| dt 25 d | 67 | converged |
+| MERCURIUS switchover 6 R_H | 49 | converged |
+| particle e <= 0.005 | 53 | colder disc: L5 lower still |
+| **particle e <= 0.02** | **102** | **the only lever found** |
+| her Fig. 7 | 159 | – |
+
+- e <= 0.02 with the full nominal system to 5 Myr (two seeds) gives N4/N5 = 2.88 and 2.90, against 6.0 at e <= 0.01.
+- The L5 losses at 2.34-2.46 Myr are dynamical. L5 Trojans swap side or leave the co-orbital region; their e stays ~0.01.
+- Retention from 2.40 to 2.60 Myr: L4 80%; L5 28% at e <= 0.01 and 48% at e <= 0.02.
+- This is the migration-driven asymmetry mechanism of her sect. 4.2. Our result has its expected rate dependence: it grows with rate, as in stage 8. Hers stays at 1.6-1.8 for every rate from x0.25 up.
+
+**Open:**
+- Her particle e distribution. The paper says "randomised in [0, 0.01]", but our runs need an effectively hotter disc.
+- How her MERCURY applied the migration (gap G4). Nothing in our set-up that is converged and checkable weakens the trailing-side loss at fast rates.
+
 ## 5. Regenerate
 ```
 conda run -n trojan-rb python campaign/scripts/s9_digitize_pirani.py     # her curves from the PDF
