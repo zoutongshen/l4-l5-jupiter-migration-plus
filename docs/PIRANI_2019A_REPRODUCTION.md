@@ -282,6 +282,57 @@ All runs below use only the Trojan source rings at her density (1000 per 0.5 au)
 - Her particle e distribution. The paper says "randomised in [0, 0.01]", but our runs need an effectively hotter disc.
 - How her MERCURY applied the migration (gap G4). Nothing in our set-up that is converged and checkable weakens the trailing-side loss at fast rates.
 
+### 4.2 Theory: why L5 drains at fast migration (Sicardy & Dubois 2003)
+Source: `literature/03_coorbital_theory/SicardyDubois2003_Coorbital_motion_with_slowly_varying_parameters.pdf`.
+
+**The asymmetry parameter.** A torque on the planet distorts its co-orbital phase space by one number, alpha = eps_s/mu.
+- eps_s = Jdot_s/(n_s J_s), which for a circular orbit is adot/(2 a n); mu is the planet-to-star mass ratio.
+- The Hamiltonian becomes g(phi) = f(phi) - alpha*phi (their eqs. 15-17).
+- At **alpha = -0.7265** (inward migration), "the points L3 and L5 ... merge ... and disappear for smaller values of alpha, leaving only the point L4" (their Sect. 6, Fig. 3).
+- This is Ogilvie & Lubow's 1.45 q Omega r = 2 x 0.7265, the same as Pirani's v_crit.
+
+**What happens near it.** Near the critical value g''(phi_5) -> 0. Then "whatever the variations of msas are, the amplitude phi_m diverges, so that the particle crosses the separatrix and escapes" (Sect. 7.6).
+
+**Other results used here:**
+- Capture by growth works through the adiabatic invariant of the action. The evolution depends only on m_s a_s (Sect. 7), generalising Fleming & Hamilton 2000.
+- A torque on the particle enters as alpha = (eps_s - eps_p)/mu.
+- They also observe: "the transferred bodies tend to be captured back to their original region when the migration stops" (Sect. 6).
+
+**|alpha| along her tracks** at 0.3-5 M_E, the capture window. These come from our tracks, whose speed is her Fig. 13 to 1-2%:
+
+| rate | \|alpha\| | our N4/N5 (source rings) | hers |
+|---|---|---|---|
+| x0.25 | 0.11-0.13 | 1.48 | 1.60 |
+| x0.5 | 0.26-0.30 | 2.57 | 1.63 |
+| x1 | **0.64-0.74** (critical below 3.6 M_E) | 5.48 | 1.80 |
+| x2 | ~1.3-1.5 (no L5 island until ~25 M_E) | running | 1.77 |
+
+Her own Fig. 13 (`scripts/s9_diag_fig13_vcrit.py`, from the PDF vectors) puts her nominal at 1.02 / 1.21 / 1.33 / 1.45 x her dashed v_crit line at 1 / 2 / 3-10 / 20 M_E. Her line is 6.3 au/Myr at 1 M_E, matching 1.45 q Omega r at 18.2 au. Above ~3 M_E it falls below 1.45 q Omega r along her own path, which overstates how supercritical her nominal is there. Either way, her nominal is at or above critical throughout capture.
+
+**Diagnostics on P1** (`scripts/s9_diag_escape.py`, `s9_diag_amplitude.py`; e <= 0.02 run in brackets):
+
+1. *Two-way side exchange in the first 50 kyr*, i.e. horseshoes counted on both sides.
+   - Of the 104 [119] L5 Trojans at 2.40 Myr, by 2.45 Myr 44 [58] are on the L4 side and 30 [21] have left the co-orbital region.
+   - Of the 205 [242] L4 Trojans, 20 [33] are on the L5 side.
+   - Net flow is toward L4, as Sicardy & Dubois and Pirani's Sect. 4.2 describe. The labels freeze by 2.6 Myr, once growth has shrunk the horseshoes into tadpoles.
+2. *Little recapture.* Of the L5 Trojans that left L5 by 2.7 Myr, 15 of 95 [35 of 110] are back at 3.0 Myr.
+3. *Composition at 5 Myr.* The 37 [66] L5 Trojans were 16 [39] L5, 13 [25] L4 and 8 [2] non-co-orbital at 2.40 Myr.
+4. *L5 Trojans librate wider* (Trojans at 3.0 Myr; sigma over 3.0-3.5 Myr):
+   - median amplitude L5 41 deg [38], L4 27 deg [25];
+   - survivors to 5 Myr: L5 36/49 [65/76], L4 190/205 [191/200];
+   - the lost ones have amplitudes > 120 deg.
+
+   This is the Sect. 7.6 prediction: near alpha_crit, L5 libration amplitudes grow. The late L5 loss (Saturn's sweep, gas removal) therefore takes the large-amplitude L5 Trojans.
+
+**Reading.** Our runs behave as the co-orbital theory predicts:
+- asymmetry rising steeply as alpha approaches critical (independently, Li et al. 2023 find the same rate dependence);
+- dynamical L5 escape at e ~ 0.01;
+- wide L5 survivors.
+
+Her ratio staying at 1.6-1.8 from x0.25 to x2, while |alpha| goes from 0.12 to ~1.4, is what needs explaining. At alpha ~ alpha_crit the outcome is hypersensitive: a 10-20% change in the effective alpha decides whether an L5 island exists while Jupiter captures. Two candidates:
+- an implementation detail of her migration (gap G4);
+- an effectively hotter disc, which helps L5: our e <= 0.02 run keeps 66 vs 37.
+
 ## 5. Regenerate
 ```
 conda run -n trojan-rb python campaign/scripts/s9_digitize_pirani.py     # her curves from the PDF
