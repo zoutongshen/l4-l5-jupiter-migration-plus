@@ -1,0 +1,41 @@
+# Stage 9 x2.0 on a wide disc (4-34 au, 60 rings x 200, her stated e): her x2 seeds start at 32.3 au, beyond her stated 26 au
+# disc (gap G3). Theory (Sicardy & Dubois 2003): |alpha| > 0.7265 until Jupiter passes ~25 M_E, so no L5 island while the
+# seed's ring is captured; any L5 Trojans must be captured late, from inner rings. Tests where her x2 L5 Trojans come from.
+# Pirani+2019a reproduction (stage 9): rate x2.00 (k = 2.0), J and S only (her sect. 3.3, Table 3) (J/S start beyond the 26 au disc: her disc extent for this rate is not stated, G3)
+# docs/PIRANI_2019A_REPRODUCTION.md. Repeats 0..9 re-randomise the disc (seed + repeat).
+[run]
+run_id = "pir_wide_x200"
+t_end_yr = 5.0e6          # her Table 3 is read at 5 Myr
+
+[giants]                  # simulation order; tracks from s9_pirani_tracks.py
+jupiter = "pirani19a/track_rate_x2.00_jupiter.csv"
+saturn = "pirani19a/track_rate_x2.00_saturn.csv"
+
+[disc]          # her sect. 3: 44 rings of 0.5 au x 1000 particles, 4-26 au; e <= 0.01, i <= 0.01 deg
+a_min_au = 4.0
+a_max_au = 34.0
+ring_au = 0.5
+n_per_ring = 200
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 3700
+
+[integrator]    # her MERCURY hybrid at 50 d
+name = "mercurius"
+dt_days = 50.0
+check_every_steps = 32     # sample/force-update every 4.4 yr (libration ~150 yr; damping >= 100 yr)
+
+[physics]
+drag = true
+drag_every_yr = 100.0
+planet_density_g_cm3 = 1.33
+sun_radius_au = 0.005
+
+[snapshots]     # 10 kyr through the migration (her Figs. 7, 11), 50 kyr after
+fine_every_yr = 1.0e4
+fine_until_yr = 3.5e6
+every_yr = 5.0e4
+
+[parallel]
+n_chunks = 10
+workers = 10

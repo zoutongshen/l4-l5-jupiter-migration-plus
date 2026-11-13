@@ -1,0 +1,40 @@
+# Stage 9 source-ring rate test (x015, Jupiter starts 7.08 au): her stated disc (e <= 0.01 uniform) on the rings 6.0-8.5 au
+# around Jupiter's start only, J + S as her sect. 3.3, 0-5 Myr. Her Table 3 row.
+# Pirani+2019a reproduction (stage 9): rate x0.15 (k = 0.125), J and S only (her sect. 3.3, Table 3)
+# docs/PIRANI_2019A_REPRODUCTION.md. Repeats 0..9 re-randomise the disc (seed + repeat).
+[run]
+run_id = "pir_src_x015"
+t_end_yr = 5.0e6          # her Table 3 is read at 5 Myr
+
+[giants]                  # simulation order; tracks from s9_pirani_tracks.py
+jupiter = "pirani19a/track_rate_x0.15_jupiter.csv"
+saturn = "pirani19a/track_rate_x0.15_saturn.csv"
+
+[disc]          # her sect. 3: 44 rings of 0.5 au x 1000 particles, 4-26 au; e <= 0.01, i <= 0.01 deg
+a_min_au = 6.0
+a_max_au = 8.5
+ring_au = 0.5
+n_per_ring = 1000
+e_max = 0.01
+inc_max_deg = 0.01
+seed = 3000
+
+[integrator]    # her MERCURY hybrid at 50 d
+name = "mercurius"
+dt_days = 50.0
+check_every_steps = 32     # sample/force-update every 4.4 yr (libration ~150 yr; damping >= 100 yr)
+
+[physics]
+drag = true
+drag_every_yr = 100.0
+planet_density_g_cm3 = 1.33
+sun_radius_au = 0.005
+
+[snapshots]     # 10 kyr through the migration (her Figs. 7, 11), 50 kyr after
+fine_every_yr = 1.0e4
+fine_until_yr = 3.5e6
+every_yr = 5.0e4
+
+[parallel]
+n_chunks = 4
+workers = 4
