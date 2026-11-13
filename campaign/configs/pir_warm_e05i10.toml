@@ -1,0 +1,43 @@
+# Stage 9 pre-stirred disc (e <= 0.05, i <= 10 deg, uniform): her nominal system (J S U N, gas, drag, damping) on the source rings
+# 17-19.5 au at 2x her density (warm discs capture fewer). Question: does gas-era migration capture still give an
+# L4 excess when the disc is warm enough for the observed inclinations (proper I median 11 deg)? Cf. Pirani+2019b.
+# Pirani+2019a reproduction (stage 9): nominal model, J S U N (her sect. 3.1, Figs. 1, 4-7, 9-11, Table 2)
+# docs/PIRANI_2019A_REPRODUCTION.md. Repeats 0..9 re-randomise the disc (seed + repeat).
+[run]
+run_id = "pir_warm_e05i10"
+t_end_yr = 5.0e6          # her Table 3 is read at 5 Myr
+
+[giants]                  # simulation order; tracks from s9_pirani_tracks.py
+jupiter = "pirani19a/track_nominal_jupiter.csv"
+saturn = "pirani19a/track_nominal_saturn.csv"
+uranus = "pirani19a/track_nominal_uranus.csv"
+neptune = "pirani19a/track_nominal_neptune.csv"
+
+[disc]          # her sect. 3: 44 rings of 0.5 au x 1000 particles, 4-26 au; e <= 0.01, i <= 0.01 deg
+a_min_au = 17.0
+a_max_au = 19.5
+ring_au = 0.5
+n_per_ring = 2000
+e_max = 0.05
+inc_max_deg = 10.0
+seed = 1000
+
+[integrator]    # her MERCURY hybrid at 50 d
+name = "mercurius"
+dt_days = 50.0
+check_every_steps = 32     # sample/force-update every 4.4 yr (libration ~150 yr; damping >= 100 yr)
+
+[physics]
+drag = true
+drag_every_yr = 100.0
+planet_density_g_cm3 = 1.33
+sun_radius_au = 0.005
+
+[snapshots]     # 10 kyr through the migration (her Figs. 7, 11), 50 kyr after
+fine_every_yr = 1.0e4
+fine_until_yr = 3.5e6
+every_yr = 5.0e4
+
+[parallel]
+n_chunks = 4
+workers = 4
