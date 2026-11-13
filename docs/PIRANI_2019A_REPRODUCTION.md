@@ -325,7 +325,7 @@ Her own Fig. 13 (`scripts/s9_diag_fig13_vcrit.py`, from the PDF vectors) puts he
    This is the Sect. 7.6 prediction: near alpha_crit, L5 libration amplitudes grow. The late L5 loss (Saturn's sweep, gas removal) therefore takes the large-amplitude L5 Trojans.
 
 **Reading.** Our runs behave as the co-orbital theory predicts:
-- asymmetry rising steeply as alpha approaches critical (independently, Li et al. 2023 find the same rate dependence);
+- asymmetry rising steeply as alpha approaches critical. Li et al. 2023a (Sect. 3.3, Table 3, p. 8) is *not* independent support: their migration is outward, for already-captured Trojans, at alpha <~ 0.3; there the shrinking (L4) side keeps its Trojans, which are pushed toward L4, and the expanding (L5) side loses them when the island shrinks back. Mirrored to inward migration that would favour L5, the opposite of us. Our regime (capture during migration, alpha near critical, Sect. 7.6 amplitude divergence) is a different one; Ogilvie & Lubow 2006 Sect. 9.1 (p. 9, Figs. 4-6) is the relevant result (trapped leading region for inward migration), and it is a streamline analysis, not a particle simulation;
 - dynamical L5 escape at e ~ 0.01;
 - wide L5 survivors.
 
