@@ -1,0 +1,25 @@
+{
+  "runs": {
+    "pir_wide_x200_r0": {
+      "n_particles": 12000,
+      "t_end_myr": 4.999972624029344,
+      "N4": 62,
+      "N5": 38,
+      "N_tot": 100,
+      "N4/N5": 1.631578947368421,
+      "err": 0.3361401966623711,
+      "hildas": 152,
+      "alive": 9508,
+      "jupiter_a_end": 5.667897598963966,
+      "N_tot_pre_migration_mean": 46.24050632911393,
+      "N_tot_peak": 172,
+      "t_peak_myr": 2.4702028755724195,
+      "trojan_origin_median_au": 31.956802165165165
+    }
+  },
+  "n_runs": 1,
+  "N_tot_mean": 100.0,
+  "N_tot_std": null,
+  "N4/N5_mean": 1.631578947368421,
+  "N4/N5_std": null
+}
